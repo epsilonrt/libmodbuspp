@@ -1,0 +1,182 @@
+#!/bin/bash
+# git-version 
+# Build a file containing version information from GIT
+# (c) Copyright 2015-2017 epsilonRT
+# All rights reserved.
+# This software is governed by the CeCILL license <http://www.cecill.info>
+
+verbose()
+{
+if [ $VERBOSE -eq 1 ]; then
+  echo "$@" >&2
+fi
+}
+
+usage()
+{
+cat << EOF
+usage: $(basename $0) [options] [filename.ext]
+
+Extract version information from the read tag using 'git describe'. 
+The tag must be of the form v[M].[m]-[p]-g[c] with:
+- [M] Major number
+- [m] Minor number
+- [p] Patch number (optional)
+- [c] SHA1 Signature Number (optional)
+
+If no tag is found by git, v1.0-0 is used.
+
+ARGUMENTS:
+  [filename.ext] name of a file to generate (optional).
+    If the extension is .h, a header file C containing the #define corresponding 
+      to all the options is generated (VERSION, VERSION_MAJOR, VERSION_MINOR ...).
+    If the extension is .mk, a makefile is created with a VERSION variable 
+      which is [M].[m].[p]
+  
+OPTIONS:
+  -h    Show this message
+  -q    Quiet mode.  Causes most warning and diagnostic messages to be suppressed.
+  -f    Display the complete number as [M].[m]-[p]-g[c] and exit.
+  -s    Displays the short number as [M].[m]-[p] and exits.
+  -t    Display the very short number in the form [M].[m] and exit.
+  -M    Display the major number as [M] and exit.
+  -m    Display the minor number as [m] and exit.
+  -p    Print the patch number as [p] and sort.
+  -c    Display the signature number in the form 0x[c] and exit.
+
+EOF
+}
+
+STAMP=.version
+HASGIT=0
+VERBOSE=1
+
+while getopts ":qh" opt; do
+  case $opt in
+    q)
+      VERBOSE=0
+      ;;
+    h)
+      usage
+      exit 0
+      ;;
+  esac
+done
+OPTIND=1
+
+if [ -x "$(command -v git 2> /dev/null)" ]; then
+  VERSION="$(git describe 2> /dev/null)"
+  if [ $? -eq 0 ]; then
+    HASGIT=1
+    VERSION=${VERSION#v}
+    VERSION=${VERSION#V}
+  fi
+fi
+
+if [ $HASGIT -eq 0 ]; then
+  VERSION="1.0-0"
+  verbose "$(basename $0): git did not find any tag, the version was assigned to 1.0-0 by default"
+fi
+
+if [ $HASGIT -eq 1 ]; then
+  #echo "the project git version is $VERSION"
+  echo "$VERSION" > ${STAMP}
+else
+  #echo "a default project version number will used ($VERSION)"
+  # Default version, the .version file is empty
+  echo -n > ${STAMP}
+fi
+
+VERSION_SHORT=${VERSION%%-g*}
+VERSION_SHORT_DOT=${VERSION_SHORT//-/.}
+VERSION_TINY=${VERSION%%-*}
+
+VERSION_CORE=${VERSION_SHORT%%-*}
+VERSION_MAJOR=${VERSION_SHORT%%.*}
+VERSION_MAJOR=${VERSION_MAJOR%%[A-Za-z]*}
+VERSION_MINOR=${VERSION_CORE##*.}
+VERSION_MINOR=${VERSION_MINOR%%[A-Za-z]*}
+
+if [[ $VERSION == *-* ]]; then
+  VERSION_PATCH=${VERSION_SHORT##*-}
+  VERSION_PATCH=${VERSION_PATCH%%[A-Za-z]*}
+else
+  VERSION_PATCH="0"
+fi
+
+if [[ $VERSION == *-g* ]]; then
+  VERSION_SHA1="0x${VERSION##*-g}"
+else
+  VERSION_SHA1="0x0"
+fi
+
+while getopts ":Mmptsfcq" opt; do
+  case $opt in
+    q)
+      VERBOSE=0
+      ;;
+    M)
+      echo $VERSION_MAJOR
+      exit 0
+      ;;
+    m)
+      echo $VERSION_MINOR
+      exit 0
+      ;;
+    p)
+      echo $VERSION_PATCH
+      exit 0
+      ;;
+    t)
+      echo $VERSION_TINY
+      exit 0
+      ;;
+    s)
+      echo $VERSION_SHORT
+      exit 0
+      ;;
+    c)
+      echo $VERSION_SHA1
+      exit 0
+      ;;
+    f)
+      echo $VERSION
+      exit 0
+      ;;
+    \?)
+      verbose "Invalid option: -$OPTARG"
+      exit 1
+      ;;
+  esac
+done
+
+shift $((OPTIND-1))
+
+if [ $# -lt 1 ]; then
+  verbose "$(basename $(basename $0)) error: you must provide the name of the file to be created"
+  exit 1
+fi
+
+OUTPUT=${1}
+EXT=${OUTPUT##*.}
+case "$EXT" in
+
+  h)  echo "#define VERSION \"$VERSION\"" > ${OUTPUT}
+      echo "#define VERSION_SHORT \"$VERSION_SHORT_DOT\"" >> ${OUTPUT}
+      echo "#define VERSION_TINY \"$VERSION_TINY\"" >> ${OUTPUT}
+      echo "#define VERSION_MAJOR $VERSION_MAJOR" >> ${OUTPUT}
+      echo "#define VERSION_MINOR $VERSION_MINOR" >> ${OUTPUT}
+      echo "#define VERSION_PATCH $VERSION_PATCH" >> ${OUTPUT}
+      echo "#define VERSION_SHA1 $VERSION_SHA1" >> ${OUTPUT}
+      ;;
+  mk) VERSION=${VERSION%%-*}
+      echo "$VERSION_SHORT_DOT" > ${OUTPUT}
+      ;;
+  *)  verbose "$(basename $0) error: unknown file extension !"
+      exit 1
+      ;;
+esac
+
+#echo "$OUTPUT generate for $VERSION version"
+#cat ${OUTPUT}
+exit 0

@@ -1,0 +1,52 @@
+# Copyright © 2018 Pascal JEAN, All rights reserved.
+# This file is part of the libmodbuspp Project.
+#
+# The libmodbuspp Library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 3 of the License, or (at your option) any later version.
+#
+# The libmodbuspp Library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public License
+# along with the libmodbuspp Library; if not, see <http://www.gnu.org/licenses/>.
+# - Config file for the modbuspp package
+# It defines the following variables
+#  MODBUSPP_INCLUDE_DIRS - include directories for modbuspp
+#  MODBUSPP_LIBRARY_DIRS - where to find libraries
+#  MODBUSPP_DATA_DIR     - where to find modbuspp data
+#  MODBUSPP_LIBRARIES    - libraries to link against
+#  MODBUSPP_CFLAGS       - all required cflags
+
+set(CMAKE_MODULE_PATH @MODBUSPP_INSTALL_CMAKE_DIR@ ${CMAKE_MODULE_PATH})
+
+# Compute paths
+get_filename_component(MODBUSPP_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
+
+unset(MODBUSPP_INCLUDE_DIRS)
+foreach(RELATIVE_PATH IN LISTS @CONF_INCLUDE_DIRS@)
+  get_filename_component(ABSOLUTE_PATH ${RELATIVE_PATH} ABSOLUTE)
+  list(APPEND MODBUSPP_INCLUDE_DIRS "${ABSOLUTE_PATH}")
+endforeach()
+
+unset(MODBUSPP_LIBRARY_DIRS)
+foreach(RELATIVE_PATH IN LISTS @CONF_LIB_DIRS@)
+  get_filename_component(ABSOLUTE_PATH ${RELATIVE_PATH} ABSOLUTE)
+  list(APPEND MODBUSPP_LIBRARY_DIRS "${ABSOLUTE_PATH}")
+endforeach()
+
+# Our library dependencies (contains definitions for IMPORTED targets)
+include("${MODBUSPP_CMAKE_DIR}/modbuspp.cmake")
+
+# These are IMPORTED targets created by modbuspp.cmake
+set(MODBUSPP_LIBRARIES modbuspp @LIBMODBUS_LIBRARIES@)
+
+set(MODBUSPP_CFLAGS @LIBMODBUS_CFLAGS@)
+set(CMAKE_MODULE_PATH "${MODBUSPP_CMAKE_DIR}")
+set(MODBUSPP_DATA_DIR @MODBUSPP_INSTALL_DATA_DIR@)
+
+#message(STATUS "MODBUSPP_INCLUDE_DIRS=${MODBUSPP_INCLUDE_DIRS}")
+#message(STATUS "MODBUSPP_LIBRARIES=${MODBUSPP_LIBRARIES}")

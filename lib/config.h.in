@@ -1,0 +1,39 @@
+/* Copyright © 2018 Pascal JEAN, All rights reserved.
+ * This file is part of the libmodbuspp Library.
+ *
+ * The libmodbuspp Library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 3 of the License, or (at your option) any later version.
+ *
+ * The libmodbuspp Library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with the libmodbuspp Library; if not, see <http://www.gnu.org/licenses/>.
+ */
+
+#ifndef MODBUSPP_CONFIG_H_
+#define MODBUSPP_CONFIG_H_
+/* ========================================================================== */
+#cmakedefine01 MODBUSPP_WITH_ARDUINO
+#cmakedefine01 MODBUSPP_WITH_GPIO
+#cmakedefine01 MODBUSPP_WITH_I2C
+#cmakedefine01 MODBUSPP_WITH_SPI
+#cmakedefine01 MODBUSPP_WITH_SERIAL
+#cmakedefine01 MODBUSPP_WITH_STATIC
+#cmakedefine01 MODBUSPP_DRIVER_BCM2835
+#cmakedefine01 MODBUSPP_DRIVER_ALLWINNERH
+
+#define MODBUSPP_VERSION       "@MODBUSPP_VERSION_STRING@"
+#define MODBUSPP_VERSION_SHORT "@MODBUSPP_VERSION_SHORT@"
+#define MODBUSPP_VERSION_TINY  "@MODBUSPP_VERSION_TINY@"
+#define MODBUSPP_VERSION_MAJOR @MODBUSPP_VERSION_MAJOR@
+#define MODBUSPP_VERSION_MINOR @MODBUSPP_VERSION_MINOR@
+#define MODBUSPP_VERSION_PATCH @MODBUSPP_VERSION_PATCH@
+#define MODBUSPP_VERSION_SHA1  @MODBUSPP_VERSION_SHA1@
+
+/* ========================================================================== */
+#endif /*MODBUSPP_CONFIG_H_ defined */
