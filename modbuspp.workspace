@@ -1,14 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CodeLite_Workspace Name="modbuspp" Database="" Version="10.0.0">
   <Project Name="libmodbuspp" Path="libmodbuspp.project" Active="Yes"/>
+  <Project Name="read-coils" Path="examples/master/read-coils/read-coils.project" Active="No"/>
   <BuildMatrix>
-    <WorkspaceConfiguration Name="Debug" Selected="no">
+    <WorkspaceConfiguration Name="Debug" Selected="yes">
       <Environment/>
       <Project Name="libmodbuspp" ConfigName="Debug"/>
+      <Project Name="read-coils" ConfigName="Debug"/>
     </WorkspaceConfiguration>
-    <WorkspaceConfiguration Name="Release" Selected="yes">
+    <WorkspaceConfiguration Name="Release" Selected="no">
       <Environment/>
       <Project Name="libmodbuspp" ConfigName="Release"/>
+      <Project Name="read-coils" ConfigName="Release"/>
     </WorkspaceConfiguration>
   </BuildMatrix>
 </CodeLite_Workspace>

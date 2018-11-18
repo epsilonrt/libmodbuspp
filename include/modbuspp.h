@@ -25,16 +25,32 @@
 namespace Modbus {
 
   const int Broadcast = MODBUS_BROADCAST_ADDRESS;
+  const int TcpSlave = MODBUS_TCP_SLAVE;
+  const int Unknown = -1;
 
-  enum Endian {
-    EndianBigBig = 0x00, // bytes in big endian order, word in big endian order
-    EndianBig = EndianBigBig,
-    EndianBigLittle = 0x01,
-    EndianLittleBig = 0x02,
-    EndianLittleLittle = 0x03,
-    EndianLittle = EndianLittleLittle
+  enum Net {
+    Rtu,
+    Tcp,
+    NoNet = Unknown
   };
 
+  enum SerialMode {
+    Rs232 = MODBUS_RTU_RS232,
+    Rs485 = MODBUS_RTU_RS485,
+    UnknownMode = Unknown
+  };
+
+  enum SerialRts {
+    RtsNone = MODBUS_RTU_RTS_NONE,
+    RtsUp = MODBUS_RTU_RTS_UP,
+    RtsDown = MODBUS_RTU_RTS_DOWN,
+    UnknownRts = Unknown
+  };
+
+  /**
+   * @class Data
+   * @brief
+   */
   class Data {
     public:
       enum Type {
@@ -44,6 +60,15 @@ namespace Modbus {
         LongLongWord,
         Float,
         Double
+      };
+      
+      enum Endian {
+        EndianBigBig = 0x00, // bytes in big endian order, word in big endian order
+        EndianBig = EndianBigBig,
+        EndianBigLittle = 0x01,
+        EndianLittleBig = 0x02,
+        EndianLittleLittle = 0x03,
+        EndianLittle = EndianLittleLittle
       };
 
       Data (Endian bigEndian = EndianBig);
@@ -59,6 +84,10 @@ namespace Modbus {
       size_t size() const;
   };
 
+  /**
+   * @class Timeout
+   * @brief
+   */
   class Timeout {
     public:
       Timeout (uint32_t s = 0, uint32_t us = 0) :
@@ -67,73 +96,80 @@ namespace Modbus {
       uint32_t usec;
   };
 
-  class DataLinkLayer {
-    public:
-      enum Type {
-        Rtu = 0,
-        Tcp,
-        Unknown = -1
-      };
-      DataLinkLayer (const DataLinkLayer & rhs) :
-        host (rhs.host), settings (rhs.settings) {}
-      DataLinkLayer () {}
-      DataLinkLayer (const std::string & h, const std::string & s) :
-        host (h), settings (s) {}
-      virtual ~DataLinkLayer() {}
-      virtual Type type() const {
-        return Unknown;
-      }
-      std::string host;
-      std::string settings;
+  /**
+   * @class NetLayer
+   * @brief
+   */
+  class NetLayer  {
+
+    protected:
+      class Private;
+      NetLayer (Private &dd);
+      std::unique_ptr<Private> d_ptr;
+
+    private:
+      PIMP_DECLARE_PRIVATE (NetLayer)
   };
 
-  class TcpLayer : public DataLinkLayer {
+  /**
+   * @class TcpLayer
+   * @brief
+   */
+  class TcpLayer : public NetLayer {
     public:
-      TcpLayer (const std::string & tcpHost = "*", const std::string & tcpService = "502") :
-        DataLinkLayer (tcpHost, tcpService) {}
-      TcpLayer (const DataLinkLayer & rhs) :
-        DataLinkLayer (rhs) {}
-      Type type() const {
-        return Tcp;
-      }
-      const char * node() const;
-      const char * service() const;
+      const std::string & node() const;
+      const std::string & service() const;
+
+      friend class Device;
+
+    protected:
+      class Private;
+      TcpLayer (Private &dd);
+
+    private:
+      PIMP_DECLARE_PRIVATE (TcpLayer)
   };
 
-  class RtuLayer: public DataLinkLayer {
+  /**
+   * @class RtuLayer
+   * @brief
+   */
+  class RtuLayer : public NetLayer {
     public:
-      RtuLayer (const std::string & rtuDevice, const std::string & rtuSettings = "19200E1") :
-        DataLinkLayer (rtuDevice, rtuSettings) {}
-      RtuLayer (const DataLinkLayer & rhs) :
-        DataLinkLayer (rhs) {}
-      Type type() const {
-        return Rtu;
-      }
-      const char * device() const;
+      const std::string & port() const;
       int baud() const;
       char parity() const;
       int stop() const;
-  };
-  
-  const int Unknown = -1;
-  
-  enum SerialMode {
-    Rs232 = MODBUS_RTU_RS232,
-    Rs485 = MODBUS_RTU_RS485,
-    UnknownMode = Unknown
-  };
-  
-  enum SerialRts {
-    RtsNone = MODBUS_RTU_RTS_NONE,
-    RtsUp = MODBUS_RTU_RTS_UP,
-    RtsDown = MODBUS_RTU_RTS_DOWN,
-    UnknownRts = Unknown
+
+      SerialMode serialMode();
+      bool setSerialMode (SerialMode mode);
+      SerialRts rts();
+      bool setRts (SerialRts rts);
+      int rtsDelay();
+      bool setRtsDelay (int delay);
+
+      static int baud (const std::string & settings);
+      static char parity (const std::string & settings);
+      static int stop (const std::string & settings);
+
+      friend class Device;
+    protected:
+      class Private;
+      RtuLayer (Private &dd);
+
+    private:
+      PIMP_DECLARE_PRIVATE (RtuLayer)
   };
 
+  /**
+   * @class Device
+   * @brief
+   */
   class Device  {
     public:
 
-      Device (const DataLinkLayer & sublayer = DataLinkLayer());
+      Device (Net net = Tcp, const std::string & connection = "*",
+              const std::string & settings = "502");
       Device (const Device & other);
       virtual ~Device();
 
@@ -145,6 +181,9 @@ namespace Modbus {
       bool flush();
       bool isOpen() const;
 
+      int slave() const;
+      bool setSlave (int id);
+
       bool setResponseTimeout (const Timeout & timeout);
       bool responseTimeout (Timeout & timeout);
       bool setByteTimeout (const Timeout & timeout);
@@ -152,19 +191,19 @@ namespace Modbus {
 
       bool setDebug (bool debug = true);
 
-      const DataLinkLayer &  dataLinkLayer() const;
-      bool isNull() const;
-      const std::string & error() const;
-
       void setPduAdressing (bool pduAdressing = true);
       bool pduAdressing() const;
 
-      // RTU only
-      SerialMode serialMode();
-      bool setSerialMode (SerialMode mode);
-      SerialRts rts();
-      bool setRts (SerialRts rts);
-      
+      bool isNull() const;
+      Net net() const;
+      RtuLayer & rtu();
+      TcpLayer & tcp();
+
+      static std::string lastError();
+
+      friend class RtuLayer;
+      friend class TcpLayer;
+
     protected:
       class Private;
       Device (Private &dd);
@@ -174,15 +213,16 @@ namespace Modbus {
       PIMP_DECLARE_PRIVATE (Device)
   };
 
+  /**
+   * @class Master
+   * @brief
+   */
   class Master : public Device {
     public:
-      static const int TcpSlave = 0xFF;
 
-      Master (const DataLinkLayer & sublayer = DataLinkLayer());
+      Master (Net net = Tcp, const std::string & connection = "*",
+              const std::string & settings = "502");
       virtual ~Master();
-
-      bool open (int slave = TcpSlave);
-      int slave() const;
 
       int readDiscreteInputs (int addr, bool * dest, int nb = 1);
       int readCoils (int addr, bool * dest, int nb = 1);

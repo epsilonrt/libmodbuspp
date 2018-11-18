@@ -9,12 +9,18 @@ using namespace Modbus;
 // -----------------------------------------------------------------------------
 int main (int argc, char **argv) {
 
-  RtuLayer net("/dev/ttyUSB0", "19200E1"); // Setting up rtu layer
-  // TcpLayer net; // Setting up TCP layer for all interfaces on port 502
-  Master mb (net); // new master on RTU
+  Master mb (Rtu, port, "19200E1"); // new master on RTU
+  // if you have to handle the DE signal of the line driver with RTS,
+  // you should uncomment the lines below...
+  // mb.rtu().setRts(RtsDown);
+  // mb.rtu().setSerialMode(Rs485);
 
-  if (mb.open (8)) { // open a connection to the slave at address 8
+  if (mb.open ()) { // open a connection
     // success, do what you want here
+    uint16_t value;
+
+    mb.setSlave (8); // to the slave at address 8
+    mb.readInputRegistrers (1, &value);
     // ....
     mb.close();
   }

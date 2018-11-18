@@ -24,30 +24,59 @@
 
 namespace Modbus {
 
+  class NetLayer::Private {
+    public:
+      Private (modbus_t * ctx) : ctx (ctx) {}
+
+      modbus_t * ctx;
+  };
+
+  class TcpLayer::Private  : public NetLayer::Private {
+
+    public:
+      Private (modbus_t * ctx, const std::string & host, const std::string & service) :
+        NetLayer::Private (ctx), host (host), service (service) {}
+
+      std::string host;
+      std::string service;
+  };
+
+  class RtuLayer::Private  : public NetLayer::Private {
+
+    public:
+      Private (modbus_t * ctx, const std::string & port, const std::string & settings) :
+        NetLayer::Private (ctx), port (port), settings (settings) {}
+        
+      std::string port;
+      std::string settings;
+  };
+
   class Device::Private {
 
     public:
-      Private (Device * q, const DataLinkLayer & sublayer);
+      Private (Device * q, Net net, const std::string & connection, const std::string & settings);
       virtual ~Private();
       int address (int addr);
 
       Device * const q_ptr;
-      DataLinkLayer dll;
       modbus_t * ctx;
       bool isOpen;
-      std::string error;
       bool pduAddressing;
+      RtuLayer * rtu;
+      TcpLayer * tcp;
+      int slave;
+      
+      friend class RtuLayer::Private;
+      friend class TcpLayer::Private;
 
       PIMP_DECLARE_PUBLIC (Device)
   };
 
-  class Master::Private  : public Device::Private {
+  class Master::Private : public Device::Private {
 
     public:
-      Private (Master * q, const DataLinkLayer & sublayer);
+      Private (Master * q, Net net, const std::string & connection, const std::string & settings);
       virtual ~Private();
-
-      int slave;
 
       PIMP_DECLARE_PUBLIC (Master)
   };
