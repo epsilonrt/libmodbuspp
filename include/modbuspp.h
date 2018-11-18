@@ -19,11 +19,12 @@
 #define MODBUSPP_H
 
 #include <string>
+#include <modbus.h>
 #include "global.h"
 
 namespace Modbus {
 
-  const int Broadcast = 0;
+  const int Broadcast = MODBUS_BROADCAST_ADDRESS;
 
   enum Endian {
     EndianBigBig = 0x00, // bytes in big endian order, word in big endian order
@@ -113,6 +114,21 @@ namespace Modbus {
       char parity() const;
       int stop() const;
   };
+  
+  const int Unknown = -1;
+  
+  enum SerialMode {
+    Rs232 = MODBUS_RTU_RS232,
+    Rs485 = MODBUS_RTU_RS485,
+    UnknownMode = Unknown
+  };
+  
+  enum SerialRts {
+    RtsNone = MODBUS_RTU_RTS_NONE,
+    RtsUp = MODBUS_RTU_RTS_UP,
+    RtsDown = MODBUS_RTU_RTS_DOWN,
+    UnknownRts = Unknown
+  };
 
   class Device  {
     public:
@@ -135,7 +151,7 @@ namespace Modbus {
       bool byteTimeout (Timeout & timeout);
 
       bool setDebug (bool debug = true);
-      
+
       const DataLinkLayer &  dataLinkLayer() const;
       bool isNull() const;
       const std::string & error() const;
@@ -143,6 +159,12 @@ namespace Modbus {
       void setPduAdressing (bool pduAdressing = true);
       bool pduAdressing() const;
 
+      // RTU only
+      SerialMode serialMode();
+      bool setSerialMode (SerialMode mode);
+      SerialRts rts();
+      bool setRts (SerialRts rts);
+      
     protected:
       class Private;
       Device (Private &dd);

@@ -215,7 +215,7 @@ namespace Modbus {
 
   // ---------------------------------------------------------------------------
   bool Device::setDebug (bool debug) {
-    
+
     if (!isNull()) {
       PIMP_D (Device);
 
@@ -223,6 +223,87 @@ namespace Modbus {
         return true;
       }
       d->error = modbus_strerror (errno);
+    }
+    return false;
+  }
+
+  // ---------------------------------------------------------------------------
+  SerialMode Device::serialMode() {
+
+    if (!isNull()) {
+      PIMP_D (Device);
+
+      if (d->dll.type() == DataLinkLayer::Rtu) {
+        int m = modbus_rtu_get_serial_mode (d->ctx);
+        if (m != -1) {
+          return static_cast<SerialMode> (m);
+        }
+        else {
+
+          d->error = modbus_strerror (errno);
+        }
+      }
+    }
+    return UnknownMode;
+  }
+
+  // ---------------------------------------------------------------------------
+  bool Device::setSerialMode (SerialMode mode) {
+
+    if (!isNull()) {
+      PIMP_D (Device);
+
+      if (d->dll.type() == DataLinkLayer::Rtu) {
+        if (modbus_rtu_set_serial_mode (d->ctx, static_cast<int> (mode)) != -1) {
+
+          return true;
+        }
+        else {
+
+          d->error = modbus_strerror (errno);
+        }
+      }
+    }
+    return false;
+  }
+  
+  // ---------------------------------------------------------------------------
+  SerialRts Device::rts() {
+
+    if (!isNull()) {
+      PIMP_D (Device);
+
+      if (d->dll.type() == DataLinkLayer::Rtu) {
+        int r = modbus_rtu_get_rts (d->ctx);
+        if (r != -1) {
+          
+          return static_cast<SerialRts> (r);
+        }
+        else {
+
+          d->error = modbus_strerror (errno);
+        }
+      }
+    }
+    return UnknownRts;
+  }
+  
+  // ---------------------------------------------------------------------------
+  bool Device::setRts (SerialRts r) {
+
+    if (!isNull()) {
+      PIMP_D (Device);
+
+      if (d->dll.type() == DataLinkLayer::Rtu) {
+        if (modbus_rtu_set_rts (d->ctx, static_cast<int> (r)) != -1) {
+
+          return true;
+        }
+        else {
+
+          d->error = modbus_strerror (errno);
+        }
+      }
     }
     return false;
   }
