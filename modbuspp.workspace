@@ -2,7 +2,7 @@
 <CodeLite_Workspace Name="modbuspp" Database="" Version="10.0.0">
   <Project Name="libmodbuspp" Path="libmodbuspp.project" Active="Yes"/>
   <BuildMatrix>
-    <WorkspaceConfiguration Name="Debug" Selected="yes">
+    <WorkspaceConfiguration Name="Debug" Selected="no">
       <Environment/>
       <Project Name="libmodbuspp" ConfigName="Debug"/>
     </WorkspaceConfiguration>
