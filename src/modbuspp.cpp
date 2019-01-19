@@ -352,7 +352,7 @@ namespace Modbus {
   }
 
   // ---------------------------------------------------------------------------
-  int Master::readInputRegistrers (int addr, uint16_t * dest, int nb) {
+  int Master::readInputRegisters (int addr, uint16_t * dest, int nb) {
 
     if (isOpen()) {
       PIMP_D (Master);

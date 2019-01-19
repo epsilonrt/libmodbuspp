@@ -22,6 +22,9 @@
 #include <modbus.h>
 #include "global.h"
 
+/**
+ *
+ */
 namespace Modbus {
 
   const int Broadcast = MODBUS_BROADCAST_ADDRESS;
@@ -61,7 +64,7 @@ namespace Modbus {
         Float,
         Double
       };
-      
+
       enum Endian {
         EndianBigBig = 0x00, // bytes in big endian order, word in big endian order
         EndianBig = EndianBigBig,
@@ -86,7 +89,7 @@ namespace Modbus {
 
   /**
    * @class Timeout
-   * @brief
+   * @brief Représente une durée de timeout
    */
   class Timeout {
     public:
@@ -95,6 +98,170 @@ namespace Modbus {
       uint32_t sec;
       uint32_t usec;
   };
+
+
+  class RtuLayer;
+  class TcpLayer;
+
+  /**
+   * @class Device
+   * @brief Représente un équipement connecté à MODBUS
+   */
+  class Device  {
+    public:
+
+      Device (Net net = Tcp, const std::string & connection = "*",
+              const std::string & settings = "502");
+      Device (const Device & other);
+      virtual ~Device();
+
+      void swap (Device &other);
+      Device& operator= (const Device &other);
+
+      virtual bool open();
+      virtual void close();
+      bool flush();
+      bool isOpen() const;
+
+      int slave() const;
+      bool setSlave (int id);
+
+      bool setResponseTimeout (const Timeout & timeout);
+      bool responseTimeout (Timeout & timeout);
+      bool setByteTimeout (const Timeout & timeout);
+      bool byteTimeout (Timeout & timeout);
+
+      bool setDebug (bool debug = true);
+
+      void setPduAdressing (bool pduAdressing = true);
+      bool pduAdressing() const;
+
+      bool isNull() const;
+      Net net() const;
+      RtuLayer & rtu();
+      TcpLayer & tcp();
+
+      static std::string lastError();
+
+      friend class RtuLayer;
+      friend class TcpLayer;
+
+    protected:
+      class Private;
+      Device (Private &dd);
+      std::unique_ptr<Private> d_ptr;
+
+    private:
+      PIMP_DECLARE_PRIVATE (Device)
+  };
+
+  /**
+   * @class Master
+   * @brief MODBUS Master (Client)
+   */
+  class Master : public Device {
+    
+    public:
+      /**
+       * @brief Constructor
+       * @param net
+       * @param connection
+       * @param settings
+       */
+      Master (Net net = Tcp, const std::string & connection = "*",
+              const std::string & settings = "502");
+      /**
+       * @brief Destructor
+       */
+      virtual ~Master();
+
+      /**
+       * @brief
+       * @param addr
+       * @param dest
+       * @param nb
+       * @return
+       */
+      int readDiscreteInputs (int addr, bool * dest, int nb = 1);
+      /**
+       * @brief
+       * @param addr
+       * @param dest
+       * @param nb
+       * @return
+       */
+      int readCoils (int addr, bool * dest, int nb = 1);
+      /**
+       * @brief
+       * @param addr
+       * @param dest
+       * @param nb
+       * @return
+       */
+      int readInputRegisters (int addr, uint16_t * dest, int nb = 1);
+      /**
+       * @brief
+       * @param addr
+       * @param dest
+       * @param nb
+       * @return
+       */
+      int readRegistrers (int addr, uint16_t * dest, int nb = 1);
+      /**
+       * @brief write a single bit
+       * 
+       * This function shall write the status of value at the address addr of 
+       * the remote device. \n
+       * The function uses the Modbus function code 0x05 (force single coil).
+       * @param addr
+       * @param value
+       * @return 
+       */
+      int writeCoil (int addr, bool value);
+      /**
+       * @brief
+       * @param addr
+       * @param src
+       * @param nb
+       * @return
+       */
+      int writeCoils (int addr, const bool * src, int nb);
+      /**
+       * @brief
+       * @param addr
+       * @param value
+       * @return
+       */
+      int writeRegistrer (int addr, uint16_t value);
+      /**
+       * @brief
+       * @param addr
+       * @param src
+       * @param nb
+       * @return
+       */
+      int writeRegistrers (int addr, const uint16_t * src, int nb);
+      /**
+       * @brief
+       * @param waddr
+       * @param src
+       * @param wnb
+       * @param raddr
+       * @param dest
+       * @param rnb
+       * @return
+       */
+      int writeReadRegistrers (int waddr, const uint16_t * src, int wnb,
+                               int raddr, uint16_t * dest, int rnb);
+
+    protected:
+      class Private;
+      Master (Private &dd);
+
+    private:
+      PIMP_DECLARE_PRIVATE (Master)
+  };
+
 
   /**
    * @class NetLayer
@@ -159,88 +326,6 @@ namespace Modbus {
 
     private:
       PIMP_DECLARE_PRIVATE (RtuLayer)
-  };
-
-  /**
-   * @class Device
-   * @brief
-   */
-  class Device  {
-    public:
-
-      Device (Net net = Tcp, const std::string & connection = "*",
-              const std::string & settings = "502");
-      Device (const Device & other);
-      virtual ~Device();
-
-      void swap (Device &other);
-      Device& operator= (const Device &other);
-
-      virtual bool open();
-      virtual void close();
-      bool flush();
-      bool isOpen() const;
-
-      int slave() const;
-      bool setSlave (int id);
-
-      bool setResponseTimeout (const Timeout & timeout);
-      bool responseTimeout (Timeout & timeout);
-      bool setByteTimeout (const Timeout & timeout);
-      bool byteTimeout (Timeout & timeout);
-
-      bool setDebug (bool debug = true);
-
-      void setPduAdressing (bool pduAdressing = true);
-      bool pduAdressing() const;
-
-      bool isNull() const;
-      Net net() const;
-      RtuLayer & rtu();
-      TcpLayer & tcp();
-
-      static std::string lastError();
-
-      friend class RtuLayer;
-      friend class TcpLayer;
-
-    protected:
-      class Private;
-      Device (Private &dd);
-      std::unique_ptr<Private> d_ptr;
-
-    private:
-      PIMP_DECLARE_PRIVATE (Device)
-  };
-
-  /**
-   * @class Master
-   * @brief
-   */
-  class Master : public Device {
-    public:
-
-      Master (Net net = Tcp, const std::string & connection = "*",
-              const std::string & settings = "502");
-      virtual ~Master();
-
-      int readDiscreteInputs (int addr, bool * dest, int nb = 1);
-      int readCoils (int addr, bool * dest, int nb = 1);
-      int readInputRegistrers (int addr, uint16_t * dest, int nb = 1);
-      int readRegistrers (int addr, uint16_t * dest, int nb = 1);
-      int writeCoil (int addr, bool value);
-      int writeCoils (int addr, const bool * src, int nb);
-      int writeRegistrer (int addr, uint16_t value);
-      int writeRegistrers (int addr, const uint16_t * src, int nb);
-      int writeReadRegistrers (int waddr, const uint16_t * src, int wnb,
-                               int raddr, uint16_t * dest, int rnb);
-
-    protected:
-      class Private;
-      Master (Private &dd);
-
-    private:
-      PIMP_DECLARE_PRIVATE (Master)
   };
 
 }

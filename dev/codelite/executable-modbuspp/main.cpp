@@ -20,7 +20,7 @@ int main (int argc, char **argv) {
     uint16_t value;
 
     mb.setSlave (8); // to the slave at address 8
-    mb.readInputRegistrers (1, &value);
+    mb.readInputRegisters (1, &value);
     // ....
     mb.close();
   }
