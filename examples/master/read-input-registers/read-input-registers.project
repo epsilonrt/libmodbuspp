@@ -1,45 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<CodeLite_Project Name="libmodbuspp" Version="10.0.0" InternalType="Console">
-  <VirtualDirectory Name="examples">
-    <VirtualDirectory Name="master">
-      <VirtualDirectory Name="read-coils">
-        <File Name="examples/master/read-coils/main.cpp"/>
-        <File Name="examples/master/read-coils/read-coils.mk"/>
-        <File Name="examples/master/read-coils/read-coils.txt"/>
-        <File Name="examples/master/read-coils/README.md"/>
-      </VirtualDirectory>
-      <VirtualDirectory Name="read-input-registers">
-        <File Name="examples/master/read-input-registers/main.cpp"/>
-        <File Name="examples/master/read-input-registers/read-input-registers.txt"/>
-        <File Name="examples/master/read-input-registers/read-input-registers.mk"/>
-        <File Name="examples/master/read-input-registers/README.md"/>
-      </VirtualDirectory>
-    </VirtualDirectory>
-  </VirtualDirectory>
-  <VirtualDirectory Name="dev">
-    <VirtualDirectory Name="codelite">
-      <VirtualDirectory Name="executable-modbuspp">
-        <File Name="dev/codelite/executable-modbuspp/main.cpp"/>
-      </VirtualDirectory>
-    </VirtualDirectory>
-    <VirtualDirectory Name="bin">
-      <File Name="dev/bin/git-version"/>
-    </VirtualDirectory>
-    <VirtualDirectory Name="cmake">
-      <File Name="dev/cmake/GitVersion.cmake"/>
-      <File Name="dev/cmake/FindGzip.cmake"/>
-      <File Name="dev/cmake/GetDate.cmake"/>
-    </VirtualDirectory>
-    <File Name="dev/CMakeLists.txt"/>
-  </VirtualDirectory>
+<CodeLite_Project Name="read-input-registers" Version="10.0.0" InternalType="Console">
   <Description/>
   <Dependencies/>
   <Settings Type="Executable">
     <GlobalSettings>
-      <Compiler Options="" C_Options="" Assembler="">
+      <Compiler Options="-std=c++14;$(shell pkg-config --cflags libmodbuspp)" C_Options="-std=c99;$(shell pkg-config --cflags libmodbuspp)" Assembler="">
         <IncludePath Value="."/>
       </Compiler>
-      <Linker Options="">
+      <Linker Options="$(shell pkg-config --libs libmodbuspp)">
         <LibraryPath Value="."/>
       </Linker>
       <ResourceCompiler Options=""/>
@@ -50,12 +18,12 @@
       </Compiler>
       <Linker Options="" Required="yes"/>
       <ResourceCompiler Options="" Required="no"/>
-      <General OutputFile="" IntermediateDirectory="./Debug" Command="$(WorkspacePath)/cmake-build-$(WorkspaceConfiguration)/bin/$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="yes" IsGUIProgram="no" IsEnabled="yes"/>
-      <BuildSystem Name="CMake"/>
+      <General OutputFile="$(IntermediateDirectory)/$(ProjectName)" IntermediateDirectory="./Debug" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="yes" IsGUIProgram="no" IsEnabled="yes"/>
+      <BuildSystem Name="Default"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
         <![CDATA[]]>
       </Environment>
-      <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="" IsExtended="no">
+      <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="" IsExtended="yes">
         <DebuggerSearchPaths/>
         <PostConnectCommands/>
         <StartupCommands/>
@@ -80,7 +48,8 @@
         <ClangCmpFlagsC/>
         <ClangCmpFlags/>
         <ClangPP/>
-        <SearchPaths/>
+        <SearchPaths>/usr/include/modbuspp
+/usr/local/include/modbuspp</SearchPaths>
       </Completion>
     </Configuration>
     <Configuration Name="Release" CompilerType="gnu g++" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
@@ -90,8 +59,8 @@
       </Compiler>
       <Linker Options="" Required="yes"/>
       <ResourceCompiler Options="" Required="no"/>
-      <General OutputFile="" IntermediateDirectory="./Release" Command="$(WorkspacePath)/cmake-build-$(WorkspaceConfiguration)/bin/$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="yes" IsGUIProgram="no" IsEnabled="yes"/>
-      <BuildSystem Name="CMake"/>
+      <General OutputFile="$(IntermediateDirectory)/$(ProjectName)" IntermediateDirectory="./Release" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="yes" IsGUIProgram="no" IsEnabled="yes"/>
+      <BuildSystem Name="Default"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
         <![CDATA[]]>
       </Environment>
@@ -120,36 +89,15 @@
         <ClangCmpFlagsC/>
         <ClangCmpFlags/>
         <ClangPP/>
-        <SearchPaths/>
+        <SearchPaths>/usr/include/modbuspp
+/usr/local/include/modbuspp</SearchPaths>
       </Completion>
     </Configuration>
   </Settings>
-  <VirtualDirectory Name="include">
-    <File Name="include/global.h"/>
-    <File Name="include/modbuspp.h"/>
-  </VirtualDirectory>
   <VirtualDirectory Name="src">
-    <File Name="src/modbuspp.cpp"/>
-    <File Name="src/modbuspp_p.h"/>
+    <File Name="main.cpp"/>
   </VirtualDirectory>
-  <VirtualDirectory Name="lib">
-    <VirtualDirectory Name="resources">
-      <File Name="lib/CMakeLists.txt"/>
-    </VirtualDirectory>
-    <File Name="lib/config.h.in"/>
-    <File Name="lib/libmodbuspp.pc.in"/>
-    <File Name="lib/libmodbuspp-config.cmake.in"/>
-    <File Name="lib/libmodbuspp-config-version.cmake.in"/>
-  </VirtualDirectory>
-  <VirtualDirectory Name="resources">
-    <File Name="CMakeLists.txt"/>
-  </VirtualDirectory>
-  <VirtualDirectory Name="libmodbuspp">
-    <File Name="AUTHORS"/>
-    <File Name="cmake_uninstall.cmake.in"/>
-    <File Name="COPYING.LESSER"/>
+  <VirtualDirectory Name="doc">
     <File Name="README.md"/>
   </VirtualDirectory>
-  <Dependencies Name="Debug"/>
-  <Dependencies Name="Release"/>
 </CodeLite_Project>
