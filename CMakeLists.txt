@@ -18,19 +18,14 @@
 cmake_minimum_required (VERSION 3.5 FATAL_ERROR)
 
 project (MODBUSPP)
-set (PROJECT_DESCRIPTION "libmodbus C++ wrapper library for standard C++")
+set (PROJECT_DESCRIPTION "libmodbuspp C++ wrapper for the libmodbus library")
 set (PROJECT_DESCRIPTION_TEXT "\
-  PiDuino is a C ++ library for Pi boards that allows the use of I/O like GPIO,\n\
-  I2C, SPI, UART ... with an API as close as possible to the Arduino language.\n\
-  The description of Pi cards uses a stored 'Object' model in a database that \n\
-  allows to add new models of boards easily.\n\
-  Supported SoC models are AllWinner H-Series and Broadcom BCM2708 through 2710."
+A C++ wrapper for the libmodbus library, to send/receive data with a device which\n\
+respects the Modbus protocol. This library can use a serial port or an\n\
+Ethernet connection."
 )
 
-#library for the Modbus protocol
-# A Modbus library written in C, to send/receive data with a device which
-# respects the Modbus protocol. This library can use a serial port or an
-# Ethernet connection.
+# library for the Modbus protocol
 
 string(TOLOWER ${CMAKE_PROJECT_NAME} PROJECT_NAME)
 
