@@ -57,34 +57,94 @@ namespace Modbus {
   class Data {
     public:
       enum Type {
-        Byte,
-        Word,
-        LongWord,
-        LongLongWord,
-        Float,
-        Double
+        Byte, // 2 Bytes (nothing is smaller than the word on MODBUS)
+        Word, // 2 Bytes - 1 MODBUS register
+        LongWord, // 4 Bytes - 2 MODBUS registers
+        LongLongWord, // 8 Bytes - 4 MODBUS registers
+        Float, // 4 Bytes - 2 MODBUS registers
+        Double, // 8 Bytes - 4 MODBUS registers
+        Void = -1
       };
 
-      enum Endian {
-        EndianBigBig = 0x00, // bytes in big endian order, word in big endian order
-        EndianBig = EndianBigBig,
-        EndianBigLittle = 0x01,
-        EndianLittleBig = 0x02,
-        EndianLittleLittle = 0x03,
-        EndianLittle = EndianLittleLittle
+      enum Endian { // network number ABCD
+        EndianBigBig = 0x00,    // bytes in big endian order, word in big endian order : ABCD
+        EndianBig = EndianBigBig, // big endian order : ABCD
+        EndianBigLittle = 0x01, // bytes in big endian order, word in little endian order : CDAB
+        EndianLittleBig = 0x02, // bytes in little endian order, word in big endian order : BADC
+        EndianLittleLittle = 0x03, // bytes in little endian order, word in little endian order : DCBA
+        EndianLittle = EndianLittleLittle // little endian order : DCBA
       };
 
-      Data (Endian bigEndian = EndianBig);
-      Data (char i, Endian bigEndian = EndianBig);
-      Data (int i, Endian bigEndian = EndianBig);
-      Data (long i, Endian bigEndian = EndianBig);
-      Data (long long i, Endian bigEndian = EndianBig);
-      Data (uint8_t i, Endian bigEndian = EndianBig);
-      Data (uint16_t i, Endian bigEndian = EndianBig);
-      Data (uint32_t i, Endian bigEndian = EndianBig);
-      Data (uint64_t i, Endian bigEndian = EndianBig);
+      Data (Type type = Void, Endian endian = EndianBig); // default constructor
+      Data (const Data & other);
+      virtual ~Data();
+
+      Data (uint8_t v, Endian endian = EndianBig);
+      Data (uint16_t v, Endian endian = EndianBig);
+      Data (uint32_t v, Endian endian = EndianBig);
+      Data (uint64_t v, Endian endian = EndianBig);
+      Data (char v, Endian endian = EndianBig);
+      Data (int v, Endian endian = EndianBig);
+      Data (long v, Endian endian = EndianBig);
+      Data (long long v, Endian endian = EndianBig);
+      Data (float v, Endian endian = EndianBig);
+      Data (double v, Endian endian = EndianBig);
+
+      void swap (Data &other);
+      Data& operator= (const Data &other);
+
+      void set (uint8_t v);
+      void set (uint16_t v);
+      void set (uint32_t v);
+      void set (uint64_t v);
+
+      void set (char v);
+      void set (int v);
+      void set (long v);
+      void set (long long v);
+      void set (float v);
+      void set (double v);
+
+      void get (uint8_t & v) const;
+      void get (uint16_t & v) const;
+      void get (uint32_t & v) const;
+      void get (uint64_t & v) const;
+
+      void get (char & v) const;
+      void get (int & v) const;
+      void get (long & v) const;
+      void get (long long & v) const;
+      void get (float & v) const;
+      void get (double & v) const;
+
+      Endian endianness() const;
       Type type() const;
+      void setType (Type t);
       size_t size() const;
+      uint16_t * ptr();
+      const uint16_t * ptr() const;
+
+      // debug purpose
+      void print () const;
+      static void print (const uint8_t * p, const size_t s);
+      static void print (const uint8_t & v);
+      static void print (const uint16_t & v);
+      static void print (const uint32_t & v);
+      static void print (const uint64_t & v);
+      static void print (const char & v);
+      static void print (const int & v);
+      static void print (const long & v);
+      static void print (const long long & v);
+      static void print (const float & v);
+      static void print (const double & v);
+
+    protected:
+      class Private;
+      Data (Private &dd);
+      std::unique_ptr<Private> d_ptr;
+
+    private:
+      PIMP_DECLARE_PRIVATE (Data)
   };
 
   /**
@@ -160,7 +220,7 @@ namespace Modbus {
    * @brief MODBUS Master (Client)
    */
   class Master : public Device {
-    
+
     public:
       /**
        * @brief Constructor
@@ -209,13 +269,13 @@ namespace Modbus {
       int readRegistrers (int addr, uint16_t * dest, int nb = 1);
       /**
        * @brief write a single bit
-       * 
-       * This function shall write the status of value at the address addr of 
+       *
+       * This function shall write the status of value at the address addr of
        * the remote device. \n
        * The function uses the Modbus function code 0x05 (force single coil).
        * @param addr
        * @param value
-       * @return 
+       * @return
        */
       int writeCoil (int addr, bool value);
       /**

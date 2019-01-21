@@ -7,6 +7,7 @@
 using namespace std;
 using namespace Modbus;
 
+
 // -----------------------------------------------------------------------------
 int main (int argc, char **argv) {
   string port ("/dev/ttyUSB1");

@@ -117,4 +117,5 @@ With [Codelite](https://codelite.org/) it's easier and funny, right ?
 
 ![Debugging with Codelite](https://raw.githubusercontent.com/epsilonrt/piduino/master/doc/images/codelite-2.png)
 
-You will find several examples in the folder `/usr/share/doc/modbuspp/examples` (or `/usr/local/share/...`) 
+You will find several examples in the folder 
+[/usr/share/doc/modbuspp/examples](https://github.com/epsilonrt/libmodbuspp/tree/master/examples/master) (or `/usr/local/share/...`) 

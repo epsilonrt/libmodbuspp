@@ -29,6 +29,7 @@ list(REMOVE_ITEM src_modbuspp ${MODBUSPP_SRC_DIR}/modbuspp.cpp)
 set (hdr_modbuspp 
   ${MODBUSPP_INC_DIR}/global.h
   ${MODBUSPP_INC_DIR}/modbuspp.h
+  ${MODBUSPP_INC_DIR}/modbuspp-data.h
 )
 
 configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/config.h.in
