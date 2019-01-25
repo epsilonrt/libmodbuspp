@@ -30,6 +30,7 @@ set (hdr_modbuspp
   ${MODBUSPP_INC_DIR}/global.h
   ${MODBUSPP_INC_DIR}/modbuspp.h
   ${MODBUSPP_INC_DIR}/modbuspp-data.h
+  ${MODBUSPP_INC_DIR}/modbuspp-swap.h
 )
 
 configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/config.h.in
