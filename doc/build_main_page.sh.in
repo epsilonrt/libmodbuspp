@@ -1,0 +1,23 @@
+#!/bin/sh
+# (c) Copyright 2011-2019 Pascal JEAN, All rights reserved.
+
+TARGET=@DOXYGEN_MAINPAGE@
+README=@DOXYGEN_README@
+
+PARSER=cat
+command -v markdown >/dev/null 2>&1 && PARSER=markdown
+command -v marked >/dev/null 2>&1 && PARSER=marked
+echo "PARSER=$PARSER"
+if [ "$PARSER" = "markdown" ]; then
+  HEAD_TAG="@htmlonly"
+  FOOT_TAG="@endhtmlonly"
+fi
+
+cat @PROJECT_SOURCE_DIR@/doc/main_page_header.dox > $TARGET
+
+# README
+echo "$HEAD_TAG" >> $TARGET
+tail -n +4 $README | ${PARSER}  >> $TARGET
+echo "$FOOT_TAG" >> $TARGET
+
+cat @PROJECT_SOURCE_DIR@/doc/main_page_footer.dox >> $TARGET

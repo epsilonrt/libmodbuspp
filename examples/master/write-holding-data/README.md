@@ -6,7 +6,7 @@ This example is intended to be compiled with [Codelite](https://codelite.org).
 
 If you want to compile it without codelite, you can do it with [GNU make](https://www.gnu.org/software/make/) :
 
-		make -f read-coils.mk
+		make -f write-holding-data.mk
 
 Nevertheless, i am not sure that it works on Windows™ and macOS™.
 

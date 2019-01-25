@@ -1,4 +1,4 @@
-/* Copyright © 2018 Pascal JEAN, All rights reserved.
+/* Copyright © 2018-2019 Pascal JEAN, All rights reserved.
  * This file is part of the libmodbuspp Library.
  *
  * The libmodbuspp Library is free software; you can redistribute it and/or
@@ -77,7 +77,7 @@ namespace Modbus {
   // ---------------------------------------------------------------------------
   bool
   Device::open () {
-      PIMP_D (Device);
+    PIMP_D (Device);
 
     if (!isOpen() && !isNull()) {
 
@@ -140,9 +140,9 @@ namespace Modbus {
   // ---------------------------------------------------------------------------
   bool Device::setSlave (int id) {
     PIMP_D (Device);
-    
+
     if (!isNull()) {
-      
+
       if (modbus_set_slave (d->ctx, id) == 0) {
 
         d->slave = id;
@@ -169,16 +169,24 @@ namespace Modbus {
 
   // ---------------------------------------------------------------------------
   RtuLayer & Device::rtu() {
-    PIMP_D (Device);
 
-    return *d->rtu;
+    if (net() == Rtu) {
+      PIMP_D (Device);
+      
+      return *d->rtu;
+    }
+    throw std::domain_error ("Error: Unable to return RTU layer !");
   }
 
   // ---------------------------------------------------------------------------
   TcpLayer & Device::tcp() {
-    PIMP_D (Device);
-
-    return *d->tcp;
+    
+    if (net() == Tcp) {
+      PIMP_D (Device);
+      
+      return *d->tcp;
+    }
+    throw std::domain_error ("Error: Unable to return TCP layer !");
   }
 
   // ---------------------------------------------------------------------------
@@ -365,7 +373,7 @@ namespace Modbus {
   }
 
   // ---------------------------------------------------------------------------
-  int Master::readRegistrers (int addr, uint16_t * dest, int nb) {
+  int Master::readRegisters (int addr, uint16_t * dest, int nb) {
 
     if (isOpen()) {
       PIMP_D (Master);
@@ -402,7 +410,7 @@ namespace Modbus {
   }
 
   // ---------------------------------------------------------------------------
-  int Master::writeRegistrer (int addr, uint16_t value) {
+  int Master::writeRegister (int addr, uint16_t value) {
 
     if (isOpen()) {
       PIMP_D (Master);
@@ -414,7 +422,7 @@ namespace Modbus {
   }
 
   // ---------------------------------------------------------------------------
-  int Master::writeRegistrers (int addr, const uint16_t * src, int nb) {
+  int Master::writeRegisters (int addr, const uint16_t * src, int nb) {
 
     if (isOpen()) {
       PIMP_D (Master);
@@ -425,8 +433,8 @@ namespace Modbus {
   }
 
   // ---------------------------------------------------------------------------
-  int Master::writeReadRegistrers (int waddr, const uint16_t * src, int wnb,
-                                   int raddr, uint16_t * dest, int rnb) {
+  int Master::writeReadRegisters (int waddr, const uint16_t * src, int wnb,
+                                  int raddr, uint16_t * dest, int rnb) {
 
     if (isOpen()) {
       PIMP_D (Master);

@@ -1,4 +1,4 @@
-/* Copyright © 2018 Pascal JEAN, All rights reserved.
+/* Copyright © 2018-2019 Pascal JEAN, All rights reserved.
  * This file is part of the libmodbuspp Library.
  *
  * The libmodbuspp Library is free software; you can redistribute it and/or
@@ -17,16 +17,21 @@
 #ifndef MODBUSPP_GLOBAL_H
 #define MODBUSPP_GLOBAL_H
 
+#ifndef __DOXYGEN__
+/*
+ * Internal: Pointer to implementation
+ * "Pointer to implementation" or "pImpl" is a C++ programming technique that 
+ * removes implementation details of a class from its object representation by 
+ * placing them in a separate class, accessed through an opaque pointer.
+ * This technique is used to construct C++ library interfaces with stable 
+ * ABI and to reduce compile-time dependencies.
+ */
+
 #include <memory>
 #include <cstdint>
 #include <cstddef>
 #include <sys/types.h>
 
-/**
- *  @defgroup libmodbuspp_global Global definitions
- *
- *  @{
- */
 #define PIMP_D(Class) Class::Private * const d = d_func()
 #define PIMP_Q(Class) Class * const q = q_func()
 #define PIMP_DECLARE_PRIVATE(Class)\
@@ -44,9 +49,6 @@
 namespace libmodbuspp {
 }
 
-/**
- *  @}
- */
-
+#endif /* __DOXYGEN__ not defined */
 /* ========================================================================== */
 #endif /* MODBUSPP_GLOBAL_H defined */

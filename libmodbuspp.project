@@ -1,5 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CodeLite_Project Name="libmodbuspp" Version="10.0.0" InternalType="Console">
+  <VirtualDirectory Name="doc">
+    <File Name="doc/DoxygenLayout.xml"/>
+    <File Name="doc/build_main_page.sh.in"/>
+    <File Name="doc/Doxyfile.in"/>
+    <File Name="doc/main_page_footer.dox"/>
+    <File Name="doc/main_page_header.dox"/>
+    <VirtualDirectory Name="resources">
+      <File Name="doc/CMakeLists.txt"/>
+    </VirtualDirectory>
+  </VirtualDirectory>
   <Plugins>
     <Plugin Name="qmake">
       <![CDATA[00010001N0005Debug000000000000]]>
@@ -43,12 +53,11 @@
     <File Name="include/global.h"/>
     <File Name="include/modbuspp.h"/>
     <File Name="include/modbuspp-data.h"/>
+    <File Name="include/modbuspp-swap.h"/>
   </VirtualDirectory>
   <VirtualDirectory Name="src">
     <File Name="src/modbuspp.cpp"/>
     <File Name="src/modbuspp_p.h"/>
-    <File Name="src/modbuspp-data.cpp"/>
-    <File Name="src/modbuspp-data_p.h"/>
   </VirtualDirectory>
   <VirtualDirectory Name="lib">
     <VirtualDirectory Name="resources">
@@ -85,7 +94,7 @@
       <Linker Options="" Required="yes"/>
       <ResourceCompiler Options="" Required="no"/>
       <General OutputFile="" IntermediateDirectory="./Debug" Command="$(WorkspacePath)/cmake-build-$(WorkspaceConfiguration)/bin/$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="yes" IsGUIProgram="no" IsEnabled="yes"/>
-      <BuildSystem Name="CMake">-DCMAKE_BUILD_TYPE=Debug</BuildSystem>
+      <BuildSystem Name="CMake">-DCMAKE_BUILD_TYPE=Debug -DMODBUSPP_WITH_DOXYGEN_DOC=1</BuildSystem>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
         <![CDATA[]]>
       </Environment>

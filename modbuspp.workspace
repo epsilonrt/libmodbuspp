@@ -1,20 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CodeLite_Workspace Name="modbuspp" Database="" Version="10.0.0">
-  <Project Name="libmodbuspp" Path="libmodbuspp.project" Active="Yes"/>
-  <Project Name="read-coils" Path="examples/master/read-coils/read-coils.project" Active="No"/>
-  <Project Name="read-input-registers" Path="examples/master/read-input-registers/read-input-registers.project" Active="No"/>
+  <Project Name="libmodbuspp" Path="libmodbuspp.project" Active="No"/>
+  <Project Name="libmodbuspp-doc" Path="doc/libmodbuspp-doc.project" Active="Yes"/>
   <BuildMatrix>
     <WorkspaceConfiguration Name="Debug" Selected="yes">
       <Environment/>
       <Project Name="libmodbuspp" ConfigName="Debug"/>
-      <Project Name="read-coils" ConfigName="Debug"/>
-      <Project Name="read-input-registers" ConfigName="Debug"/>
+      <Project Name="libmodbuspp-doc" ConfigName="Debug"/>
     </WorkspaceConfiguration>
     <WorkspaceConfiguration Name="Release" Selected="yes">
       <Environment/>
       <Project Name="libmodbuspp" ConfigName="Release"/>
-      <Project Name="read-coils" ConfigName="Release"/>
-      <Project Name="read-input-registers" ConfigName="Release"/>
+      <Project Name="libmodbuspp-doc" ConfigName="Release"/>
     </WorkspaceConfiguration>
   </BuildMatrix>
 </CodeLite_Workspace>

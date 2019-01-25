@@ -1,4 +1,4 @@
-/* Copyright © 2018 Pascal JEAN, All rights reserved.
+/* Copyright © 2018-2019 Pascal JEAN, All rights reserved.
  * This file is part of the libmodbuspp Library.
  *
  * The libmodbuspp Library is free software; you can redistribute it and/or

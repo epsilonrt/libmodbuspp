@@ -1,4 +1,4 @@
-# Copyright © 2018 Pascal JEAN, All rights reserved.
+# Copyright © 2018-2019 Pascal JEAN, All rights reserved.
 # This file is part of the libmodbuspp Project.
 #
 # The libmodbuspp Project is free software: you can redistribute it and/or modify
@@ -129,7 +129,7 @@ add_compile_options(-Wno-psabi)
 add_subdirectory (dev)
 add_subdirectory (lib)
 #add_subdirectory (utils)
-#add_subdirectory (doc)
+add_subdirectory (doc)
 
 if (MODBUSPP_WITH_DOXYGEN_DOC)
   add_dependencies(modbuspp-shared doc)
