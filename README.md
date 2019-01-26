@@ -38,7 +38,7 @@ so you should do the following :
     wget -O- http://www.piduino.org/piduino-key.asc | sudo apt-key add -
     sudo add-apt-repository 'deb http://apt.piduino.org stretch piduino'
     sudo apt update
-    sudo apt install libmodbuspp-dev  libmodbuspp-doc 
+    sudo apt install libmodbuspp-dev libmodbuspp-doc 
 
 This repository provides Piduino packages for `i386`, `amd64`, `armhf` and 
 `arm64` architectures.  
@@ -52,7 +52,7 @@ For Raspbian you have to do a little different :
     wget -O- http://www.piduino.org/piduino-key.asc | sudo apt-key add -
     echo 'deb http://raspbian.piduino.org stretch piduino' | sudo tee /etc/apt/sources.list.d/piduino.list
     sudo apt update
-    sudo apt install libmodbuspp-dev  libmodbuspp-doc
+    sudo apt install libmodbuspp-dev libmodbuspp-doc
 
 The Raspbian repository provides Piduino packages for `armhf` architecture for Stretch only.
 
@@ -123,7 +123,7 @@ You will find several examples in the folder
 
 ## Documentation
 
-The libmodbus-doc package provides documentation.
+The libmodbuspp-doc package provides documentation.
 
 The classes provided by the library are documented by man pages:
 
