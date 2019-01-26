@@ -79,7 +79,7 @@ namespace Modbus {
   Device::open () {
     PIMP_D (Device);
 
-    if (!isOpen() && !isNull()) {
+    if (!isOpen()) {
 
       d->isOpen = (modbus_connect (d->ctx) == 0);
       if (d->isOpen) {
@@ -105,14 +105,14 @@ namespace Modbus {
   }
 
   // ---------------------------------------------------------------------------
-  bool Device::flush() {
+  int Device::flush() {
 
     if (isOpen()) {
       PIMP_D (Device);
 
-      return (modbus_flush (d->ctx) >= 0);
+      return modbus_flush (d->ctx);
     }
-    return false;
+    return -1;
   }
 
   // ---------------------------------------------------------------------------
@@ -121,13 +121,6 @@ namespace Modbus {
     PIMP_D (const Device);
 
     return d->isOpen;
-  }
-
-  // ---------------------------------------------------------------------------
-  bool Device::isNull() const {
-    PIMP_D (const Device);
-
-    return d->ctx == 0;
   }
 
   // ---------------------------------------------------------------------------
@@ -141,13 +134,10 @@ namespace Modbus {
   bool Device::setSlave (int id) {
     PIMP_D (Device);
 
-    if (!isNull()) {
+    if (modbus_set_slave (d->ctx, id) == 0) {
 
-      if (modbus_set_slave (d->ctx, id) == 0) {
-
-        d->slave = id;
-        return true;
-      }
+      d->slave = id;
+      return true;
     }
     return false;
   }
@@ -172,7 +162,7 @@ namespace Modbus {
 
     if (net() == Rtu) {
       PIMP_D (Device);
-      
+
       return *d->rtu;
     }
     throw std::domain_error ("Error: Unable to return RTU layer !");
@@ -180,10 +170,10 @@ namespace Modbus {
 
   // ---------------------------------------------------------------------------
   TcpLayer & Device::tcp() {
-    
+
     if (net() == Tcp) {
       PIMP_D (Device);
-      
+
       return *d->tcp;
     }
     throw std::domain_error ("Error: Unable to return TCP layer !");
@@ -193,55 +183,35 @@ namespace Modbus {
   bool Device::setResponseTimeout (const Timeout & t) {
     PIMP_D (Device);
 
-    if (!isNull()) {
-
-      return (modbus_set_response_timeout (d->ctx, t.sec, t.usec) == 0);
-    }
-    return false;
+    return (modbus_set_response_timeout (d->ctx, t.sec, t.usec) == 0);
   }
 
   // ---------------------------------------------------------------------------
   bool Device::responseTimeout (Timeout & t) {
     PIMP_D (Device);
 
-    if (!isNull()) {
-
-      return (modbus_get_response_timeout (d->ctx, &t.sec, &t.usec) == 0);
-    }
-    return false;
+    return (modbus_get_response_timeout (d->ctx, &t.sec, &t.usec) == 0);
   }
 
   // ---------------------------------------------------------------------------
   bool Device::setByteTimeout (const Timeout & t) {
     PIMP_D (Device);
 
-    if (!isNull()) {
-
-      return (modbus_set_byte_timeout (d->ctx, t.sec, t.usec) == 0);
-    }
-    return false;
+    return (modbus_set_byte_timeout (d->ctx, t.sec, t.usec) == 0);
   }
 
   // ---------------------------------------------------------------------------
   bool Device::byteTimeout (Timeout & t) {
     PIMP_D (Device);
 
-    if (!isNull()) {
-
-      return (modbus_get_byte_timeout (d->ctx, &t.sec, &t.usec) == 0);
-    }
-    return false;
+    return (modbus_get_byte_timeout (d->ctx, &t.sec, &t.usec) == 0);
   }
 
   // ---------------------------------------------------------------------------
   bool Device::setDebug (bool debug) {
     PIMP_D (Device);
 
-    if (!isNull()) {
-
-      return (modbus_set_debug (d->ctx, debug ? TRUE : FALSE) == 0);
-    }
-    return false;
+    return (modbus_set_debug (d->ctx, debug ? TRUE : FALSE) == 0);
   }
 
   // ---------------------------------------------------------------------------
@@ -573,7 +543,7 @@ namespace Modbus {
   // ---------------------------------------------------------------------------
   // static
   char RtuLayer::parity (const std::string & settings) {
-    char p = 'N';
+    char p = 'E';
     size_t s = settings.length();
 
     if (s >= 2) {

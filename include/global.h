@@ -46,8 +46,6 @@
   inline Class* q_func() { return reinterpret_cast<Class *>(q_ptr); } \
   inline const Class* q_func() const { return reinterpret_cast<const Class *>(q_ptr); } \
   friend class Class;
-namespace libmodbuspp {
-}
 
 #endif /* __DOXYGEN__ not defined */
 /* ========================================================================== */
