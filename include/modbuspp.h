@@ -19,6 +19,8 @@
 #define MODBUSPP_H
 
 #include <string>
+#include <vector>
+#include <iostream>
 #include <modbus.h>
 #include <modbuspp-data.h>
 #include "global.h"
@@ -98,7 +100,7 @@ namespace Modbus {
    *
    * When \b RtsUp is used, an ioctl call is made with RTS flag enabled then
    * data is written on the bus after a delay of 1 ms, then another ioctl call
-   * is made with the RTS flag disabled and again a delay of 1 ms occurs. 
+   * is made with the RTS flag disabled and again a delay of 1 ms occurs.
    *
    * The \b RtsDown mode applies the same procedure but with an inverted RTS flag.
    */
@@ -117,10 +119,69 @@ namespace Modbus {
    */
   class Timeout {
     public:
-      Timeout (uint32_t s = 0, uint32_t us = 0) :
-        sec (s), usec (us) {}
-      uint32_t sec;   ///< number of seconds
-      uint32_t usec; ///< number of microseconds, must be in the range 0 to 999999.
+
+      /**
+       * @brief Default constructor
+       * @param s seconds
+       * @param us microseconds
+       */
+      Timeout (uint32_t s = 1, uint32_t us = 0);
+
+      /**
+       * @brief Constructor from a double
+       * @param t time in seconds
+       */
+      Timeout (const double & t);
+
+      /**
+       * @brief Return the timeout in seconds
+       */
+      double value() const;
+
+      /**
+       * @brief Set value from a double
+       * @param t time in seconds
+       */
+      void setValue (const double & t);
+
+      /**
+       * @brief Set the value from the integer part and the decimal part
+       * @param s seconds
+       * @param us microseconds, if this value is greater than 999999, it is
+       * adjusted as well as \b s.
+       */
+      void setValue (uint32_t s, uint32_t us);
+
+      /**
+       * @brief Overload of the assignment operator from a double value
+       * @param t time in seconds
+       */
+      Timeout& operator= (const double& t) {
+        setValue (t);
+        return *this;
+      }
+
+      /**
+       * @brief Return the number of seconds
+       */
+      uint32_t sec() const {
+        return m_sec;
+      }
+
+      /**
+       * @brief Return the number of microseconds
+       *
+       * in the range 0 to 999999.
+       */
+      uint32_t usec() const {
+        return m_usec;
+      }
+
+      friend class Device;
+
+    private:
+      uint32_t m_sec;
+      uint32_t m_usec;
   };
 
 
@@ -280,12 +341,34 @@ namespace Modbus {
        * timeout is disabled, the full confirmation response must be received
        * before expiration of the response timeout.
        *
-       * @param timeout reference on the variable that will contain the new timeout value
-       * @return return true if successful.
-       * Otherwise it shall return false and set errno.
+       * @param timeout reference on the variable that will contain the new 
+       * timeout in seconds.
        * @sa responseTimeout()
        */
-      bool setResponseTimeout (const Timeout & timeout);
+      void setResponseTimeout (const double & timeout);
+
+      /**
+       * @brief Get timeout for response
+       *
+       * @return timeout for response in seconds.
+       * @sa setResponseTimeout()
+       */
+      double responseTimeout();
+
+      /**
+       * @brief Set timeout for response
+       *
+       * This function shall set the timeout interval used to wait for
+       * a response. When a byte timeout is set, if elapsed time for the first
+       * byte of response is longer than the given timeout, an `ETIMEDOUT` error
+       * will be raised by the function waiting for a response. When byte
+       * timeout is disabled, the full confirmation response must be received
+       * before expiration of the response timeout.
+       *
+       * @param timeout reference on the variable that will contain the new timeout value
+       * @sa responseTimeout()
+       */
+      void setResponseTimeout (const Timeout & timeout);
 
       /**
        * @brief Get timeout for response
@@ -293,11 +376,32 @@ namespace Modbus {
        * This function shall return the timeout interval used to wait
        * for a response in the \b timeout argument.
        * @param timeout reference on the variable that will contain the timeout value
-       * @return return true if successful.
-       * Otherwise it shall return false and set errno.
        * @sa setResponseTimeout()
        */
-      bool responseTimeout (Timeout & timeout);
+      void responseTimeout (Timeout & timeout);
+
+      /**
+       * @brief Set timeout between bytes
+       *
+       * This function shall set the timeout interval between two consecutive
+       * bytes of the same message. The timeout is an upper bound on the amount
+       * of time elapsed before *select()* returns, if the time elapsed is longer
+       * than the defined timeout, an `ETIMEDOUT` error will be raised by the
+       * function waiting for a response.
+       *
+       * @param timeout reference on the variable that will contain the new 
+       * timeout in seconds.
+       * @sa byteTimeout()
+       */
+      void setByteTimeout (const double & timeout);
+
+      /**
+       * @brief Get timeout between bytes
+       *
+       * @return timeout between bytes in seconds.
+       * @sa setByteTimeout()
+       */
+      double byteTimeout();
 
       /**
        * @brief Set timeout between bytes
@@ -309,11 +413,9 @@ namespace Modbus {
        * function waiting for a response.
        *
        * @param timeout reference on the variable that will contain the new timeout value
-       * @return return true if successful.
-       * Otherwise it shall return false and set errno.
        * @sa byteTimeout()
        */
-      bool setByteTimeout (const Timeout & timeout);
+      void setByteTimeout (const Timeout & timeout);
 
       /**
        * @brief Get timeout between bytes
@@ -322,28 +424,26 @@ namespace Modbus {
        * bytes of the same message in the \b timeout argument.
        *
        * @param timeout reference on the variable that will contain the timeout value
-       * @return return true if successful.
-       * Otherwise it shall return false and set errno.
        * @sa setByteTimeout()
        */
-      bool byteTimeout (Timeout & timeout);
+      void byteTimeout (Timeout & timeout);
 
       /**
        * @brief Modbus addressing mode
        *
        * This function shall return the Modbus addressing mode used.
        * The address mode used is, by default, that of the data model, that is
-       * to say, a numbering of the registers from 1 to n. 
-       * 
+       * to say, a numbering of the registers from 1 to n.
+       *
        * The Modbus application protocol defines precisely PDU addressing rules.
-       * In a Modbus PDU each data is addressed from 0 to 65535. 
-       * 
+       * In a Modbus PDU each data is addressed from 0 to 65535.
+       *
        * It also defines clearly a Modbus data model composed of 4 blocks that
-       * comprises several elements numbered from 1 to n. 
-       * 
+       * comprises several elements numbered from 1 to n.
+       *
        * In the Modbus data Model each element within a data block is numbered
-       * from 1 to n. 
-       * 
+       * from 1 to n.
+       *
        * Afterwards the Modbus data model has to be bound to the device
        * application (IEC -61131 object, or other application model).
        *
@@ -398,7 +498,7 @@ namespace Modbus {
        * This function function shall set the debug flag by using the argument
        * \b flag. By default, the boolean flag is set to false.
        * When the \b flag value is set to true, many verbose messages are
-       * displayed on stdout and stderr. 
+       * displayed on stdout and stderr.
        * For example, this flag is useful to display the bytes of the
        * Modbus messages :
        * @code
@@ -488,8 +588,8 @@ namespace Modbus {
        *
        * This function shall read the content of the \b nb input bits to the
        * address \b addr of the remote device.  The result of reading is stored
-       * in \b dest array as  boolean. 
-       * 
+       * in \b dest array as  boolean.
+       *
        * The function uses the Modbus function code 0x02 (read input status).
        *
        * @return the number of read input status if successful.
@@ -502,8 +602,8 @@ namespace Modbus {
        *
        * This function shall read the status of the \b nb bits (coils) to the
        * address \b addr of the remote device. The result of reading is stored
-       * in \b dest array as boolean. 
-       * 
+       * in \b dest array as boolean.
+       *
        * The function uses the Modbus function code 0x01 (read coil status).
        *
        * @return the number of read bits if successful.
@@ -515,8 +615,8 @@ namespace Modbus {
        * @brief Write a single coil (bit)
        *
        * This function shall write the status of src at the address addr of
-       * the remote device. 
-       * 
+       * the remote device.
+       *
        * The function uses the Modbus function code 0x05 (force single coil).
        *
        * @return 1 if successful.
@@ -529,8 +629,8 @@ namespace Modbus {
        *
        * This function shall write the status of the \b nb bits (coils) from
        * \b src at the address \b addr of the remote device.
-       * The \b src array must contains booelans. 
-       * 
+       * The \b src array must contains booelans.
+       *
        * The function uses the Modbus function code 0x0F (force multiple coils).
        *
        * @return the number of written bits if successful.
@@ -542,10 +642,10 @@ namespace Modbus {
        * @brief Read many input registers
        *
        * This function shall read the content of the \b nb input registers to
-       * the address \b addr of the remote device. 
-       * 
-       * The result of reading is stored in \b dest array as word values (16 bits). 
-       * 
+       * the address \b addr of the remote device.
+       *
+       * The result of reading is stored in \b dest array as word values (16 bits).
+       *
        * The function uses the Modbus function code 0x04 (read input registers).
        * The holding registers and input registers have different historical
        * meaning, but nowadays it's more common to use holding registers only.
@@ -587,8 +687,8 @@ namespace Modbus {
        * @brief Write many registers
        *
        * This function shall write the content of the \b nb holding registers
-       * from the array \b src at address \b addr of the remote device. 
-       * 
+       * from the array \b src at address \b addr of the remote device.
+       *
        * The function uses the Modbus function code 0x10 (preset multiple registers).
        *
        * @return number of written registers if successful.
@@ -621,7 +721,7 @@ namespace Modbus {
        *
        * This function shall read a single input bits to the address \b addr
        * of the remote device.  The result of reading is stored in \b dest
-       * as boolean. 
+       * as boolean.
        *
        * The function uses the Modbus function code 0x02 (read input status).
        *
@@ -639,7 +739,7 @@ namespace Modbus {
        * This function shall read a signle bit (coil) to the address \b addr of
        * the remote device. The result of reading is stored in \b dest
        * as boolean.
-       * 
+       *
        * The function uses the Modbus function code 0x01 (read coil status).
        *
        * @return 1 if successful.
@@ -655,9 +755,9 @@ namespace Modbus {
        *
        * This function shall read a single input register to the address \b addr
        * of the remote device.
-       * 
+       *
        * The result of reading is stored in \b dest as word values (16 bits).
-       *        
+       *
        * The function uses the Modbus function code 0x04 (read input registers).
        * The holding registers and input registers have different historical
        * meaning, but nowadays it's more common to use holding registers only.
@@ -674,10 +774,10 @@ namespace Modbus {
        * @brief Read a single register
        *
        * This function shall read a signle holding register to
-       * the address \b addr of the remote device. 
-       * 
+       * the address \b addr of the remote device.
+       *
        * The result of reading is stored in \b dest as word values (16 bits).
-       * 
+       *
        * The function uses the Modbus function code 0x03 (read holding registers).
        *
        * @return 1 if successful.
@@ -695,8 +795,8 @@ namespace Modbus {
        * arithmetic data in multiple 16-bit Modbus registers.
        *
        * This function shall read the content of the \b nb input data to
-       * the address \b addr of the remote device. 
-       * 
+       * the address \b addr of the remote device.
+       *
        * The result of reading is stored in \b dest array as \b T values.
        *
        * The function uses the Modbus function code 0x04 (read input registers).
@@ -705,19 +805,20 @@ namespace Modbus {
        * Otherwise it shall return -1 and set errno.
        */
       template <typename T, Endian e> int readInputRegisters (int addr, Data<T, e> * dest, int nb = 1) {
-        int ret = 0;
+        int ret;
+        std::vector<uint16_t> buf (nb * dest[0].registers().size(), 0);
 
-        for (int i = 0; i < nb; i++) {
-
-          int r = readInputRegister (addr, dest[i]);
-          if (r > 0) {
-
-            addr += r;
-            ret  += r;
-          }
-          else {
-
-            return r;
+        ret = readInputRegisters (addr, buf.data(), buf.size());
+        if (static_cast<std::size_t>(ret) == buf.size()) {
+          int n = 0;
+          
+          for (int i = 0; i < nb; i++) {
+            
+            for (auto & r : dest[i].registers()) {
+              
+              r = buf[n++];
+            }
+            dest[i].updateValue();
           }
         }
         return ret;
@@ -750,40 +851,6 @@ namespace Modbus {
         return r;
       }
 
-      /**
-       * @brief Read many holding data
-       *
-       * Data is a template class for storing, transmitting, and receiving
-       * arithmetic data in multiple 16-bit Modbus registers.
-       *
-       * This function shall read the content of the \b nb data to
-       * the address \b addr of the remote device. 
-       * 
-       * The result of reading is stored in \b dest array as \b T values.
-       *
-       * The function uses the Modbus function code 0x03 (read holding registers).
-       *
-       * @return return the number of read holding Modbus registers (16-bit) if successful.
-       * Otherwise it shall return -1 and set errno.
-       */
-      template <typename T, Endian e> int readRegisters (int addr, Data<T, e> * dest, int nb = 1) {
-        int ret = 0;
-
-        for (int i = 0; i < nb; i++) {
-
-          int r = readRegister (addr, dest[i]);
-          if (r > 0) {
-
-            addr += r;
-            ret  += r;
-          }
-          else {
-
-            return r;
-          }
-        }
-        return ret;
-      }
 
       /**
        * @brief Read a single holding data
@@ -813,6 +880,42 @@ namespace Modbus {
       }
 
       /**
+       * @brief Read many holding data
+       *
+       * Data is a template class for storing, transmitting, and receiving
+       * arithmetic data in multiple 16-bit Modbus registers.
+       *
+       * This function shall read the content of the \b nb data to
+       * the address \b addr of the remote device.
+       *
+       * The result of reading is stored in \b dest array as \b T values.
+       *
+       * The function uses the Modbus function code 0x03 (read holding registers).
+       *
+       * @return return the number of read holding Modbus registers (16-bit) if successful.
+       * Otherwise it shall return -1 and set errno.
+       */
+      template <typename T, Endian e> int readRegisters (int addr, Data<T, e> * dest, int nb = 1) {
+        int ret;
+        std::vector<uint16_t> buf (nb * dest[0].registers().size(), 0);
+
+        ret = readRegisters (addr, buf.data(), buf.size());
+        if (static_cast<std::size_t>(ret) == buf.size()) {
+          int n = 0;
+          
+          for (int i = 0; i < nb; i++) {
+            
+            for (auto & r : dest[i].registers()) {
+              
+              r = buf[n++];
+            }
+            dest[i].updateValue();
+          }
+        }
+        return ret;
+      }
+
+      /**
        * @brief Write many holding data
        *
        * Data is a template class for storing, transmitting, and receiving
@@ -827,22 +930,14 @@ namespace Modbus {
        * Otherwise it shall return -1 and set errno.
        */
       template <typename T, Endian e> int writeRegisters (int addr, const Data<T, e> * src, int nb = 1) {
-        int ret = 0;
+        std::vector<uint16_t> buf;
 
         for (int i = 0; i < nb; i++) {
-
-          int r = writeRegister (addr, src[i]);
-          if (r > 0) {
-
-            addr += r;
-            ret  += r;
-          }
-          else {
-
-            return r;
+          for (auto & r : src[i].registers()) {
+            buf.push_back (r);
           }
         }
-        return ret;
+        return writeRegisters (addr, buf.data(), buf.size());;
       }
 
       /**
@@ -898,12 +993,12 @@ namespace Modbus {
    *
    * This class can not and should not be instantiated by the user.
    * It provides access to properties and methods specific to the TCP layer.
-   * 
-   * An instance of this class is created by the constructor \b Device::Device() 
-   * of the \b Device class (or its derived classes) if the TCP layer is selected. 
-   * 
+   *
+   * An instance of this class is created by the constructor \b Device::Device()
+   * of the \b Device class (or its derived classes) if the TCP layer is selected.
+   *
    * Access to this instance is done using the Device::tcp() method.
-   * 
+   *
    * @sa Device::Device()
    * @sa Device::tcp()
    */
@@ -943,36 +1038,36 @@ namespace Modbus {
    *
    * This class can not and should not be instantiated by the user.
    * It provides access to properties and methods specific to the RTU layer.
-   * 
-   * An instance of this class is created by the constructor \b Device::Device() 
-   * of the \b Device class (or its derived classes) if the RTU layer is selected. 
-   * 
+   *
+   * An instance of this class is created by the constructor \b Device::Device()
+   * of the \b Device class (or its derived classes) if the RTU layer is selected.
+   *
    * Access to this instance is done using the Device::rtu() method.
-   * 
+   *
    * @sa Device::Device()
    * @sa Device::rtu()
    */
   class RtuLayer : public NetLayer {
-  public:
-    
+    public:
+
       /**
        * @brief Name of the serial port
-       * 
+       *
        * This property specifies the name of the serial port handled by the
        *  OS, eg. "/dev/ttyS0" or "/dev/ttyUSB0".
        */
       const std::string & port() const;
-      
+
       /**
        * @brief Return the baudrate
        */
       int baud() const;
-      
+
       /**
        * @brief Return the parity
        */
       char parity() const;
-      
+
       /**
        * @brief Return the bits of stop
        */
@@ -980,79 +1075,79 @@ namespace Modbus {
 
       /**
        * @brief Get the current serial mode
-       * 
+       *
        * This function shall return the serial mode currently used.
-       * 
+       *
        * - \b Rs232: the serial line is set for RS232 communication. RS-232
-       *  (Recommended Standard 232) is the traditional name for a series of 
-       *  standards  for serial binary single-ended data and control signals 
-       *  connecting between a DTE (Data Terminal Equipment) and a DCE 
-       *  (Data Circuit-terminating  Equipment). 
+       *  (Recommended Standard 232) is the traditional name for a series of
+       *  standards  for serial binary single-ended data and control signals
+       *  connecting between a DTE (Data Terminal Equipment) and a DCE
+       *  (Data Circuit-terminating  Equipment).
        *  It is commonly used in computer serial ports
        * - \b Rs485: the serial line is set for RS485 communication. EIA-485,
        *  also known as TIA/EIA-485 or RS-485, is a standard defining the electrical
-       *  characteristics of drivers and receivers for use in balanced digital 
-       *  multipoint systems. This standard is widely used for communications in 
-       *  industrial  automation because it can be used effectively over long 
+       *  characteristics of drivers and receivers for use in balanced digital
+       *  multipoint systems. This standard is widely used for communications in
+       *  industrial  automation because it can be used effectively over long
        *  distances and in  electrically noisy environments.
        * .
        * This function is only available on Linux kernels 2.6.28 onwards.
-       * 
-       * @return return the current mode if successful. 
+       *
+       * @return return the current mode if successful.
        * Otherwise it shall return \b UnknownMode (-1) and set errno.
        * @sa setSerialMode()
        */
       SerialMode serialMode();
-      
+
       /**
        * @brief Set the serial mode
-       * 
+       *
        * This function shall set the selected serial mode \b mode.
-       * 
-       * @return true if successful. 
+       *
+       * @return true if successful.
        * Otherwise it shall return false and set errno.
        * @sa serialMode()
        */
       bool setSerialMode (SerialMode mode);
-      
+
       /**
        * @brief Get the current RTS mode
-       * 
+       *
        * This function shall get the current Request To Send mode
-       * 
-       * @return the current RTS mode if successful. 
+       *
+       * @return the current RTS mode if successful.
        * Otherwise it shall return \b UnknownRts (-1) and set errno.
        * @sa setRts()
        */
       SerialRts rts();
-      
+
       /**
        * @brief Set the RTS mode
-       * 
-       * This function shall set the Request To Send mode to communicate on a 
+       *
+       * This function shall set the Request To Send mode to communicate on a
        * RS485 serial bus.
-       * 
-       * @return true if successful. 
+       *
+       * @return true if successful.
        * Otherwise it shall return false and set errno.
        * @sa rts()
        */
       bool setRts (SerialRts rts);
-      
+
       /**
        * @brief Get the current RTS delay
-       * 
+       *
        * This function shall get the current Request To Send delay period.
-       * @return the current RTS delay in microseconds if successful. 
+       * @return the current RTS delay in microseconds if successful.
        * Otherwise it shall return -1 and set errno.
        * @sa setRtsDelay()
        */
       int rtsDelay();
-      
+
       /**
        * @brief Set the RTS delay
-       * 
+       *
        * This function shall set the Request To Send delay period in microseconds.
-       * 
+       *
        * @return true if successful.
        * Otherwise it shall return false and set errno.
        * @sa rtsDelay()
@@ -1061,28 +1156,28 @@ namespace Modbus {
 
       /**
        * @brief Extracts the baudrate from a settings string.
-       * @return the baudrate found. if no value is found, returns the default 
+       * @return the baudrate found. if no value is found, returns the default
        * value, ie 19200.
        */
       static int baud (const std::string & settings);
-      
+
       /**
        * @brief Extracts the parity from a settings string.
-       * @return the parity found. if no value is found, returns the default 
+       * @return the parity found. if no value is found, returns the default
        * value, ie E for Even parity.
        */
       static char parity (const std::string & settings);
-      
+
       /**
        * @brief Return the stop bits from a settings string.
-       * 
-       * @return the number returned is determined based on the parity found. 
+       *
+       * @return the number returned is determined based on the parity found.
        * If the parity is None, this function returns 2, otherwise returns 1.
        */
       static int stop (const std::string & settings);
 
       friend class Device;
-      
+
     protected:
       class Private;
       RtuLayer (Private &dd);

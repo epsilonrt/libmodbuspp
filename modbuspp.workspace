@@ -3,7 +3,7 @@
   <Project Name="libmodbuspp" Path="libmodbuspp.project" Active="Yes"/>
   <Project Name="libmodbuspp-doc" Path="doc/libmodbuspp-doc.project" Active="No"/>
   <BuildMatrix>
-    <WorkspaceConfiguration Name="Debug" Selected="yes">
+    <WorkspaceConfiguration Name="Debug" Selected="no">
       <Environment/>
       <Project Name="libmodbuspp" ConfigName="Debug"/>
       <Project Name="libmodbuspp-doc" ConfigName="Debug"/>

@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CodeLite_Project Name="libmodbuspp" Version="10.0.0" InternalType="Console">
+  <Plugins>
+    <Plugin Name="qmake">
+      <![CDATA[00020001N0005Debug0000000000000001N0007Release000000000000]]>
+    </Plugin>
+  </Plugins>
   <VirtualDirectory Name="doc">
     <File Name="doc/DoxygenLayout.xml"/>
     <File Name="doc/build_main_page.sh.in"/>
@@ -10,11 +15,6 @@
       <File Name="doc/CMakeLists.txt"/>
     </VirtualDirectory>
   </VirtualDirectory>
-  <Plugins>
-    <Plugin Name="qmake">
-      <![CDATA[00010001N0005Debug000000000000]]>
-    </Plugin>
-  </Plugins>
   <VirtualDirectory Name="examples">
     <VirtualDirectory Name="master">
       <VirtualDirectory Name="read-coils">
@@ -28,6 +28,19 @@
         <File Name="examples/master/read-input-registers/read-input-registers.txt"/>
         <File Name="examples/master/read-input-registers/read-input-registers.mk"/>
         <File Name="examples/master/read-input-registers/README.md"/>
+        <VirtualDirectory Name="Debug">
+          <File Name="examples/master/read-input-registers/Debug/read-input-registers"/>
+        </VirtualDirectory>
+      </VirtualDirectory>
+      <VirtualDirectory Name="read-holding-data">
+        <File Name="examples/master/read-holding-data/main.cpp"/>
+        <File Name="examples/master/read-holding-data/read-holding-data.txt"/>
+        <File Name="examples/master/read-holding-data/read-holding-data.mk"/>
+      </VirtualDirectory>
+      <VirtualDirectory Name="write-holding-data">
+        <File Name="examples/master/write-holding-data/main.cpp"/>
+        <File Name="examples/master/write-holding-data/write-holding-data.txt"/>
+        <File Name="examples/master/write-holding-data/write-holding-data.mk"/>
       </VirtualDirectory>
     </VirtualDirectory>
   </VirtualDirectory>
@@ -94,7 +107,7 @@
       <Linker Options="" Required="yes"/>
       <ResourceCompiler Options="" Required="no"/>
       <General OutputFile="" IntermediateDirectory="./Debug" Command="$(WorkspacePath)/cmake-build-$(WorkspaceConfiguration)/bin/$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="yes" IsGUIProgram="no" IsEnabled="yes"/>
-      <BuildSystem Name="CMake">-DCMAKE_BUILD_TYPE=Debug -DMODBUSPP_WITH_DOXYGEN_DOC=1</BuildSystem>
+      <BuildSystem Name="CMake">-DCMAKE_BUILD_TYPE=Debug</BuildSystem>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
         <![CDATA[]]>
       </Environment>
@@ -134,7 +147,7 @@
       <Linker Options="" Required="yes"/>
       <ResourceCompiler Options="" Required="no"/>
       <General OutputFile="" IntermediateDirectory="./Release" Command="$(WorkspacePath)/cmake-build-$(WorkspaceConfiguration)/bin/$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="yes" IsGUIProgram="no" IsEnabled="yes"/>
-      <BuildSystem Name="CMake"/>
+      <BuildSystem Name="CMake">-DMODBUSPP_WITH_DOXYGEN_DOC=1</BuildSystem>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
         <![CDATA[]]>
       </Environment>

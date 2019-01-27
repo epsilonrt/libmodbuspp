@@ -34,7 +34,9 @@ namespace Modbus {
   // ---------------------------------------------------------------------------
   Device::Device (Net net, const std::string & connection,
                   const std::string & settings) :
-    d_ptr (new Private (this, net, connection, settings)) {}
+    d_ptr (new Private (this, net, connection, settings)) {
+
+  }
 
   // ---------------------------------------------------------------------------
   Device::Device (const Device & other) :
@@ -180,31 +182,59 @@ namespace Modbus {
   }
 
   // ---------------------------------------------------------------------------
-  bool Device::setResponseTimeout (const Timeout & t) {
+  void Device::setResponseTimeout (const Timeout & t) {
     PIMP_D (Device);
 
-    return (modbus_set_response_timeout (d->ctx, t.sec, t.usec) == 0);
+    (void) modbus_set_response_timeout (d->ctx, t.sec(), t.usec());
   }
 
   // ---------------------------------------------------------------------------
-  bool Device::responseTimeout (Timeout & t) {
-    PIMP_D (Device);
+  void Device::setResponseTimeout (const double & t) {
 
-    return (modbus_get_response_timeout (d->ctx, &t.sec, &t.usec) == 0);
+    setResponseTimeout (Timeout (t));
   }
 
   // ---------------------------------------------------------------------------
-  bool Device::setByteTimeout (const Timeout & t) {
+  void Device::responseTimeout (Timeout & t) {
     PIMP_D (Device);
 
-    return (modbus_set_byte_timeout (d->ctx, t.sec, t.usec) == 0);
+    (void) modbus_get_response_timeout (d->ctx, &t.m_sec, &t.m_usec);
   }
 
   // ---------------------------------------------------------------------------
-  bool Device::byteTimeout (Timeout & t) {
+  double Device::responseTimeout () {
+    Timeout t;
+
+    responseTimeout (t);
+    return t.value();
+  }
+
+  // ---------------------------------------------------------------------------
+  void Device::setByteTimeout (const Timeout & t) {
     PIMP_D (Device);
 
-    return (modbus_get_byte_timeout (d->ctx, &t.sec, &t.usec) == 0);
+    (void) modbus_set_byte_timeout (d->ctx, t.sec(), t.usec());
+  }
+
+  // ---------------------------------------------------------------------------
+  void Device::setByteTimeout (const double & t) {
+
+    setByteTimeout (Timeout (t));
+  }
+
+  // ---------------------------------------------------------------------------
+  void Device::byteTimeout (Timeout & t) {
+    PIMP_D (Device);
+
+    (void) modbus_get_byte_timeout (d->ctx, &t.m_sec, &t.m_usec);
+  }
+
+  // ---------------------------------------------------------------------------
+  double Device::byteTimeout () {
+    Timeout t;
+
+    byteTimeout (t);
+    return t.value();
   }
 
   // ---------------------------------------------------------------------------
@@ -216,7 +246,7 @@ namespace Modbus {
 
   // ---------------------------------------------------------------------------
   // static
-  std::string lastError() {
+  std::string Device::lastError() {
 
     return modbus_strerror (errno);
   }
@@ -271,6 +301,7 @@ namespace Modbus {
           "Error: Unable to create Modbus Device for this net !");
         break;
     }
+
   }
 
   // ---------------------------------------------------------------------------
@@ -587,6 +618,48 @@ namespace Modbus {
     PIMP_D (const TcpLayer);
 
     return d->service;
+  }
+
+  // ---------------------------------------------------------------------------
+  //
+  //                         Timeout Class
+  //
+  // ---------------------------------------------------------------------------
+
+  // ---------------------------------------------------------------------------
+  Timeout::Timeout (uint32_t s, uint32_t us) {
+
+    setValue (s, us);
+  }
+
+  // ---------------------------------------------------------------------------
+  Timeout::Timeout (const double & t) {
+
+    setValue (t);
+  }
+
+  // ---------------------------------------------------------------------------
+  void Timeout::setValue (const double & t) {
+
+    m_sec = static_cast<uint32_t> (t);
+    m_usec = (t - m_sec) * 1000000UL;
+  }
+
+  // ---------------------------------------------------------------------------
+  void  Timeout::setValue (uint32_t s, uint32_t us) {
+
+    if (us > 999999) {
+      uint32_t ts = us / 1000000UL;
+      s += ts;
+      us -= ts * 1000000UL;
+    }
+    m_sec = s;
+    m_usec = us;
+  }
+
+  // ---------------------------------------------------------------------------
+  double Timeout::value() const {
+    return static_cast<double> (m_sec) + static_cast<double> (m_usec) / 1000000UL;
   }
 
 }
