@@ -86,8 +86,10 @@ if (MODBUSPP_WITH_DOXYGEN_DOC)
   install(DIRECTORY ${PROJECT_SOURCE_DIR}/examples/
           DESTINATION ${MODBUSPP_INSTALL_EXAMPLES_DIR}
           COMPONENT doc
-          FILES_MATCHING PATTERN "*.c" PATTERN "*.cpp" PATTERN "*.project"  PATTERN "*.workspace" PATTERN "CMakeLists.txt"
+          FILES_MATCHING PATTERN "*.c" PATTERN "*.h" PATTERN "*.cpp" PATTERN "*.mk" PATTERN "*.txt" PATTERN "*.project"  PATTERN "*.workspace" PATTERN "CMakeLists.txt" PATTERN "README*"
           PATTERN ".clang/" EXCLUDE
+          PATTERN "Debug/" EXCLUDE
+          PATTERN "Release/" EXCLUDE
           PATTERN ".codelite/" EXCLUDE
           PATTERN "cmake-build*/" EXCLUDE)
 
