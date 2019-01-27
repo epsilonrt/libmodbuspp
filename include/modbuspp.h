@@ -113,9 +113,10 @@ namespace Modbus {
 
   /**
    * @class Timeout
+   * @brief Represents a timeout
+   * 
    * @author Pascal JEAN, aka epsilonrt
    * @copyright GNU Lesser General Public License
-   * @brief Represents a timeout
    */
   class Timeout {
     public:
@@ -190,12 +191,13 @@ namespace Modbus {
 
   /**
    * @class Device
-   * @author Pascal JEAN, aka epsilonrt
-   * @copyright GNU Lesser General Public License
    * @brief Device connected to Modbus
    *
    * This class is the base class for Master and Slave.
    * It groups together their common properties and methods.
+   * 
+   * @author Pascal JEAN, aka epsilonrt
+   * @copyright GNU Lesser General Public License
    */
   class Device  {
     public:
@@ -526,18 +528,31 @@ namespace Modbus {
 
   /**
    * @class Master
-   * @author Pascal JEAN, aka epsilonrt
-   * @copyright GNU Lesser General Public License
    * @brief Master connected to Modbus (Client)
    *
    * The Modbus master is the only one able to initiate a transaction with
    * the slaves. This class therefore makes it possible to read or write in
    * Modbus slaves.
+   * 
+   * To use, simply perform the following actions:
+   * @code
+      // instantiate a variable by choosing the network and the parameters to connect to it
+      Master mb (Rtu, port , "38400E1");
+      // open the communication
+      mb.open ();
+      // if necessary, choose the slave, eg:
+      mb.setSlave (33);
+      // perform read or write operations of slaves
+      mb.readInputRegisters (1, values, 2);
+   * @endcode
    *
    * @example master/read-holding-data/main.cpp
    * @example master/read-input-registers/main.cpp
    * @example master/write-holding-data/main.cpp
    * @example master/read-coils/main.cpp
+   * 
+   * @author Pascal JEAN, aka epsilonrt
+   * @copyright GNU Lesser General Public License
    */
   class Master : public Device {
 
@@ -970,9 +985,10 @@ namespace Modbus {
 
   /**
    * @class NetLayer
+   * @brief Network layer base class (backend)
+   * 
    * @author Pascal JEAN, aka epsilonrt
    * @copyright GNU Lesser General Public License
-   * @brief Network layer base class (backend)
    */
   class NetLayer  {
 
@@ -987,8 +1003,6 @@ namespace Modbus {
 
   /**
    * @class TcpLayer
-   * @author Pascal JEAN, aka epsilonrt
-   * @copyright GNU Lesser General Public License
    * @brief TCP network layer
    *
    * This class can not and should not be instantiated by the user.
@@ -999,6 +1013,9 @@ namespace Modbus {
    *
    * Access to this instance is done using the Device::tcp() method.
    *
+   * @author Pascal JEAN, aka epsilonrt
+   * @copyright GNU Lesser General Public License
+   * 
    * @sa Device::Device()
    * @sa Device::tcp()
    */
@@ -1032,8 +1049,6 @@ namespace Modbus {
 
   /**
    * @class RtuLayer
-   * @author Pascal JEAN, aka epsilonrt
-   * @copyright GNU Lesser General Public License
    * @brief RTU serial link layer
    *
    * This class can not and should not be instantiated by the user.
@@ -1046,6 +1061,9 @@ namespace Modbus {
    *
    * @sa Device::Device()
    * @sa Device::rtu()
+   * 
+   * @author Pascal JEAN, aka epsilonrt
+   * @copyright GNU Lesser General Public License
    */
   class RtuLayer : public NetLayer {
     public:

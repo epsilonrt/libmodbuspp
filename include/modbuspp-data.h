@@ -44,8 +44,6 @@ namespace Modbus {
 
   /**
    * @class Data
-   * @author Pascal JEAN, aka epsilonrt
-   * @copyright GNU Lesser General Public License
    * @brief Arithmetic data in multiple 16-bit Modbus registers
    * 
    * Data is a template class for storing, transmitting, and receiving 
@@ -56,6 +54,9 @@ namespace Modbus {
    * @param e is the order of bytes and words in the data model used by the 
    * user's Modbus network. By default it is the big endian order for bytes 
    * and words that is used.
+   * 
+   * @author Pascal JEAN, aka epsilonrt
+   * @copyright GNU Lesser General Public License
    */
   template <typename T, Endian e = EndianBig>
   class Data {
