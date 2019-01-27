@@ -18,11 +18,11 @@
 cmake_minimum_required (VERSION 3.5 FATAL_ERROR)
 
 project (MODBUSPP)
-set (PROJECT_DESCRIPTION "libmodbuspp C++ wrapper for the libmodbus library")
+set (PROJECT_DESCRIPTION "C++ wrapper for the libmodbus library")
 set (PROJECT_DESCRIPTION_TEXT "\
-A C++ wrapper for the libmodbus library, to send/receive data with a device which\n\
-respects the Modbus protocol. This library can use a serial port or an\n\
-Ethernet connection."
+  A C++ wrapper for the libmodbus library, to send/receive data with a device which\n\
+  respects the Modbus protocol. This library can use a serial port or an\n\
+  Ethernet connection."
 )
 
 # library for the Modbus protocol

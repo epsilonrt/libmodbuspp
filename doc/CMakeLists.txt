@@ -73,9 +73,21 @@ if (MODBUSPP_WITH_DOXYGEN_DOC)
   #message("MODBUSPP_INSTALL_DOC_DIR=${MODBUSPP_INSTALL_DOC_DIR}")
   #message("INSTALL_DATA_DIR=${INSTALL_DATA_DIR}")
 
+  # API documentation
   install(DIRECTORY ${CMAKE_BINARY_DIR}/html/
           DESTINATION ${MODBUSPP_INSTALL_DOC_DIR}/api-manual COMPONENT doc)
+  
+  # manpages
   install(FILES ${manpages}
           DESTINATION "${INSTALL_DATA_DIR}/man/man3" COMPONENT doc)
+
+  # Examples
+  install(DIRECTORY ${PROJECT_SOURCE_DIR}/examples/
+          DESTINATION ${MODBUSPP_INSTALL_EXAMPLES_DIR}
+          COMPONENT doc
+          FILES_MATCHING PATTERN "*.c" PATTERN "*.cpp" PATTERN "*.project"  PATTERN "*.workspace" PATTERN "CMakeLists.txt"
+          PATTERN ".clang/" EXCLUDE
+          PATTERN ".codelite/" EXCLUDE
+          PATTERN "cmake-build*/" EXCLUDE)
 
 endif(MODBUSPP_WITH_DOXYGEN_DOC)
