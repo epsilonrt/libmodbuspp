@@ -14,7 +14,7 @@ int main (int argc, char **argv) {
 
   if (argc > 1) {
 
-    port = argv[1];
+    port = argv[1]; // the serial port can be provided as a parameter on the command line.
   }
 
   Master mb (Rtu, port, "19200E1"); // new master on RTU
@@ -38,7 +38,15 @@ int main (int argc, char **argv) {
       }
       cout << endl;
     }
+    else {
+      cerr << "Unable to read coils ! "  << mb.lastError() << endl;
+      exit (EXIT_FAILURE);
+    }
     mb.close();
+  }
+  else {
+    cerr << "Unable to open MODBUS connection to " << port << " : " << mb.lastError() << endl;
+    exit (EXIT_FAILURE);
   }
 
   return 0;
