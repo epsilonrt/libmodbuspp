@@ -133,7 +133,7 @@ The classes provided by the library are documented by man pages:
 * The **Modbus_TcpLayer** page for the `Modbus::TcpLayer` class  
 * The **Modbus_Timeout** page for the `Modbus::Timeout` class  
 
-The complete API is documented in the folder `/usr/share/doc/libmodbus/api-manual`
+The complete API is documented in the folder `/usr/share/doc/modbuspp/api-manual`
 
 ## About Modbus
 
