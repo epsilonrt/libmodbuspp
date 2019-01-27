@@ -69,7 +69,6 @@ if (MODBUSPP_WITH_DOXYGEN_DOC)
   add_custom_target(doc)
   add_dependencies(doc main_page.dox html)
   
-  file(GLOB manpages  ${CMAKE_BINARY_DIR}/man/man3/Modbus_*.3)
   #message("MODBUSPP_INSTALL_DOC_DIR=${MODBUSPP_INSTALL_DOC_DIR}")
   #message("INSTALL_DATA_DIR=${INSTALL_DATA_DIR}")
 
@@ -78,8 +77,10 @@ if (MODBUSPP_WITH_DOXYGEN_DOC)
           DESTINATION ${MODBUSPP_INSTALL_DOC_DIR}/api-manual COMPONENT doc)
   
   # manpages
-  install(FILES ${manpages}
-          DESTINATION "${INSTALL_DATA_DIR}/man/man3" COMPONENT doc)
+  install(DIRECTORY ${CMAKE_BINARY_DIR}/man/
+          DESTINATION ${INSTALL_DATA_DIR}/man 
+          COMPONENT doc
+          FILES_MATCHING PATTERN "Modbus_*.3")
 
   # Examples
   install(DIRECTORY ${PROJECT_SOURCE_DIR}/examples/
