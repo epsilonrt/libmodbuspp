@@ -448,6 +448,18 @@ namespace Modbus {
   }
 
   // ---------------------------------------------------------------------------
+  int Master::reportSlaveId (int max_dest, uint8_t *dest) {
+    
+    if (isOpen() && net() == Rtu) {
+      PIMP_D (Master);
+
+      return modbus_report_slave_id (d->ctx, max_dest, dest);
+    }
+    return -1;
+
+  }
+
+  // ---------------------------------------------------------------------------
   //
   //                         Master::Private Class
   //
