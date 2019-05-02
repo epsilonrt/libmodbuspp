@@ -42,6 +42,12 @@
         <File Name="examples/master/write-holding-data/write-holding-data.txt"/>
         <File Name="examples/master/write-holding-data/write-holding-data.mk"/>
       </VirtualDirectory>
+      <VirtualDirectory Name="report-slave-id">
+        <File Name="examples/master/report-slave-id/report-slave-id.txt"/>
+        <File Name="examples/master/report-slave-id/main.cpp"/>
+        <File Name="examples/master/report-slave-id/report-slave-id.mk"/>
+        <File Name="examples/master/report-slave-id/README.md"/>
+      </VirtualDirectory>
     </VirtualDirectory>
   </VirtualDirectory>
   <VirtualDirectory Name="dev">

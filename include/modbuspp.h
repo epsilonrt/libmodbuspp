@@ -730,34 +730,6 @@ namespace Modbus {
        */
       int writeReadRegisters (int write_addr, const uint16_t * src, int write_nb,
                               int  read_addr, uint16_t * dest, int read_nb);
-                              
-      /**
-       * @brief returns a description of the controller 
-       * 
-       * This function shall send a request to the controller to obtain a 
-       * description of the controller. \n
-       * The response stored in dest contains:
-       * - the slave ID, this unique ID is in reality not unique at all so it’s 
-       * not possible to depend on it to know how the information are packed in 
-       * the response.
-       * - the run indicator status (0x00 = OFF, 0xFF = ON)
-       * - additional data specific to each controller. For example, 
-       * libmodbuspp returns the version of the library as a string.
-       * .
-       * The function writes at most max_dest bytes from the response to dest 
-       * so you must ensure that dest is large enough.
-
-       * @param max_dest
-       * @param dest
-       * @return return the number of read data if successful.
-       * If the output was truncated due to the max_dest limit then the return 
-       * value is the number of bytes which would have been written to dest if 
-       * enough space had been available. Thus, a return value greater than 
-       * max_dest means that the response data was truncated.
-       * Otherwise it shall return -1 and set errno.
-       */
-      int reportSlaveId (int max_dest, uint8_t *dest);
-
 
       /**
        * @brief Read a single discrete input (input bit)
@@ -1001,6 +973,74 @@ namespace Modbus {
 
         return writeRegisters (addr, value.registers().data(), value.registers().size());
       }
+
+
+      /**
+       * @brief returns a description of the controller
+       *
+       * This function shall send a request to the controller to obtain a
+       * description of the controller. \n
+       * The response stored in dest contains:
+       * - the slave ID, this unique ID is in reality not unique at all so it’s
+       * not possible to depend on it to know how the information are packed in
+       * the response.
+       * - the run indicator status (0x00 = OFF, 0xFF = ON)
+       * - additional data specific to each controller. For example,
+       * libmodbuspp returns the version of the library as a string.
+       * .
+       * The function writes at most max_dest bytes from the response to dest
+       * so you must ensure that dest is large enough.
+       * @return return the number of read data if successful.
+       * If the output was truncated due to the max_dest limit then the return
+       * value is the number of bytes which would have been written to dest if
+       * enough space had been available. Thus, a return value greater than
+       * max_dest means that the response data was truncated.
+       * Otherwise it shall return -1 and set errno.
+       */
+      int reportSlaveId (int max_dest, uint8_t * dest);
+      
+      /**
+       * @brief returns a description of the controller
+       * 
+       * SlaveId is a template class for storing and manipulate slave identifier
+       * datas returns by the MODBUS 17 function.
+       * @param dest description of the controller 
+       * @return return the number of read data bytes if successful.
+       * Otherwise it shall return -1 and set errno.
+       */
+      template <typename T, Endian e = EndianBig> int reportSlaveId (SlaveId<T, e> & dest) {
+        int r = reportSlaveId (MODBUS_MAX_PDU_LENGTH, dest.m_data);
+        if (r >= 0) {
+          dest.m_size = r;
+        }
+        return r;
+      }
+      
+#ifndef __DOXYGEN__
+      template <Endian e = EndianBig> int reportSlaveId (SlaveId<uint8_t, e> & dest) {
+        int r = reportSlaveId (MODBUS_MAX_PDU_LENGTH, dest.m_data);
+        if (r >= 0) {
+          dest.m_size = r;
+        }
+        return r;
+      }
+      
+      template <Endian e = EndianBig> int reportSlaveId (SlaveId<uint16_t, e> & dest) {
+        int r = reportSlaveId (MODBUS_MAX_PDU_LENGTH, dest.m_data);
+        if (r >= 0) {
+          dest.m_size = r;
+        }
+        return r;
+      }
+      
+      template <Endian e = EndianBig> int reportSlaveId (SlaveId<uint32_t, e> & dest) {
+        int r = reportSlaveId (MODBUS_MAX_PDU_LENGTH, dest.m_data);
+        if (r >= 0) {
+          dest.m_size = r;
+        }
+        return r;
+      }
+#endif /* __DOXYGEN__ not defined */
 
     protected:
       class Private;
