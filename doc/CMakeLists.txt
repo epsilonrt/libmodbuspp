@@ -38,7 +38,15 @@ if (MODBUSPP_WITH_DOXYGEN_DOC)
 
   set(DOXYGEN_INPUT_LIST 
     ${PROJECT_SOURCE_DIR}/include/modbuspp.h
-    ${PROJECT_SOURCE_DIR}/include/modbuspp-data.h
+    ${PROJECT_SOURCE_DIR}/include/modbuspp/global.h
+    ${PROJECT_SOURCE_DIR}/include/modbuspp/data.h
+    ${PROJECT_SOURCE_DIR}/include/modbuspp/netlayer.h
+    ${PROJECT_SOURCE_DIR}/include/modbuspp/tcplayer.h
+    ${PROJECT_SOURCE_DIR}/include/modbuspp/rtulayer.h
+    ${PROJECT_SOURCE_DIR}/include/modbuspp/timeout.h
+    ${PROJECT_SOURCE_DIR}/include/modbuspp/device.h
+    ${PROJECT_SOURCE_DIR}/include/modbuspp/master.h
+    ${PROJECT_SOURCE_DIR}/include/modbuspp/slave.h
     )
 
   set(DOXYGEN_INPUT "${CMAKE_BINARY_DIR}/main_page.dox")

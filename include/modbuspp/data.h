@@ -14,15 +14,13 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with the libmodbuspp Library; if not, see <http://www.gnu.org/licenses/>.
  */
-
-#ifndef MODBUSPP_DATA_H
-#define MODBUSPP_DATA_H
+#pragma once
 
 #include <cstdio>     // printf
 #include <cstring>    // memcpy ...
 #include <array>
 #include <type_traits>
-#include "modbuspp-swap.h"
+#include <modbuspp/swap.h>
 
 namespace Modbus {
 
@@ -41,6 +39,7 @@ namespace Modbus {
 
   class Device;
   class Master;
+  class Slave;
 
   /**
    * @class Data
@@ -216,6 +215,7 @@ namespace Modbus {
 
       friend class Device;
       friend class Master;
+      friend class Slave;
 
   protected:
 
@@ -339,7 +339,5 @@ namespace Modbus {
       size_t m_size;
       uint8_t m_data[MODBUS_MAX_PDU_LENGTH];
   };
-
 }
 /* ========================================================================== */
-#endif /* MODBUSPP_DATA_H defined */

@@ -23,14 +23,20 @@ endif()
 
 WriteGitVersionFile(${CMAKE_CURRENT_BINARY_DIR}/version.h)
   
-file(GLOB src_modbuspp  ${MODBUSPP_SRC_DIR}/*.cpp)
-list(REMOVE_ITEM src_modbuspp ${MODBUSPP_SRC_DIR}/modbuspp.cpp)
+file(GLOB_RECURSE src_modbuspp  ${MODBUSPP_SRC_DIR}/*.cpp)
 
 set (hdr_modbuspp 
-  ${MODBUSPP_INC_DIR}/global.h
   ${MODBUSPP_INC_DIR}/modbuspp.h
-  ${MODBUSPP_INC_DIR}/modbuspp-data.h
-  ${MODBUSPP_INC_DIR}/modbuspp-swap.h
+  ${MODBUSPP_INC_DIR}/modbuspp/global.h
+  ${MODBUSPP_INC_DIR}/modbuspp/data.h
+  ${MODBUSPP_INC_DIR}/modbuspp/swap.h
+  ${MODBUSPP_INC_DIR}/modbuspp/netlayer.h
+  ${MODBUSPP_INC_DIR}/modbuspp/tcplayer.h
+  ${MODBUSPP_INC_DIR}/modbuspp/rtulayer.h
+  ${MODBUSPP_INC_DIR}/modbuspp/timeout.h
+  ${MODBUSPP_INC_DIR}/modbuspp/device.h
+  ${MODBUSPP_INC_DIR}/modbuspp/master.h
+  ${MODBUSPP_INC_DIR}/modbuspp/slave.h
 )
 
 configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/config.h.in
@@ -38,7 +44,7 @@ configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/config.h.in
 
 set(hdr_public ${hdr_modbuspp} ${CMAKE_CURRENT_BINARY_DIR}/config.h)
 
-set (libsrc ${MODBUSPP_SRC_DIR}/modbuspp.cpp  ${src_modbuspp})
+set (libsrc ${src_modbuspp})
 
 include_directories(BEFORE
   ${LIBMODBUS_INCLUDE_DIRS} 

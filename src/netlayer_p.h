@@ -16,8 +16,16 @@
  */
 #pragma once
 
-#include <modbuspp/rtulayer.h>
-#include <modbuspp/tcplayer.h>
-#include <modbuspp/master.h>
-#include <modbuspp/slave.h>
+#include <modbuspp/netlayer.h>
+
+namespace Modbus {
+
+  class NetLayer::Private {
+    public:
+      Private (modbus_t * ctx) : ctx (ctx) {}
+
+      modbus_t * ctx;
+  };
+}
+
 /* ========================================================================== */

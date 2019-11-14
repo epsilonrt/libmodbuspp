@@ -16,8 +16,28 @@
  */
 #pragma once
 
-#include <modbuspp/rtulayer.h>
-#include <modbuspp/tcplayer.h>
-#include <modbuspp/master.h>
-#include <modbuspp/slave.h>
+#include <string>
+#include <modbuspp/global.h>
+
+namespace Modbus {
+
+  /**
+   * @class NetLayer
+   * @brief Network layer base class (backend)
+   * 
+   * @author Pascal JEAN, aka epsilonrt
+   * @copyright GNU Lesser General Public License
+   */
+  class NetLayer  {
+
+    protected:
+      class Private;
+      NetLayer (Private &dd);
+      std::unique_ptr<Private> d_ptr;
+
+    private:
+      PIMP_DECLARE_PRIVATE (NetLayer)
+  };
+}
+
 /* ========================================================================== */

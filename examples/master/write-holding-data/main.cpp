@@ -1,7 +1,7 @@
-// Writes floating point holding registers to SolarPi humidity meter
+// Writes floating point holding registers to SolarPi pressure meter
 
-// The humidity sensor calibration is composed of 4 decimal values.
-// The first 2 are the minimum and maximum humidity calibration values in %RH.
+// The pressure sensor calibration is composed of 4 decimal values.
+// The first 2 are the minimum and maximum pressure calibration values in hPa.
 // The following 2 are the output values of the analog-to-digital converter
 // (in LSB) corresponding to the calibration values.
 
@@ -35,7 +35,7 @@ int main (int argc, char **argv) {
     // the solarpi calibration registers are arranged in little endian.
     Data<float, EndianBigLittle> registers[4];
 
-    mb.setSlave (33); // to the slave at address 33
+    mb.setSlave (33); // for SolarPi Pressure board
 
     // set values ...
     registers[0] = 152.3;

@@ -14,42 +14,13 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with the libmodbuspp Library; if not, see <http://www.gnu.org/licenses/>.
  */
+#pragma once
 
-#ifndef MODBUSPP_PRIVATE_H
-#define MODBUSPP_PRIVATE_H
-
-#include <cerrno>
-#include <modbuspp.h>
-#include <modbus.h>
+#include <modbuspp/device.h>
+#include "rtulayer_p.h"
+#include "tcplayer_p.h"
 
 namespace Modbus {
-
-  class NetLayer::Private {
-    public:
-      Private (modbus_t * ctx) : ctx (ctx) {}
-
-      modbus_t * ctx;
-  };
-
-  class TcpLayer::Private  : public NetLayer::Private {
-
-    public:
-      Private (modbus_t * ctx, const std::string & host, const std::string & service) :
-        NetLayer::Private (ctx), host (host), service (service) {}
-
-      std::string host;
-      std::string service;
-  };
-
-  class RtuLayer::Private  : public NetLayer::Private {
-
-    public:
-      Private (modbus_t * ctx, const std::string & port, const std::string & settings) :
-        NetLayer::Private (ctx), port (port), settings (settings) {}
-        
-      std::string port;
-      std::string settings;
-  };
 
   class Device::Private {
 
@@ -65,22 +36,12 @@ namespace Modbus {
       RtuLayer * rtu;
       TcpLayer * tcp;
       int slave;
-      
+
       friend class RtuLayer::Private;
       friend class TcpLayer::Private;
 
       PIMP_DECLARE_PUBLIC (Device)
   };
-
-  class Master::Private : public Device::Private {
-
-    public:
-      Private (Master * q, Net net, const std::string & connection, const std::string & settings);
-      virtual ~Private();
-
-      PIMP_DECLARE_PUBLIC (Master)
-  };
 }
 
 /* ========================================================================== */
-#endif /* MODBUSPP_PRIVATE_H defined */

@@ -5,6 +5,21 @@
       <![CDATA[00020001N0005Debug0000000000000001N0007Release000000000000]]>
     </Plugin>
   </Plugins>
+  <VirtualDirectory Name="include">
+    <VirtualDirectory Name="modbuspp">
+      <File Name="include/modbuspp/swap.h"/>
+      <File Name="include/modbuspp/global.h"/>
+      <File Name="include/modbuspp/data.h"/>
+      <File Name="include/modbuspp/device.h"/>
+      <File Name="include/modbuspp/master.h"/>
+      <File Name="include/modbuspp/netlayer.h"/>
+      <File Name="include/modbuspp/rtulayer.h"/>
+      <File Name="include/modbuspp/slave.h"/>
+      <File Name="include/modbuspp/tcplayer.h"/>
+      <File Name="include/modbuspp/timeout.h"/>
+    </VirtualDirectory>
+    <File Name="include/modbuspp.h"/>
+  </VirtualDirectory>
   <VirtualDirectory Name="doc">
     <File Name="doc/DoxygenLayout.xml"/>
     <File Name="doc/build_main_page.sh.in"/>
@@ -68,15 +83,20 @@
   </VirtualDirectory>
   <Description/>
   <Dependencies/>
-  <VirtualDirectory Name="include">
-    <File Name="include/global.h"/>
-    <File Name="include/modbuspp.h"/>
-    <File Name="include/modbuspp-data.h"/>
-    <File Name="include/modbuspp-swap.h"/>
-  </VirtualDirectory>
   <VirtualDirectory Name="src">
-    <File Name="src/modbuspp.cpp"/>
-    <File Name="src/modbuspp_p.h"/>
+    <File Name="src/device.cpp"/>
+    <File Name="src/master.cpp"/>
+    <File Name="src/netlayer.cpp"/>
+    <File Name="src/rtulayer.cpp"/>
+    <File Name="src/tcplayer.cpp"/>
+    <File Name="src/device_p.h"/>
+    <File Name="src/master_p.h"/>
+    <File Name="src/netlayer_p.h"/>
+    <File Name="src/rtulayer_p.h"/>
+    <File Name="src/slave_p.h"/>
+    <File Name="src/tcplayer_p.h"/>
+    <File Name="src/timeout.cpp"/>
+    <File Name="src/slave.cpp"/>
   </VirtualDirectory>
   <VirtualDirectory Name="lib">
     <VirtualDirectory Name="resources">

@@ -14,9 +14,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with the libmodbuspp Library; if not, see <http://www.gnu.org/licenses/>.
  */
-
-#ifndef MODBUSPP_SWAP_H
-#define MODBUSPP_SWAP_H
+#pragma once
 
 #ifndef __DOXYGEN__
 
@@ -90,4 +88,3 @@ T ntoh (T input) {
 }
 #endif /* __DOXYGEN__ not defined */
 /* ========================================================================== */
-#endif /* MODBUSPP_SWAP_H defined */

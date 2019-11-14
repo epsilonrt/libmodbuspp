@@ -1,4 +1,4 @@
-// Reads the slave identifier from SolarPi humidity meter and print as follow :
+// Reads the slave identifier from SolarPi pressure meter and print as follow :
 
 // Length: 14
 // Id    : 0x02
@@ -32,7 +32,7 @@ int main (int argc, char **argv) {
     // success, do what you want here
     SlaveId<uint8_t> i; 
 
-    mb.setSlave (33); // to the slave at address 33
+    mb.setSlave (33); // for SolarPi Pressure board
     if (mb.reportSlaveId (i) > 0) {
 
       cout << "Length: " << i.size() << endl;

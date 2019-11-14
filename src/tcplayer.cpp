@@ -14,10 +14,33 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with the libmodbuspp Library; if not, see <http://www.gnu.org/licenses/>.
  */
-#pragma once
+#include "tcplayer_p.h"
+#include "config.h"
 
-#include <modbuspp/rtulayer.h>
-#include <modbuspp/tcplayer.h>
-#include <modbuspp/master.h>
-#include <modbuspp/slave.h>
+namespace Modbus {
+
+  // ---------------------------------------------------------------------------
+  //
+  //                         TcpLayer Class
+  //
+  // ---------------------------------------------------------------------------
+
+  // ---------------------------------------------------------------------------
+  TcpLayer::TcpLayer (TcpLayer::Private &dd) : NetLayer (dd) {}
+
+  // ---------------------------------------------------------------------------
+  const std::string & TcpLayer::node() const {
+    PIMP_D (const TcpLayer);
+
+    return d->host;
+  }
+
+  // ---------------------------------------------------------------------------
+  const std::string & TcpLayer::service() const {
+    PIMP_D (const TcpLayer);
+
+    return d->service;
+  }
+}
+
 /* ========================================================================== */

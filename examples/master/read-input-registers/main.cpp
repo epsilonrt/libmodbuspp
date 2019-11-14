@@ -31,7 +31,7 @@ int main (int argc, char **argv) {
     // success, do what you want here
     uint16_t values[2];
 
-    mb.setSlave (33); // to the slave at address 33
+    mb.setSlave (32); // SolarPi Humidity board
     if (mb.readInputRegisters (1, values, 2) == 2) {
 
       cout << "R0=" << values[0] << endl;

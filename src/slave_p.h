@@ -16,8 +16,19 @@
  */
 #pragma once
 
-#include <modbuspp/rtulayer.h>
-#include <modbuspp/tcplayer.h>
-#include <modbuspp/master.h>
 #include <modbuspp/slave.h>
+#include "device_p.h"
+
+namespace Modbus {
+
+  class Slave::Private : public Device::Private {
+
+    public:
+      Private (Slave * q, Net net, const std::string & connection, const std::string & settings);
+      virtual ~Private();
+
+      PIMP_DECLARE_PUBLIC (Slave)
+  };
+}
+
 /* ========================================================================== */
