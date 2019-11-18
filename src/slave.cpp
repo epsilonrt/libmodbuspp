@@ -24,17 +24,55 @@ namespace Modbus {
   //                         Slave Class
   //
   // ---------------------------------------------------------------------------
-  
-  // ---------------------------------------------------------------------------
-  int Slave::readDiscreteInputs (int addr, bool * dest, int nb) {
-    PIMP_D (Slave);
 
-    return -1;
-  }
+  // ---------------------------------------------------------------------------
+  Slave::Slave (Slave::Private &dd) : DataModel (dd) {}
+
+  // ---------------------------------------------------------------------------
+  Slave::Slave (int slaveAddr, Device * dev) :
+    DataModel (*new Private (this, slaveAddr, dev)) {}
+
+  // ---------------------------------------------------------------------------
+  Slave::~Slave() = default;
 
   // ---------------------------------------------------------------------------
   int Slave::readCoils (int addr, bool * dest, int nb) {
     PIMP_D (Slave);
+
+    if (d->dev->isOpen()) {
+
+      return modbus_read_bits (d->ctx(),
+                               pduAddress (addr), nb, (uint8_t *) dest);
+    }
+    return -1;
+
+  }
+
+  // ---------------------------------------------------------------------------
+  int Slave::readDiscreteInputs (int addr, bool * dest, int nb) {
+    PIMP_D (Slave);
+
+    if (d->dev->isOpen()) {
+
+      return modbus_read_input_bits (d->ctx(),
+                                     pduAddress (addr), nb, (uint8_t *) dest);
+    }
+    return -1;
+
+  }
+
+  // ---------------------------------------------------------------------------
+  int Slave::readRegisters (int addr, uint16_t * dest, int nb) {
+    PIMP_D (Slave);
+
+    if (d->dev->isOpen()) {
+
+      if (modbus_set_slave (d->ctx(), d->slave) == 0) {
+        
+        return modbus_read_registers (d->ctx(),
+                                      pduAddress (addr), nb, dest);
+      }
+    }
 
     return -1;
   }
@@ -43,19 +81,14 @@ namespace Modbus {
   int Slave::readInputRegisters (int addr, uint16_t * dest, int nb) {
     PIMP_D (Slave);
 
-    return -1;
-  }
+    if (d->dev->isOpen()) {
 
-  // ---------------------------------------------------------------------------
-  int Slave::readRegisters (int addr, uint16_t * dest, int nb) {
-    PIMP_D (Slave);
-
-    return -1;
-  }
-
-  // ---------------------------------------------------------------------------
-  int Slave::writeCoil (int addr, bool value) {
-    PIMP_D (Slave);
+      if (modbus_set_slave (d->ctx(), d->slave) == 0) {
+        
+        return modbus_read_input_registers (d->ctx(),
+                                            pduAddress (addr), nb, dest);
+      }
+    }
 
     return -1;
   }
@@ -64,13 +97,29 @@ namespace Modbus {
   int Slave::writeCoils (int addr, const bool * src, int nb) {
     PIMP_D (Slave);
 
+    if (d->dev->isOpen()) {
+
+      if (modbus_set_slave (d->ctx(), d->slave) == 0) {
+        
+        return modbus_write_bits (d->ctx(),
+                                  pduAddress (addr), nb, (const uint8_t *) src);
+      }
+    }
     return -1;
   }
 
   // ---------------------------------------------------------------------------
-  int Slave::writeRegister (int addr, uint16_t value) {
+  int Slave::writeCoil (int addr, bool value) {
     PIMP_D (Slave);
 
+    if (d->dev->isOpen()) {
+
+      if (modbus_set_slave (d->ctx(), d->slave) == 0) {
+        
+        return modbus_write_bit (d->ctx(),
+                                 pduAddress (addr), (uint8_t) value);
+      }
+    }
     return -1;
   }
 
@@ -78,8 +127,76 @@ namespace Modbus {
   int Slave::writeRegisters (int addr, const uint16_t * src, int nb) {
     PIMP_D (Slave);
 
+    if (d->dev->isOpen()) {
+
+      if (modbus_set_slave (d->ctx(), d->slave) == 0) {
+        
+        return modbus_write_registers (d->ctx(), pduAddress (addr), nb, src);
+      }
+    }
     return -1;
   }
+
+  // ---------------------------------------------------------------------------
+  int Slave::writeRegister (int addr, uint16_t value) {
+    PIMP_D (Slave);
+
+    if (d->dev->isOpen()) {
+
+      if (modbus_set_slave (d->ctx(), d->slave) == 0) {
+        
+        return modbus_write_register (d->ctx(),
+                                      pduAddress (addr), value);
+      }
+    }
+    return -1;
+  }
+
+
+  // ---------------------------------------------------------------------------
+  int Slave::writeReadRegisters (int waddr, const uint16_t * src, int wnb,
+                                 int raddr, uint16_t * dest, int rnb) {
+    PIMP_D (Slave);
+
+    if (d->dev->isOpen()) {
+
+      if (modbus_set_slave (d->ctx(), d->slave) == 0) {
+        
+        return modbus_write_and_read_registers (d->ctx(),
+                                                pduAddress (waddr), wnb, src,
+                                                pduAddress (raddr), rnb, dest);
+      }
+    }
+    return -1;
+  }
+
+  // ---------------------------------------------------------------------------
+  int Slave::reportSlaveId (uint16_t max_dest, uint8_t *dest) {
+    PIMP_D (Slave);
+
+    if (d->dev->isOpen() && d->dev->net() == Rtu) {
+
+      if (modbus_set_slave (d->ctx(), d->slave) == 0) {
+        
+        return modbus_report_slave_id (d->ctx(), max_dest, dest);
+      }
+    }
+    return -1;
+  }
+
+  // ---------------------------------------------------------------------------
+  //
+  //                         Slave::Private Class
+  //
+  // ---------------------------------------------------------------------------
+
+  // ---------------------------------------------------------------------------
+  Slave::Private::Private (Slave * q, int s, Device * d) :
+    DataModel::Private (q, s), dev (d) {}
+
+  // ---------------------------------------------------------------------------
+  Slave::Private::~Private() = default;
+
 }
 
 /* ========================================================================== */

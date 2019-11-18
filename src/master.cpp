@@ -14,11 +14,9 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with the libmodbuspp Library; if not, see <http://www.gnu.org/licenses/>.
  */
+#include <sstream>
 #include "master_p.h"
 #include "config.h"
-//#include <chrono>
-//#include <thread>
-//#include <stdexcept>
 
 namespace Modbus {
 
@@ -29,139 +27,106 @@ namespace Modbus {
   // ---------------------------------------------------------------------------
 
   // ---------------------------------------------------------------------------
-  Master::Master (Master::Private &dd) : Device (dd) {
-
-  }
+  Master::Master (Master::Private &dd) : Device (dd) {}
 
   // ---------------------------------------------------------------------------
   Master::Master (Net net, const std::string & connection,
                   const std::string & settings) :
-    Device (*new Private (this, net, connection, settings)) {}
+    Device (*new Private (this, net, connection, settings)) {
+
+    switch (net) {
+
+      case Tcp:
+        addSlave (TcpSlave);
+        break;
+
+      case Rtu:
+        addSlave (Broadcast);
+        break;
+    }
+  }
 
   // ---------------------------------------------------------------------------
   Master::~Master() = default;
 
   // ---------------------------------------------------------------------------
-  int Master::readDiscreteInputs (int addr, bool * dest, int nb) {
+  void Master::setRecoveryLink (bool recovery) {
+    PIMP_D (Master);
 
-    if (isOpen()) {
-      PIMP_D (Master);
-
-      return modbus_read_input_bits (d->ctx,
-                                     d->address (addr), nb, (uint8_t *) dest);
-    }
-    return -1;
+    modbus_set_error_recovery (d->ctx(), recovery ?
+                               MODBUS_ERROR_RECOVERY_LINK :
+                               MODBUS_ERROR_RECOVERY_NONE);
+    d->recoveryLink = recovery;
   }
 
   // ---------------------------------------------------------------------------
-  int Master::readCoils (int addr, bool * dest, int nb) {
+  bool Master::hasSlave (int slaveAddr) const {
+    PIMP_D (const Master);
 
-    if (isOpen()) {
-      PIMP_D (Master);
-
-      return modbus_read_bits (d->ctx,
-                               d->address (addr), nb, (uint8_t *) dest);
-    }
-    return -1;
+    return d->slave.count (slaveAddr) > 0;
   }
 
   // ---------------------------------------------------------------------------
-  int Master::readInputRegisters (int addr, uint16_t * dest, int nb) {
+  Slave & Master::addSlave (int slaveAddr) {
+    PIMP_D (Master);
 
-    if (isOpen()) {
-      PIMP_D (Master);
-
-      return modbus_read_input_registers (d->ctx,
-                                          d->address (addr), nb, dest);
+    if (modbus_set_slave (d->ctx(), slaveAddr) != 0) {
+      std::ostringstream oss;
+      
+      oss << "Error: Unable to add slave[" << slaveAddr << "]\n" << lastError();
+      throw std::invalid_argument (oss.str());
     }
 
-    return -1;
+    if (hasSlave (slaveAddr)) {
+      return slave (slaveAddr);
+    }
+    Slave * s = new Slave (slaveAddr, this);
+    d->slave[slaveAddr] = s;
+    return *s;
   }
 
   // ---------------------------------------------------------------------------
-  int Master::readRegisters (int addr, uint16_t * dest, int nb) {
+  Slave & Master::slave (int slaveAddr) {
+    PIMP_D (Master);
 
-    if (isOpen()) {
-      PIMP_D (Master);
-
-      return modbus_read_registers (d->ctx,
-                                    d->address (addr), nb, dest);
-    }
-
-    return -1;
+    return *d->slave.at (d->defaultSlave (slaveAddr));
   }
 
   // ---------------------------------------------------------------------------
-  int Master::writeCoil (int addr, bool value) {
+  const Slave & Master::slave (int slaveAddr) const {
+    PIMP_D (const Master);
 
-    if (isOpen()) {
-      PIMP_D (Master);
-
-      return modbus_write_bit (d->ctx,
-                               d->address (addr), (uint8_t) value);
-    }
-    return -1;
+    return *d->slave.at (d->defaultSlave (slaveAddr));
   }
 
   // ---------------------------------------------------------------------------
-  int Master::writeCoils (int addr, const bool * src, int nb) {
+  Slave * Master::slavePtr (int slaveAddr) {
+    PIMP_D (Master);
+    int i = d->defaultSlave (slaveAddr);
 
-    if (isOpen()) {
-      PIMP_D (Master);
-
-      return modbus_write_bits (d->ctx,
-                                d->address (addr), nb, (const uint8_t *) src);
-    }
-    return -1;
+    return hasSlave (i) ? d->slave.at (i) : 0;
   }
 
   // ---------------------------------------------------------------------------
-  int Master::writeRegister (int addr, uint16_t value) {
+  const Slave * Master::slavePtr (int slaveAddr) const {
+    PIMP_D (const Master);
+    int i = d->defaultSlave (slaveAddr);
 
-    if (isOpen()) {
-      PIMP_D (Master);
-
-      return modbus_write_register (d->ctx,
-                                    d->address (addr), value);
-    }
-    return -1;
+    return hasSlave (i) ? d->slave.at (i) : 0;
   }
 
   // ---------------------------------------------------------------------------
-  int Master::writeRegisters (int addr, const uint16_t * src, int nb) {
+  Slave & Master::operator[] (int slaveAddr) {
+    PIMP_D (Master);
 
-    if (isOpen()) {
-      PIMP_D (Master);
-
-      return modbus_write_registers (d->ctx, d->address (addr), nb, src);
-    }
-    return -1;
+    return * d->slave.at (slaveAddr);
   }
 
   // ---------------------------------------------------------------------------
-  int Master::writeReadRegisters (int waddr, const uint16_t * src, int wnb,
-                                  int raddr, uint16_t * dest, int rnb) {
+  const Slave & Master::operator[] (int slaveAddr) const {
+    PIMP_D (const Master);
 
-    if (isOpen()) {
-      PIMP_D (Master);
-
-      return modbus_write_and_read_registers (d->ctx,
-                                              d->address (waddr), wnb, src,
-                                              d->address (raddr), rnb, dest);
-    }
-    return -1;
-  }
-
-  // ---------------------------------------------------------------------------
-  int Master::reportSlaveId (int max_dest, uint8_t *dest) {
-    
-    if (isOpen() && net() == Rtu) {
-      PIMP_D (Master);
-
-      return modbus_report_slave_id (d->ctx, max_dest, dest);
-    }
-    return -1;
-
+    return * d->slave.at (slaveAddr);
   }
 
   // ---------------------------------------------------------------------------
@@ -177,6 +142,6 @@ namespace Modbus {
 
   // ---------------------------------------------------------------------------
   Master::Private::~Private() = default;
-}
 
+}
 /* ========================================================================== */

@@ -23,11 +23,15 @@ int main (int argc, char **argv) {
   // mb.rtu().setRts(RtsDown);
   // mb.rtu().setSerialMode(Rs485);
 
+  Slave slv (mb.addSlave (8));
+
+  cout << "Reads coils of slave[" << slv.slave() << "] on " <<
+       mb.backend().connection() << " (" << mb.backend().settings() << ")" << endl;
+
   if (mb.open ()) { // open a connection
     bool coil[5];
 
-    mb.setSlave (8); // to the slave at address 8
-    int ncoils = mb.readCoils (1, coil, 5); // reads coils 1 to 5
+    int ncoils = slv.readCoils (1, coil, 5); // reads coils 1 to 5
     if (ncoils > 0) {
 
       // if success, print the binary values

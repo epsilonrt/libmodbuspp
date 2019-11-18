@@ -1,7 +1,4 @@
-// Reads input registers from SolarPi humidity meter
-
-// the sensor has 2 input registers, the first corresponds to the humidity in 
-// hundredth of% RH and the second to the raw value ADC.
+// Reads input registers of SolarPi pressure meter
 
 // This example code is in the public domain.
 #include <iostream>
@@ -27,12 +24,16 @@ int main (int argc, char **argv) {
   // mb.rtu().setRts(RtsDown);
   // mb.rtu().setSerialMode(Rs485);
 
+  Slave slv (mb.addSlave (33)); // SolarPi Pressure meter
+
+  cout << "Reads input registers of slave[" << slv.slave() << "] on " <<
+       mb.backend().connection() << " (" << mb.backend().settings() << ")" << endl;
+
   if (mb.open ()) { // open a connection
     // success, do what you want here
     uint16_t values[2];
 
-    mb.setSlave (32); // SolarPi Humidity board
-    if (mb.readInputRegisters (1, values, 2) == 2) {
+    if (slv.readInputRegisters (1, values, 2) == 2) {
 
       cout << "R0=" << values[0] << endl;
       cout << "R1=" << values[1] << endl;

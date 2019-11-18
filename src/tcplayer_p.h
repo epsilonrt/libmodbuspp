@@ -24,11 +24,7 @@ namespace Modbus {
   class TcpLayer::Private  : public NetLayer::Private {
 
     public:
-      Private (modbus_t * ctx, const std::string & host, const std::string & service) :
-        NetLayer::Private (ctx), host (host), service (service) {}
-
-      std::string host;
-      std::string service;
+      Private (const std::string & host, const std::string & service);
   };
 }
 

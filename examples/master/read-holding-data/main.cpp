@@ -27,6 +27,11 @@ int main (int argc, char **argv) {
   // mb.rtu().setRts(RtsDown);
   // mb.rtu().setSerialMode(Rs485);
 
+  Slave & slv = mb.addSlave (33); // SolarPi Pressure meter
+
+  cout << "Reads holding registers of slave[" << slv.slave() << "] on " <<
+       mb.backend().connection() << " (" << mb.backend().settings() << ")" << endl;
+
   if (mb.open ()) { // open a connection
     // success, do what you want here
 
@@ -34,10 +39,8 @@ int main (int argc, char **argv) {
     // the solarpi calibration registers are arranged in little endian.
     Data<float, EndianBigLittle> registers[4];
 
-    mb.setSlave (33); // for SolarPi Pressure board
-    
     // reads values ....
-    if (mb.readRegisters (1, registers, 4) > 0) {
+    if (slv.readRegisters (1, registers, 4) > 0) {
 
       // then print them !
       cout << "R0=" << registers[0].value() << endl;

@@ -29,6 +29,10 @@ namespace Modbus {
   RtuLayer::RtuLayer (RtuLayer::Private &dd) : NetLayer (dd) {}
 
   // ---------------------------------------------------------------------------
+  RtuLayer::RtuLayer (const std::string & port, const std::string & settings) :
+    NetLayer (*new Private (port, settings)) {}
+
+  // ---------------------------------------------------------------------------
   SerialMode RtuLayer::serialMode() {
     PIMP_D (RtuLayer);
 
@@ -81,9 +85,8 @@ namespace Modbus {
 
   // ---------------------------------------------------------------------------
   const std::string & RtuLayer::port() const {
-    PIMP_D (const RtuLayer);
 
-    return d->port;
+    return connection();
   }
 
   // ---------------------------------------------------------------------------
@@ -145,6 +148,29 @@ namespace Modbus {
     }
     return 1;
   }
+
+  // ---------------------------------------------------------------------------
+  //
+  //                         RtuLayer::Private Class
+  //
+  // ---------------------------------------------------------------------------
+
+  // ---------------------------------------------------------------------------
+  RtuLayer::Private::Private (const std::string & port, const std::string & settings) :
+    NetLayer::Private (Rtu, port, settings, MODBUS_RTU_MAX_ADU_LENGTH) {
+
+    // RTU MUST BE 8-bits
+    ctx = modbus_new_rtu (port.c_str(), RtuLayer::baud (settings),
+                          RtuLayer::parity (settings), 8,
+                          RtuLayer::stop (settings));
+    if (! ctx) {
+
+      throw std::invalid_argument (
+        "Error: Unable to create RTU Modbus Backend("
+        + port + "," + settings + ")\n" + lastError());
+    }
+  }
+
 }
 
 /* ========================================================================== */

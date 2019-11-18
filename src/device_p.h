@@ -17,28 +17,29 @@
 #pragma once
 
 #include <modbuspp/device.h>
-#include "rtulayer_p.h"
-#include "tcplayer_p.h"
+#include <modbuspp/netlayer.h>
 
 namespace Modbus {
-
+  
   class Device::Private {
 
     public:
-      Private (Device * q, Net net, const std::string & connection, const std::string & settings);
+      Private (Device * q, Net net, const std::string & connection,
+               const std::string & settings);
+      Private (Device * q, const Private & other);
       virtual ~Private();
-      int address (int addr);
+      inline modbus_t * ctx() {
+        return backend->context();
+      }
+      inline modbus_t * ctx() const {
+        return backend->context();
+      }
+      int defaultSlave (int addr) const;
 
       Device * const q_ptr;
-      modbus_t * ctx;
       bool isOpen;
-      bool pduAddressing;
-      RtuLayer * rtu;
-      TcpLayer * tcp;
-      int slave;
-
-      friend class RtuLayer::Private;
-      friend class TcpLayer::Private;
+      NetLayer * backend;
+      bool recoveryLink;
 
       PIMP_DECLARE_PUBLIC (Device)
   };

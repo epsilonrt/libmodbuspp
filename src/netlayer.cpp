@@ -27,6 +27,62 @@ namespace Modbus {
 
   // ---------------------------------------------------------------------------
   NetLayer::NetLayer (NetLayer::Private &dd) : d_ptr (&dd) {}
+
+  // ---------------------------------------------------------------------------
+  NetLayer::NetLayer () :
+    d_ptr (new Private (NoNet, std::string(), std::string(), 0)) {}
+
+  // ---------------------------------------------------------------------------
+  NetLayer::~NetLayer() = default;
+
+  // ---------------------------------------------------------------------------
+  uint16_t NetLayer::maxAduLength() const {
+    PIMP_D (const NetLayer);
+
+    return d->maxAduLength;
+  }
+
+  // ---------------------------------------------------------------------------
+  Net NetLayer::net() const {
+    PIMP_D (const NetLayer);
+
+    return d->net;
+  }
+
+  // ---------------------------------------------------------------------------
+  modbus_t * NetLayer::context() {
+    PIMP_D (NetLayer);
+
+    return d->ctx;
+  }
+  
+  // ---------------------------------------------------------------------------
+  const modbus_t * NetLayer::context() const {
+    PIMP_D (const NetLayer);
+
+    return d->ctx;
+  }
+
+  // ---------------------------------------------------------------------------
+  const std::string & NetLayer::connection() const {
+    PIMP_D (const NetLayer);
+
+    return d->connection;
+  }
+  
+  // ---------------------------------------------------------------------------
+  const std::string & NetLayer::settings() const {
+    PIMP_D (const NetLayer);
+
+    return d->settings;
+  }
+  
+  // ---------------------------------------------------------------------------
+  // static
+  std::string NetLayer::lastError() {
+
+    return modbus_strerror (errno);
+  }
 }
 
 /* ========================================================================== */

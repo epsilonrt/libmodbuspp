@@ -14,6 +14,8 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with the libmodbuspp Library; if not, see <http://www.gnu.org/licenses/>.
  */
+#include <modbuspp/rtulayer.h>
+#include <modbuspp/tcplayer.h>
 #include "device_p.h"
 #include "config.h"
 #include <chrono>
@@ -33,46 +35,12 @@ namespace Modbus {
   // ---------------------------------------------------------------------------
   Device::Device (Net net, const std::string & connection,
                   const std::string & settings) :
-    d_ptr (new Private (this, net, connection, settings)) {
-
-  }
-
-  // ---------------------------------------------------------------------------
-  Device::Device (const Device & other) :
-    d_ptr (new Private (*other.d_ptr)) {}
-
-  // ---------------------------------------------------------------------------
-  void Device::swap (Device &other) {
-
-    d_ptr.swap (other.d_ptr);
-  }
-
-  // ---------------------------------------------------------------------------
-  Device& Device::operator= (const Device &other) {
-
-    Device (other).swap (*this);
-    return *this;
-  }
+    d_ptr (new Private (this, net, connection, settings)) {}
 
   // ---------------------------------------------------------------------------
   Device::~Device() {
 
     close();
-    modbus_free (d_ptr->ctx);
-  }
-
-  // ---------------------------------------------------------------------------
-  void Device::setPduAdressing (bool pdu) {
-    PIMP_D (Device);
-
-    d->pduAddressing = pdu;
-  }
-
-  // ---------------------------------------------------------------------------
-  bool  Device::pduAdressing() const {
-    PIMP_D (const Device);
-
-    return d->pduAddressing;
   }
 
   // ---------------------------------------------------------------------------
@@ -82,7 +50,7 @@ namespace Modbus {
 
     if (!isOpen()) {
 
-      d->isOpen = (modbus_connect (d->ctx) == 0);
+      d->isOpen = (modbus_connect (d->ctx()) == 0);
       if (d->isOpen) {
         // avoid that the slave takes the pulse of 40μs created by the
         // driver when opening the port as a start bit.
@@ -100,7 +68,7 @@ namespace Modbus {
     if (isOpen()) {
       PIMP_D (Device);
 
-      modbus_close (d->ctx);
+      modbus_close (d->ctx());
       d->isOpen = false;
     }
   }
@@ -111,7 +79,7 @@ namespace Modbus {
     if (isOpen()) {
       PIMP_D (Device);
 
-      return modbus_flush (d->ctx);
+      return modbus_flush (d->ctx());
     }
     return -1;
   }
@@ -124,87 +92,33 @@ namespace Modbus {
     return d->isOpen;
   }
 
-  
   // ---------------------------------------------------------------------------
-  int Device::readDiscreteInputs (int addr, bool * dest, int nb) {
-
-    return -1;
-  }
-
-  // ---------------------------------------------------------------------------
-  int Device::readCoils (int addr, bool * dest, int nb) {
-
-    return -1;
-  }
-
-  // ---------------------------------------------------------------------------
-  int Device::readInputRegisters (int addr, uint16_t * dest, int nb) {
-
-    return -1;
-  }
-
-  // ---------------------------------------------------------------------------
-  int Device::readRegisters (int addr, uint16_t * dest, int nb) {
-
-    return -1;
-  }
-
-  // ---------------------------------------------------------------------------
-  int Device::writeCoil (int addr, bool value) {
-
-    return -1;
-  }
-
-  // ---------------------------------------------------------------------------
-  int Device::writeCoils (int addr, const bool * src, int nb) {
-
-    return -1;
-  }
-
-  // ---------------------------------------------------------------------------
-  int Device::writeRegister (int addr, uint16_t value) {
-
-    return -1;
-  }
-
-  // ---------------------------------------------------------------------------
-  int Device::writeRegisters (int addr, const uint16_t * src, int nb) {
-
-    return -1;
-  }
-
-  // ---------------------------------------------------------------------------
-  int Device::slave() const {
+  bool
+  Device::isConnected() const {
     PIMP_D (const Device);
 
-    return d->slave;
+    return d->isOpen && (modbus_get_socket (d->ctx()) != -1);
   }
 
   // ---------------------------------------------------------------------------
-  bool Device::setSlave (int id) {
+  void Device::setRecoveryLink (bool recovery) {
     PIMP_D (Device);
 
-    if (modbus_set_slave (d->ctx, id) == 0) {
-
-      d->slave = id;
-      return true;
-    }
-    return false;
+    d->recoveryLink = recovery;
   }
 
   // ---------------------------------------------------------------------------
-  Net Device::net() const {
+  bool Device::recoveryLink() const {
     PIMP_D (const Device);
 
-    if (d->rtu) {
+    return d->recoveryLink;
+  }
 
-      return Rtu;
-    }
-    else if (d->tcp) {
+  // ---------------------------------------------------------------------------
+  NetLayer & Device::backend() const {
+    PIMP_D (const Device);
 
-      return Tcp;
-    }
-    return NoNet;
+    return *d->backend;
   }
 
   // ---------------------------------------------------------------------------
@@ -213,7 +127,7 @@ namespace Modbus {
     if (net() == Rtu) {
       PIMP_D (Device);
 
-      return *d->rtu;
+      return * reinterpret_cast<RtuLayer *> (d->backend);
     }
     throw std::domain_error ("Error: Unable to return RTU layer !");
   }
@@ -224,7 +138,7 @@ namespace Modbus {
     if (net() == Tcp) {
       PIMP_D (Device);
 
-      return *d->tcp;
+      return * reinterpret_cast<TcpLayer *> (d->backend);
     }
     throw std::domain_error ("Error: Unable to return TCP layer !");
   }
@@ -233,7 +147,7 @@ namespace Modbus {
   void Device::setResponseTimeout (const Timeout & t) {
     PIMP_D (Device);
 
-    (void) modbus_set_response_timeout (d->ctx, t.sec(), t.usec());
+    (void) modbus_set_response_timeout (d->ctx(), t.sec(), t.usec());
   }
 
   // ---------------------------------------------------------------------------
@@ -246,7 +160,7 @@ namespace Modbus {
   void Device::responseTimeout (Timeout & t) {
     PIMP_D (Device);
 
-    (void) modbus_get_response_timeout (d->ctx, &t.m_sec, &t.m_usec);
+    (void) modbus_get_response_timeout (d->ctx(), &t.m_sec, &t.m_usec);
   }
 
   // ---------------------------------------------------------------------------
@@ -261,7 +175,7 @@ namespace Modbus {
   void Device::setByteTimeout (const Timeout & t) {
     PIMP_D (Device);
 
-    (void) modbus_set_byte_timeout (d->ctx, t.sec(), t.usec());
+    (void) modbus_set_byte_timeout (d->ctx(), t.sec(), t.usec());
   }
 
   // ---------------------------------------------------------------------------
@@ -274,7 +188,7 @@ namespace Modbus {
   void Device::byteTimeout (Timeout & t) {
     PIMP_D (Device);
 
-    (void) modbus_get_byte_timeout (d->ctx, &t.m_sec, &t.m_usec);
+    (void) modbus_get_byte_timeout (d->ctx(), &t.m_sec, &t.m_usec);
   }
 
   // ---------------------------------------------------------------------------
@@ -289,14 +203,20 @@ namespace Modbus {
   bool Device::setDebug (bool debug) {
     PIMP_D (Device);
 
-    return (modbus_set_debug (d->ctx, debug ? TRUE : FALSE) == 0);
+    return (modbus_set_debug (d->ctx(), debug ? TRUE : FALSE) == 0);
+  }
+
+  // ---------------------------------------------------------------------------
+  Net Device::net() const {
+
+    return backend().net();
   }
 
   // ---------------------------------------------------------------------------
   // static
   std::string Device::lastError() {
 
-    return modbus_strerror (errno);
+    return NetLayer::lastError();
   }
 
   // ---------------------------------------------------------------------------
@@ -308,40 +228,16 @@ namespace Modbus {
   // ---------------------------------------------------------------------------
   Device::Private::Private (Device * q, Net net, const std::string & connection,
                             const std::string & settings) :
-    q_ptr (q), ctx (0), isOpen (false), pduAddressing (false),
-    rtu (0), tcp (0), slave (0) {
+    q_ptr (q), isOpen (false), backend (0), recoveryLink (false) {
 
     switch (net) {
 
       case Tcp:
-        ctx = modbus_new_tcp_pi (connection.c_str(), settings.c_str());
-        if (ctx) {
-          tcp = new TcpLayer (*new TcpLayer::Private (ctx, connection, settings));
-        }
-        else {
-
-          throw std::invalid_argument (
-            "Error: Unable to create TCP Modbus Device(" +
-            connection + "," + settings + ")");
-        }
-        slave = TcpSlave;
+        backend = new TcpLayer (connection, settings);
         break;
 
       case Rtu:
-        // RTU MUST BE 8-bits
-        ctx = modbus_new_rtu (connection.c_str(), RtuLayer::baud (settings),
-                              RtuLayer::parity (settings), 8,
-                              RtuLayer::stop (settings));
-        if (ctx) {
-
-          rtu = new RtuLayer (*new RtuLayer::Private (ctx, connection, settings));
-        }
-        else {
-
-          throw std::invalid_argument (
-            "Error: Unable to create RTU Modbus Device("
-            + connection + "," + settings + ")");
-        }
+        backend = new RtuLayer (connection, settings);
         break;
 
       default:
@@ -349,20 +245,22 @@ namespace Modbus {
           "Error: Unable to create Modbus Device for this net !");
         break;
     }
-
   }
 
   // ---------------------------------------------------------------------------
   Device::Private::~Private() {
 
-    delete rtu;
-    delete tcp;
+    delete backend;
   }
-
+  
   // ---------------------------------------------------------------------------
-  int Device::Private::address (int addr) {
+  int Device::Private::defaultSlave (int addr) const {
 
-    return addr - (pduAddressing ? 0 : 1);
+    if (addr < 0) {
+
+      return backend->net() == Rtu ? Broadcast : TcpSlave;
+    }
+    return addr;
   }
 }
 

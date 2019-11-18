@@ -14,59 +14,74 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with the libmodbuspp Library; if not, see <http://www.gnu.org/licenses/>.
  */
-#include "tcplayer_p.h"
+#include "datamodel_p.h"
 #include "config.h"
 
 namespace Modbus {
 
   // ---------------------------------------------------------------------------
   //
-  //                         TcpLayer Class
+  //                             DataModel Class
   //
   // ---------------------------------------------------------------------------
 
   // ---------------------------------------------------------------------------
-  TcpLayer::TcpLayer (TcpLayer::Private &dd) : NetLayer (dd) {}
+  DataModel::DataModel (DataModel::Private &dd) : d_ptr (&dd) {}
 
   // ---------------------------------------------------------------------------
-  TcpLayer::TcpLayer (const std::string & host, const std::string & service) :
-    NetLayer (*new Private (host, service)) {}
+  DataModel::DataModel (int id) :
+    d_ptr (new Private (this, id)) {}
 
   // ---------------------------------------------------------------------------
-  const std::string & TcpLayer::node() const {
+  DataModel::~DataModel() = default;
 
-    return connection();
+  // ---------------------------------------------------------------------------
+  void DataModel::setPduAddressing (bool pdu) {
+    PIMP_D (DataModel);
+
+    d->pduAddressing = pdu;
   }
 
   // ---------------------------------------------------------------------------
-  const std::string & TcpLayer::service() const {
+  bool  DataModel::pduAddressing() const {
+    PIMP_D (const DataModel);
 
-    return settings();
+    return d->pduAddressing;
   }
 
   // ---------------------------------------------------------------------------
-  //
-  //                         TcpLayer::Private Class
-  //
-  // ---------------------------------------------------------------------------
+  int DataModel::pduAddress (int dataAddr) const {
+    PIMP_D (const DataModel);
+
+    return dataAddr - (d->pduAddressing ? 0 : 1);
+  }
 
   // ---------------------------------------------------------------------------
-  TcpLayer::Private::Private (const std::string & host, const std::string & service) :
-    NetLayer::Private (Tcp, host, service, MODBUS_TCP_MAX_ADU_LENGTH) {
-    const char * node = NULL;
+  int DataModel::slave() const {
+    PIMP_D (const DataModel);
+
+    return d->slave;
+  }
+
+  // ---------------------------------------------------------------------------
+  // static
+  void DataModel::setBoolArray (bool * dest, const uint8_t * src, size_t n) {
     
-    if (host != "*") {
-      node = host.c_str();
-    }
-
-    ctx = modbus_new_tcp_pi (node, service.c_str());
-    if (! ctx) {
-
-      throw std::invalid_argument (
-        "Error: Unable to create TCP Modbus Backend(" +
-        host + ":" + service + ")\n" + lastError());
-    }
+    modbus_set_bits_from_bytes ((uint8_t *) dest, 0, n, src);
   }
+
+  // ---------------------------------------------------------------------------
+  //
+  //                         DataModel::Private Class
+  //
+  // ---------------------------------------------------------------------------
+
+  // ---------------------------------------------------------------------------
+  DataModel::Private::Private (DataModel * q, int id) :
+    q_ptr (q), pduAddressing (false), slave (id) {}
+
+  // ---------------------------------------------------------------------------
+  DataModel::Private::~Private() = default;
 
 }
 

@@ -16,7 +16,7 @@
  */
 #pragma once
 
-//#include <cerrno>
+#include <map>
 #include <modbuspp/master.h>
 #include "device_p.h"
 
@@ -27,7 +27,8 @@ namespace Modbus {
     public:
       Private (Master * q, Net net, const std::string & connection, const std::string & settings);
       virtual ~Private();
-
+      
+      std::map <int,Slave*> slave;
       PIMP_DECLARE_PUBLIC (Master)
   };
 }

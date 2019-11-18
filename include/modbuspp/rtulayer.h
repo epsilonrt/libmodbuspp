@@ -42,6 +42,11 @@ namespace Modbus {
     public:
 
       /**
+       * @brief Constructor
+       */
+      RtuLayer (const std::string & port, const std::string & settings);
+
+      /**
        * @brief Name of the serial port
        *
        * This property specifies the name of the serial port handled by the
@@ -144,7 +149,7 @@ namespace Modbus {
        * @sa rtsDelay()
        */
       bool setRtsDelay (int us);
-
+      
       /**
        * @brief Extracts the baudrate from a settings string.
        * @return the baudrate found. if no value is found, returns the default
@@ -166,8 +171,6 @@ namespace Modbus {
        * If the parity is None, this function returns 2, otherwise returns 1.
        */
       static int stop (const std::string & settings);
-
-      friend class Device;
 
     protected:
       class Private;

@@ -86,6 +86,13 @@ GetGitVersion(MODBUSPP_VERSION)
 set(MODBUSPP_VERSION
   ${MODBUSPP_VERSION_MAJOR}.${MODBUSPP_VERSION_MINOR}.${MODBUSPP_VERSION_PATCH})
 
+include(CheckTypeSize)
+check_type_size(bool SIZEOF_BOOL BUILTIN_TYPES_ONLY LANGUAGE CXX)
+message(STATUS "  size of bool is ${SIZEOF_BOOL}")
+if (NOT ${SIZEOF_BOOL} EQUAL 1)
+  message(FATAL_ERROR "bool must have a size of 1 byte !")
+endif()
+
 # Make relative paths absolute (needed later on)
 foreach(p LIB BIN INCLUDE CMAKE DATA DOC CODELITE)
   set(var INSTALL_${p}_DIR)

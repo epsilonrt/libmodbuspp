@@ -16,8 +16,29 @@
  */
 #pragma once
 
-#include <modbuspp/rtulayer.h>
-#include <modbuspp/tcplayer.h>
-#include <modbuspp/master.h>
-#include <modbuspp/server.h>
+#include <vector>
+#include <modbuspp/bufferedslave.h>
+#include "slave_p.h"
+
+namespace Modbus {
+
+  class BufferedSlave::Private : public Slave::Private {
+
+    public:
+      Private (BufferedSlave * q, int s, Device * d);
+      virtual ~Private();
+      int setDiscreteInputBlock (int addr, int nmemb);
+      int setCoilBlock (int addr, int nmemb);
+      int setHoldingRegisterBlock (int addr, int nmemb);
+      int setInputRegisterBlock (int addr, int nmemb);
+
+      modbus_mapping_t * map;
+      std::vector<uint8_t> idReport;
+      Message::Callback beforeReplyCB;
+      Message::Callback afterReplyCB;
+
+      PIMP_DECLARE_PUBLIC (BufferedSlave)
+  };
+}
+
 /* ========================================================================== */

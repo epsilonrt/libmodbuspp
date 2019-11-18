@@ -17,6 +17,11 @@
       <File Name="include/modbuspp/slave.h"/>
       <File Name="include/modbuspp/tcplayer.h"/>
       <File Name="include/modbuspp/timeout.h"/>
+      <File Name="include/modbuspp/datamodel.h"/>
+      <File Name="include/modbuspp/server.h"/>
+      <File Name="include/modbuspp/bufferedslave.h"/>
+      <File Name="include/modbuspp/slaveid.h"/>
+      <File Name="include/modbuspp/message.h"/>
     </VirtualDirectory>
     <File Name="include/modbuspp.h"/>
   </VirtualDirectory>
@@ -96,7 +101,15 @@
     <File Name="src/slave_p.h"/>
     <File Name="src/tcplayer_p.h"/>
     <File Name="src/timeout.cpp"/>
+    <File Name="src/datamodel_p.h"/>
+    <File Name="src/datamodel.cpp"/>
+    <File Name="src/server_p.h"/>
     <File Name="src/slave.cpp"/>
+    <File Name="src/server.cpp"/>
+    <File Name="src/bufferedslave.cpp"/>
+    <File Name="src/bufferedslave_p.h"/>
+    <File Name="src/message.cpp"/>
+    <File Name="src/message_p.h"/>
   </VirtualDirectory>
   <VirtualDirectory Name="lib">
     <VirtualDirectory Name="resources">

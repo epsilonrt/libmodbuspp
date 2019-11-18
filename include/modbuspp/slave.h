@@ -16,85 +16,29 @@
  */
 #pragma once
 
-//#include <iostream>
-#include <modbuspp/device.h>
+#include <modbuspp/datamodel.h>
+#include <modbuspp/slaveid.h>
 
 namespace Modbus {
-/*
-
-
-In TCP mode, you must not use the usual modbus_connect(3) to establish the connection but a pair of accept/listen calls
-
-    modbus_tcp_listen(3) modbus_tcp_accept(3) modbus_tcp_pi_listen(3) modbus_tcp_pi_accept(3)
-then the data can be received with
-
-    modbus_receive(3)
-and a response can be send with
-
-    modbus_reply(3) modbus_reply_exception(3)
-
-To handle the mapping of your Modbus data, you must use: modbus_mapping_new(3) modbus_mapping_free(3)
-*/
+  class Device;
+  
  /**
    * @class Slave
-   * @brief Slave connected to Modbus (Server)
-   *
-   * The Modbus slave is waiting for request from Mosbus Masters (clients) and 
-   * must answer when it is concerned by the request.
-   * 
-   * To use, simply perform the following actions:
-   * @code
-      // instantiate a variable by choosing the network and the parameters to connect to it
-      Slave mb (Rtu, port , "38400E1");
-      // open the communication
-      mb.open ();
-      // if necessary, choose the slave, eg:
-      mb.setSlave (33);
-      // perform read or write operations of slaves
-      mb.readInputRegisters (1, values, 2);
-   * @endcode
+   * @brief Slave connected to Modbus
    *
    * @example slave/..../main.cpp
    * 
    * @author Pascal JEAN, aka epsilonrt
    * @copyright GNU Lesser General Public License
    */
-  class Slave : public Device {
+  class Slave : public DataModel {
 
     public:
       /**
        * @brief Constructor
-       *
-       * Constructs a Modbus master for the \b net network.
-       *
-       * For the Tcp backend :
-       * - \b connection specifies the host name or IP
-       * address of the host to connect to, eg. "192.168.0.5" , "::1" or
-       * "server.com". A NULL value can be used to listen any addresses in server mode,
-       * - \b settings is the service name/port number to connect to.
-       * To use the default Modbus port use the string "502". On many Unix
-       * systems, it’s convenient to use a port number greater than or equal
-       * to 1024 because it’s not necessary to have administrator privileges.
-       * .
-       *
-       * For the Rtu backend :
-       * - \b connection specifies the name of the serial port handled by the
-       *  OS, eg. "/dev/ttyS0" or "/dev/ttyUSB0",
-       * - \b settings specifies communication settings as a string in the
-       *  format BBBBPS. BBBB specifies the baud rate of the communication, PS
-       *  specifies the parity and the bits of stop. \n
-       *  According to Modbus RTU specifications :
-       *    - the possible combinations for PS are E1, O1 and N2.
-       *    - the number of bits of data must be 8, also there is no possibility
-       *      to change this setting
-       *    .
-       * .
-       *
-       * An exception std::invalid_argument is thrown if one of the parameters
-       * is incorrect.
        */
-      Slave (Net net = Tcp, const std::string & connection = "*",
-              const std::string & settings = "502");
+      Slave (int slaveAddr, Device * dev);
+
       /**
        * @brief Destructor
        *
@@ -103,12 +47,12 @@ To handle the mapping of your Modbus data, you must use: modbus_mapping_new(3) m
        */
       virtual ~Slave();
 
-      using Device::readInputRegisters;
-      using Device::readInputRegister;
-      using Device::readRegister;
-      using Device::readRegisters;
-      using Device::writeRegisters;
-      using Device::writeRegister;
+      using DataModel::readInputRegisters;
+      using DataModel::readInputRegister;
+      using DataModel::readRegister;
+      using DataModel::readRegisters;
+      using DataModel::writeRegisters;
+      using DataModel::writeRegister;
 
       /**
        * @brief Read many discrete inputs (input bits)
@@ -122,7 +66,7 @@ To handle the mapping of your Modbus data, you must use: modbus_mapping_new(3) m
        * @return the number of read input status if successful.
        * Otherwise it shall return -1 and set errno.
        */
-      int readDiscreteInputs (int addr, bool * dest, int nb = 1);
+      virtual int readDiscreteInputs (int addr, bool * dest, int nb = 1);
 
       /**
        * @brief Read many coils (bits)
@@ -136,7 +80,7 @@ To handle the mapping of your Modbus data, you must use: modbus_mapping_new(3) m
        * @return the number of read bits if successful.
        * Otherwise it shall return -1 and set errno.
        */
-      int readCoils (int addr, bool * dest, int nb = 1);
+      virtual int readCoils (int addr, bool * dest, int nb = 1);
 
       /**
        * @brief Write a single coil (bit)
@@ -149,7 +93,7 @@ To handle the mapping of your Modbus data, you must use: modbus_mapping_new(3) m
        * @return 1 if successful.
        * Otherwise it shall return -1 and set errno.
        */
-      int writeCoil (int addr, bool src);
+      virtual int writeCoil (int addr, bool src);
 
       /**
        * @brief Write many coils (bits)
@@ -163,7 +107,7 @@ To handle the mapping of your Modbus data, you must use: modbus_mapping_new(3) m
        * @return the number of written bits if successful.
        * Otherwise it shall return -1 and set errno.
        */
-      int writeCoils (int addr, const bool * src, int nb);
+      virtual int writeCoils (int addr, const bool * src, int nb);
 
       /**
        * @brief Read many input registers
@@ -180,7 +124,7 @@ To handle the mapping of your Modbus data, you must use: modbus_mapping_new(3) m
        * @return return the number of read input registers if successful.
        * Otherwise it shall return -1 and set errno.
        */
-      int readInputRegisters (int addr, uint16_t * dest, int nb = 1);
+      virtual int readInputRegisters (int addr, uint16_t * dest, int nb = 1);
 
       /**
        * @brief Read many registers
@@ -195,7 +139,7 @@ To handle the mapping of your Modbus data, you must use: modbus_mapping_new(3) m
        * @return return the number of read registers if successful.
        * Otherwise it shall return -1 and set errno.
        */
-      int readRegisters (int addr, uint16_t * dest, int nb = 1);
+      virtual int readRegisters (int addr, uint16_t * dest, int nb = 1);
 
       /**
        * @brief Write a single register
@@ -208,7 +152,7 @@ To handle the mapping of your Modbus data, you must use: modbus_mapping_new(3) m
        * @return 1 if successful.
        * Otherwise it shall return -1 and set errno.
        */
-      int writeRegister (int addr, uint16_t value);
+      virtual int writeRegister (int addr, uint16_t value);
 
       /**
        * @brief Write many registers
@@ -221,7 +165,94 @@ To handle the mapping of your Modbus data, you must use: modbus_mapping_new(3) m
        * @return number of written registers if successful.
        * Otherwise it shall return -1 and set errno.
        */
-      int writeRegisters (int addr, const uint16_t * src, int nb);
+      virtual int writeRegisters (int addr, const uint16_t * src, int nb);
+
+      /**
+       * @brief Write and read many registers in a single transaction
+       *
+       * This function shall write the content of the \b write_nb holding
+       * registers from the array 'src' to the address \b write_addr of the
+       * remote device then shall read the content of the \b read_nb holding
+       * registers to the address \b read_addr of the remote device.
+       * The result of reading is stored in \b dest array as word values (16 bits).
+       *
+       * You must take care to allocate enough memory to store the results in
+       * \b dest (at least \b nb * sizeof(uint16_t)).
+       *
+       * The function uses the Modbus function code 0x17 (write/read registers).
+       *
+       * @return the number of read registers if successful.
+       * Otherwise it shall return -1 and set errno.
+       */
+      virtual int writeReadRegisters (int write_addr, const uint16_t * src, int write_nb,
+                              int  read_addr, uint16_t * dest, int read_nb);
+
+      /**
+       * @brief returns a description of the controller
+       *
+       * This function shall send a request to the controller to obtain a
+       * description of the controller. \n
+       * The response stored in dest contains:
+       * - the slave ID, this unique ID is in reality not unique at all so it’s
+       * not possible to depend on it to know how the information are packed in
+       * the response.
+       * - the run indicator status (0x00 = OFF, 0xFF = ON)
+       * - additional data specific to each controller. For example,
+       * libmodbuspp returns the version of the library as a string.
+       * .
+       * The function writes at most max_dest bytes from the response to dest
+       * so you must ensure that dest is large enough.
+       * @return return the number of read data if successful.
+       * If the output was truncated due to the max_dest limit then the return
+       * value is the number of bytes which would have been written to dest if
+       * enough space had been available. Thus, a return value greater than
+       * max_dest means that the response data was truncated.
+       * Otherwise it shall return -1 and set errno.
+       */
+      virtual int reportSlaveId (uint16_t max_dest, uint8_t * dest);
+
+      /**
+       * @brief returns a description of the controller
+       *
+       * SlaveId is a template class for storing and manipulate slave identifier
+       * datas returns by the MODBUS 17 function.
+       * @param dest description of the controller
+       * @return return the number of read data bytes if successful.
+       * Otherwise it shall return -1 and set errno.
+       */
+      template <typename T, Endian e = EndianBig> int reportSlaveId (SlaveId<T, e> & dest) {
+        int r = reportSlaveId (MODBUS_MAX_PDU_LENGTH, dest.m_data);
+        if (r >= 0) {
+          dest.m_size = r;
+        }
+        return r;
+      }
+
+#ifndef __DOXYGEN__
+      template <Endian e = EndianBig> int reportSlaveId (SlaveId<uint8_t, e> & dest) {
+        int r = reportSlaveId (MODBUS_MAX_PDU_LENGTH, dest.m_data);
+        if (r >= 0) {
+          dest.m_size = r;
+        }
+        return r;
+      }
+
+      template <Endian e = EndianBig> int reportSlaveId (SlaveId<uint16_t, e> & dest) {
+        int r = reportSlaveId (MODBUS_MAX_PDU_LENGTH, dest.m_data);
+        if (r >= 0) {
+          dest.m_size = r;
+        }
+        return r;
+      }
+
+      template <Endian e = EndianBig> int reportSlaveId (SlaveId<uint32_t, e> & dest) {
+        int r = reportSlaveId (MODBUS_MAX_PDU_LENGTH, dest.m_data);
+        if (r >= 0) {
+          dest.m_size = r;
+        }
+        return r;
+      }
+#endif /* __DOXYGEN__ not defined */
 
     protected:
       class Private;
@@ -229,6 +260,7 @@ To handle the mapping of your Modbus data, you must use: modbus_mapping_new(3) m
 
     private:
       PIMP_DECLARE_PRIVATE (Slave)
+
   };
 }
 

@@ -19,10 +19,10 @@
 #ifndef __DOXYGEN__
 /*
  * Internal: Pointer to implementation
- * "Pointer to implementation" or "pImpl" is a C++ programming technique that 
- * removes implementation details of a class from its object representation by 
+ * "Pointer to implementation" or "pImpl" is a C++ programming technique that
+ * removes implementation details of a class from its object representation by
  * placing them in a separate class, accessed through an opaque pointer.
- * This technique is used to construct C++ library interfaces with stable 
+ * This technique is used to construct C++ library interfaces with stable
  * ABI and to reduce compile-time dependencies.
  */
 
@@ -47,7 +47,8 @@
   inline Class* q_func() { return reinterpret_cast<Class *>(q_ptr); } \
   inline const Class* q_func() const { return reinterpret_cast<const Class *>(q_ptr); } \
   friend class Class;
-
+#define PIMP_D_CAST(Class,FromInstance) \
+  *reinterpret_cast<Class::Private*>(FromInstance.d_ptr.get())
 #endif /* __DOXYGEN__ not defined */
 
 /**
@@ -58,6 +59,7 @@ namespace Modbus {
   const int Broadcast = MODBUS_BROADCAST_ADDRESS; ///< Modbus Broadcast Address
   const int TcpSlave = MODBUS_TCP_SLAVE; ///< Can be used in TCP mode to restore the default value
   const int Unknown = -1; ///< Value corresponding to an unknown parameter
+  const uint16_t MaxPduLength = MODBUS_MAX_PDU_LENGTH;
 
   /**
    * @enum Net
@@ -135,5 +137,52 @@ namespace Modbus {
     RtsDown = MODBUS_RTU_RTS_DOWN, ///< RTS flag OFF during communication, ON outside.
     UnknownRts = Unknown   ///< Unknown RTS mode.
   };
+
+  /**
+   * @enum Endian
+   * @brief Sequential order in which bytes are arranged
+   */
+  enum Endian {
+    EndianBigBig = 0x00,    ///< Bytes in big endian order, word in big endian order : ABCD
+    EndianBig = EndianBigBig, ///< Big endian order : ABCD
+    EndianBigLittle = 0x01, ///< Bytes in big endian order, word in little endian order : CDAB
+    EndianLittleBig = 0x02, ///< Bytes in little endian order, word in big endian order : BADC
+    EndianLittleLittle = 0x03, ///< Bytes in little endian order, word in little endian order : DCBA
+    EndianLittle = EndianLittleLittle ///< Little endian order : DCBA
+  };
+  /**
+   * @enum Table
+   * @brief Data type
+   */
+  enum Table {
+    DiscreteInput = 0,
+    Coil = 1,
+    InputRegister = 3,
+    HoldingRegister = 4
+  };
+
+  enum Function {
+    ReadCoils = MODBUS_FC_READ_COILS,
+    ReadDiscreteInputs = MODBUS_FC_READ_DISCRETE_INPUTS,
+    ReadHoldingRegisters = MODBUS_FC_READ_HOLDING_REGISTERS,
+    ReadInputRegisters = MODBUS_FC_READ_INPUT_REGISTERS,
+    WriteSingleCoil = MODBUS_FC_WRITE_SINGLE_COIL,
+    WriteSingleRegister = MODBUS_FC_WRITE_SINGLE_REGISTER,
+    ReadExceptionStatus = MODBUS_FC_READ_EXCEPTION_STATUS,
+    // Diagnostic = 8, // Not implemented
+    // GetComEventCounter = 11, // Not implemented
+    // GetComEventLog = 12, // Not implemented
+    WriteMultipleCoils = MODBUS_FC_WRITE_MULTIPLE_COILS,
+    WriteMultipleRegisters = MODBUS_FC_WRITE_MULTIPLE_REGISTERS,
+    ReportServerId = MODBUS_FC_REPORT_SLAVE_ID,
+    // ReadFileRecord = 20, // Not implemented
+    // WriteFileRecord = 21, // Not implemented
+    MaskWriteRegister = MODBUS_FC_MASK_WRITE_REGISTER,
+    ReadWriteMultipleRegisters = MODBUS_FC_WRITE_AND_READ_REGISTERS,
+    // ReadFifoQueue = 24, // Not implemented
+    // ReadDeviceId = 43, // Not implemented
+    UnknownFunction = Unknown
+  };
+
 }
 /* ========================================================================== */

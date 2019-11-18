@@ -17,16 +17,25 @@
 #pragma once
 
 #include <modbuspp/slave.h>
-#include "device_p.h"
+#include <modbuspp/device.h>
+#include <modbuspp/netlayer.h>
+#include "datamodel_p.h"
 
 namespace Modbus {
 
-  class Slave::Private : public Device::Private {
+  class Slave::Private : public DataModel::Private {
 
     public:
-      Private (Slave * q, Net net, const std::string & connection, const std::string & settings);
+      Private (Slave * q, int s, Device * d);
       virtual ~Private();
+      inline modbus_t * ctx() {
+        return dev->backend().context();
+      }
+      inline const modbus_t * ctx() const {
+        return dev->backend().context();
+      }
 
+      Device * dev;
       PIMP_DECLARE_PUBLIC (Slave)
   };
 }

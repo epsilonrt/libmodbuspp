@@ -16,40 +16,37 @@
  */
 #pragma once
 
-#include <modbuspp/device.h>
-#include <modbuspp/slave.h>
+#include <modbuspp/master.h>
+#include <modbuspp/message.h>
+#include <modbuspp/bufferedslave.h>
 
 namespace Modbus {
 
-  /**
-   * @class Master
-   * @brief Master connected to Modbus (Client)
+ /**
+   * @class Server
+   * @brief Server connected to Modbus (Server)
    *
-   * The Modbus master is the only one able to initiate a transaction with
-   * the slaves. This class therefore makes it possible to read or write in
-   * Modbus slaves.
-   *
+   * The Modbus slave is waiting for request from Modbus Masters (clients) and 
+   * must answer when it is concerned by the request.
+   * 
    * To use, simply perform the following actions:
    * @code
       // instantiate a variable by choosing the network and the parameters to connect to it
-      Master mb (Rtu, port , "38400E1");
-      // adds a new slave and gets her reference
-      Slave & slave = mb.addSlave(33);
+      Server mb (Rtu, port , "38400E1");
       // open the communication
       mb.open ();
-      // perform read or write operations for this slave
-      slave.readInputRegisters (1, values, 2);
+      // if necessary, choose the slave, eg:
+      mb.setSlave (33);
+      // perform read or write operations of slaves
+      mb.readInputRegisters (1, values, 2);
    * @endcode
    *
-   * @example master/read-holding-data/main.cpp
-   * @example master/read-input-registers/main.cpp
-   * @example master/write-holding-data/main.cpp
-   * @example master/read-coils/main.cpp
-   *
+   * @example slave/..../main.cpp
+   * 
    * @author Pascal JEAN, aka epsilonrt
    * @copyright GNU Lesser General Public License
    */
-  class Master : public Device {
+  class Server : public Device {
 
     public:
       /**
@@ -66,8 +63,7 @@ namespace Modbus {
        * systems, it’s convenient to use a port number greater than or equal
        * to 1024 because it’s not necessary to have administrator privileges.
        * .
-       * The default slave TCP (255) is added to the list of slaves.
-       * 
+       *
        * For the Rtu backend :
        * - \b connection specifies the name of the serial port handled by the
        *  OS, eg. "/dev/ttyS0" or "/dev/ttyUSB0",
@@ -80,53 +76,43 @@ namespace Modbus {
        *      to change this setting
        *    .
        * .
-       * The broadcast slave (0)) is added to the list of slaves.
-       * 
+       *
        * An exception std::invalid_argument is thrown if one of the parameters
        * is incorrect.
        */
-      Master (Net net = Tcp, const std::string & connection = "*",
+      Server (Net net = Tcp, const std::string & connection = "*",
               const std::string & settings = "502");
-
       /**
        * @brief Destructor
        *
        * The destructor closes the connection if it is open and releases all
        * affected resources.
        */
-      virtual ~Master();
+      virtual ~Server();
 
       /**
-       * @brief Set the link recovery  mode after disconnection.
+       * @brief Establish a Modbus connection
        *
-       * @overload
+       * This function shall establish a connection to a Modbus server,
+       * a network or a bus
+       *
+       * @return true if successful.
+       * Otherwise it shall return -1 and set errno.
        */
-      void setRecoveryLink (bool recovery = true);
+      bool open();
 
       /**
-       * @brief Adds a slave 
-       *
-       * This function shall add a slave with the \b slaveAddr value.
-       *
-       * The behavior depends of network and the role of the device:
-       * - \b RTU: Define the slave ID of the remote device to talk in master
-       *  mode or set the internal slave ID in slave mode. According to the
-       *  protocol, a Modbus device must only accept message holding its slave
-       *  number or the special broadcast number.
-       * - \b TCP: The slave number is only required in TCP if the message must
-       *  reach a device on a serial network. Some not compliant devices or
-       *  software (such as modpoll) uses the slave ID as unit identifier,
-       *  that's incorrect (cf page 23 of Modbus Messaging Implementation
-       *  Guide v1.0b) but without the slave value, the faulty remote device or
-       *  software drops the requests ! \n
-       *  The special value \b TcpSlave (255) can be used in TCP mode
-       *  to restore the default value.
-       * .
-       *
-       * @return the slave by reference
-       * @sa slave()
+       * @brief Close a Modbus connection
        */
-      Slave & addSlave (int slaveAddr);
+      void close();
+      
+      /**
+       * @brief 
+       * @return 
+       */
+      int task();
+
+      BufferedSlave & addSlave (int slaveAddr, Master * master = 0);
       
       /**
        * @brief 
@@ -138,38 +124,38 @@ namespace Modbus {
        * @param slaveAddr
        * @return  the slave by reference
        */
-      Slave & slave (int slaveAddr = -1);
+      BufferedSlave & slave (int slaveAddr = -1);
       
       /**
        * @brief 
        * @param slaveAddr
        * @return 
        */
-      const Slave & slave (int slaveAddr = -1) const;
+      const BufferedSlave & slave (int slaveAddr = -1) const;
       
       /**
        * @brief 
        * @param slaveAddr
        * @return  the slave by reference
        */
-      Slave * slavePtr (int slaveAddr = -1);
+      BufferedSlave * slavePtr (int slaveAddr = -1);
       
       /**
        * @brief 
        * @param slaveAddr
        * @return  the pointer on the slave
        */
-      const Slave * slavePtr (int slaveAddr = -1) const;
+      const BufferedSlave * slavePtr (int slaveAddr = -1) const;
       
       /**
        * @brief 
        */
-      Slave &operator[] (int);
+      BufferedSlave &operator[] (int);
       
       /**
        * @brief 
        */
-      const Slave &operator[] (int) const;
+      const BufferedSlave &operator[] (int) const;
       
       /**
        * @brief 
@@ -177,13 +163,13 @@ namespace Modbus {
        * @return 
        */
       bool hasSlave (int slaveAddr) const;
-
+      
     protected:
       class Private;
-      Master (Private &dd);
+      Server (Private &dd);
 
     private:
-      PIMP_DECLARE_PRIVATE (Master)
+      PIMP_DECLARE_PRIVATE (Server)
   };
 }
 

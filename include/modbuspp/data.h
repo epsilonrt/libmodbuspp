@@ -20,26 +20,12 @@
 #include <cstring>    // memcpy ...
 #include <array>
 #include <type_traits>
+#include <modbuspp/global.h>
 #include <modbuspp/swap.h>
 
 namespace Modbus {
 
-  /**
-   * @enum Endian
-   * @brief Sequential order in which bytes are arranged 
-   */
-  enum Endian { 
-    EndianBigBig = 0x00,    ///< Bytes in big endian order, word in big endian order : ABCD
-    EndianBig = EndianBigBig, ///< Big endian order : ABCD
-    EndianBigLittle = 0x01, ///< Bytes in big endian order, word in little endian order : CDAB
-    EndianLittleBig = 0x02, ///< Bytes in little endian order, word in big endian order : BADC
-    EndianLittleLittle = 0x03, ///< Bytes in little endian order, word in little endian order : DCBA
-    EndianLittle = EndianLittleLittle ///< Little endian order : DCBA
-  };
-
-  class Device;
-  class Master;
-  class Slave;
+  class DataModel;
 
   /**
    * @class Data
@@ -213,9 +199,7 @@ namespace Modbus {
         print ( (const uint8_t *) m_registers.data(), size());
       }
 
-      friend class Device;
-      friend class Master;
-      friend class Slave;
+      friend class DataModel;
 
   protected:
 
@@ -251,93 +235,6 @@ namespace Modbus {
       T m_value;
       Endian m_endian;
       std::array < uint16_t, sizeof (T) / 2 > m_registers;
-  };
-
-  /**
-   * @class SlaveId
-   * @brief For storing and manipulate slave identifier datas returns by the MODBUS 17 function
-   */
-  template <typename T, Endian e = EndianBig>
-  class SlaveId {
-
-  public:
-      /**
-       * @brief Default constructor
-       */
-      SlaveId() : m_endian (e), m_size (0) {}
-
-      /**
-       * @brief Run Indicator Status
-       * @return true if ON.
-       */
-      bool status() const {
-        
-        if (m_size > sizeof (T)) {
-          
-          return m_data[sizeof (T)] == 0xFF;
-        }
-        return false;
-      }
-
-      /**
-       * @brief Slave ID
-       * @return the returned value is of type T which depends on the device
-       */
-      T id() const {
-        T v = 0;
-
-        if (m_size >= sizeof (T)) {
-
-          std::memcpy (&v, m_data, sizeof (T));
-
-          switch (m_endian) { // net value: ABCDEFGH
-            case EndianBigBig: // ABCDEFGH: bytes Big, word Big : no swap
-              break;
-            case EndianBigLittle: // GHEFCDAB: bytes Big, word Little : swap words
-              v = swapWords (v);
-              break;
-            case EndianLittleBig: // BADCFEHG: bytes Little, word Big : swap bytes of words
-              v = swapBytesInWords (v);
-              break;
-            case EndianLittleLittle: // HGFEDCBA: bytes Little, word Little: swap all
-              v = swapBytes (v);
-              break;
-          }
-          return ntoh (v);
-        }
-
-        return v;
-      }
-
-      /**
-       * @brief Additional Data
-       * @return 
-       */
-      std::string data() const {
-        std::string d;
-        size_t len = m_size - (sizeof (T) + 1);
-
-        if (len > 0) {
-
-          d.assign (reinterpret_cast<const char *> (&m_data[sizeof (T) + 1]), len);
-        }
-        return d;
-      }
-      
-      /**
-       * @brief number of bytes stored in the underlying array.
-       */
-      inline size_t size() const {
-
-        return m_size;
-      }
-
-      friend class Master;
-
-    protected:
-      Endian m_endian;
-      size_t m_size;
-      uint8_t m_data[MODBUS_MAX_PDU_LENGTH];
   };
 }
 /* ========================================================================== */

@@ -16,8 +16,22 @@
  */
 #pragma once
 
-#include <modbuspp/rtulayer.h>
-#include <modbuspp/tcplayer.h>
-#include <modbuspp/master.h>
-#include <modbuspp/server.h>
+#include <modbuspp/datamodel.h>
+
+namespace Modbus {
+
+  class DataModel::Private {
+
+    public:
+      Private (DataModel * q, int id);
+      virtual ~Private();
+
+      DataModel * const q_ptr;
+      bool pduAddressing;
+      int slave;
+
+      PIMP_DECLARE_PUBLIC (DataModel)
+  };
+}
+
 /* ========================================================================== */

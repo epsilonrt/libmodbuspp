@@ -34,12 +34,17 @@ namespace Modbus {
    *
    * @author Pascal JEAN, aka epsilonrt
    * @copyright GNU Lesser General Public License
-   * 
+   *
    * @sa Device::Device()
    * @sa Device::tcp()
    */
   class TcpLayer : public NetLayer {
-    public:
+
+  public:
+      /**
+       * @brief Constructor
+       */
+      TcpLayer (const std::string & host, const std::string & service);
 
       /**
        * @brief Host name or IP address
@@ -55,8 +60,6 @@ namespace Modbus {
        * This property is the service name/port number to which we are connected.
        */
       const std::string & service() const;
-
-      friend class Device;
 
     protected:
       class Private;
