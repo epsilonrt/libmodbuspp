@@ -17,14 +17,6 @@
 #pragma once
 
 #ifndef __DOXYGEN__
-/*
- * Internal: Pointer to implementation
- * "Pointer to implementation" or "pImpl" is a C++ programming technique that
- * removes implementation details of a class from its object representation by
- * placing them in a separate class, accessed through an opaque pointer.
- * This technique is used to construct C++ library interfaces with stable
- * ABI and to reduce compile-time dependencies.
- */
 
 #include <memory>
 #include <cstdint>
@@ -33,6 +25,14 @@
 #include <sys/types.h>
 #include <modbus.h>
 
+/*
+ * Internal: Pointer to implementation
+ * "Pointer to implementation" or "pImpl" is a C++ programming technique that
+ * removes implementation details of a class from its object representation by
+ * placing them in a separate class, accessed through an opaque pointer.
+ * This technique is used to construct C++ library interfaces with stable
+ * ABI and to reduce compile-time dependencies.
+ */
 #define PIMP_D(Class) Class::Private * const d = d_func()
 #define PIMP_Q(Class) Class * const q = q_func()
 #define PIMP_DECLARE_PRIVATE(Class)\
@@ -47,8 +47,6 @@
   inline Class* q_func() { return reinterpret_cast<Class *>(q_ptr); } \
   inline const Class* q_func() const { return reinterpret_cast<const Class *>(q_ptr); } \
   friend class Class;
-#define PIMP_D_CAST(Class,FromInstance) \
-  *reinterpret_cast<Class::Private*>(FromInstance.d_ptr.get())
 #endif /* __DOXYGEN__ not defined */
 
 /**
@@ -59,7 +57,7 @@ namespace Modbus {
   const int Broadcast = MODBUS_BROADCAST_ADDRESS; ///< Modbus Broadcast Address
   const int TcpSlave = MODBUS_TCP_SLAVE; ///< Can be used in TCP mode to restore the default value
   const int Unknown = -1; ///< Value corresponding to an unknown parameter
-  const uint16_t MaxPduLength = MODBUS_MAX_PDU_LENGTH;
+  const uint16_t MaxPduLength = MODBUS_MAX_PDU_LENGTH; ///< maximum size of a PDU
 
   /**
    * @enum Net
@@ -150,9 +148,10 @@ namespace Modbus {
     EndianLittleLittle = 0x03, ///< Bytes in little endian order, word in little endian order : DCBA
     EndianLittle = EndianLittleLittle ///< Little endian order : DCBA
   };
+  
   /**
    * @enum Table
-   * @brief Data type
+   * @brief Enumerations of data types managed by MODBUS
    */
   enum Table {
     DiscreteInput = 0,
@@ -161,6 +160,10 @@ namespace Modbus {
     HoldingRegister = 4
   };
 
+  /**
+   * @enum Function
+   * @brief Enumerations of MODBUS functions managed by libmodbuspp
+   */
   enum Function {
     ReadCoils = MODBUS_FC_READ_COILS,
     ReadDiscreteInputs = MODBUS_FC_READ_DISCRETE_INPUTS,

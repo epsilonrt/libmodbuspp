@@ -37,16 +37,20 @@ if (MODBUSPP_WITH_DOXYGEN_DOC)
   set(DOXYGEN_MAINPAGE ${CMAKE_BINARY_DIR}/main_page.dox)
 
   set(DOXYGEN_INPUT_LIST 
-    ${PROJECT_SOURCE_DIR}/include/modbuspp.h
-    ${PROJECT_SOURCE_DIR}/include/modbuspp/global.h
+    ${PROJECT_SOURCE_DIR}/include/modbuspp/bufferedslave.h
     ${PROJECT_SOURCE_DIR}/include/modbuspp/data.h
-    ${PROJECT_SOURCE_DIR}/include/modbuspp/netlayer.h
-    ${PROJECT_SOURCE_DIR}/include/modbuspp/tcplayer.h
-    ${PROJECT_SOURCE_DIR}/include/modbuspp/rtulayer.h
-    ${PROJECT_SOURCE_DIR}/include/modbuspp/timeout.h
     ${PROJECT_SOURCE_DIR}/include/modbuspp/device.h
+    ${PROJECT_SOURCE_DIR}/include/modbuspp/global.h
     ${PROJECT_SOURCE_DIR}/include/modbuspp/master.h
+    ${PROJECT_SOURCE_DIR}/include/modbuspp/message.h
+    ${PROJECT_SOURCE_DIR}/include/modbuspp/netlayer.h
+    ${PROJECT_SOURCE_DIR}/include/modbuspp/rtulayer.h
+    ${PROJECT_SOURCE_DIR}/include/modbuspp/server.h
     ${PROJECT_SOURCE_DIR}/include/modbuspp/slave.h
+    ${PROJECT_SOURCE_DIR}/include/modbuspp/slavereport.h
+    ${PROJECT_SOURCE_DIR}/include/modbuspp/swap.h
+    ${PROJECT_SOURCE_DIR}/include/modbuspp/tcplayer.h
+    ${PROJECT_SOURCE_DIR}/include/modbuspp/timeout.h
     )
 
   set(DOXYGEN_INPUT "${CMAKE_BINARY_DIR}/main_page.dox")

@@ -97,7 +97,7 @@ namespace Modbus {
   Device::isConnected() const {
     PIMP_D (const Device);
 
-    return d->isOpen && (modbus_get_socket (d->ctx()) != -1);
+    return d->isOpen && d->isConnected();
   }
 
   // ---------------------------------------------------------------------------
@@ -202,8 +202,20 @@ namespace Modbus {
   // ---------------------------------------------------------------------------
   bool Device::setDebug (bool debug) {
     PIMP_D (Device);
+    
+    int rc = modbus_set_debug (d->ctx(), debug ? TRUE : FALSE);
+    if (rc == 0) {
+      d->debug = debug;
+    }
+    
+    return (rc == 0);
+  }
 
-    return (modbus_set_debug (d->ctx(), debug ? TRUE : FALSE) == 0);
+  // ---------------------------------------------------------------------------
+  bool Device::debug () const {
+    PIMP_D (const Device);
+    
+    return d->debug;
   }
 
   // ---------------------------------------------------------------------------
@@ -228,7 +240,7 @@ namespace Modbus {
   // ---------------------------------------------------------------------------
   Device::Private::Private (Device * q, Net net, const std::string & connection,
                             const std::string & settings) :
-    q_ptr (q), isOpen (false), backend (0), recoveryLink (false) {
+    q_ptr (q), isOpen (false), backend (0), recoveryLink (false), debug (false) {
 
     switch (net) {
 
@@ -252,7 +264,7 @@ namespace Modbus {
 
     delete backend;
   }
-  
+
   // ---------------------------------------------------------------------------
   int Device::Private::defaultSlave (int addr) const {
 
@@ -262,6 +274,14 @@ namespace Modbus {
     }
     return addr;
   }
+
+  // ---------------------------------------------------------------------------
+  bool
+  Device::Private::isConnected() const {
+
+    return (modbus_get_socket (ctx()) >= 0);
+  }
+
 }
 
 /* ========================================================================== */

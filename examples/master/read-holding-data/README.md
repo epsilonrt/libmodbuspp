@@ -8,6 +8,12 @@ If you want to compile it without codelite, you can do it with [GNU make](https:
 
 		make -f read-holding-data.mk
 
-Nevertheless, i am not sure that it works on Windows™ and macOS™.
-
 You can then run the program that is in the Debug folder.
+
+Nevertheless, I am not sure that it works on Windows ™ and macOS ™, so you 
+should follow my advice and use CodeLite...
+
+This library provides a file for pkg-config that should also allow you to 
+compile with gcc:
+
+		g++ -o clock-server $(pkg-config --cflags --libs libmodbuspp) main.cpp

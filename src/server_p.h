@@ -17,6 +17,8 @@
 #pragma once
 
 #include <map>
+#include <future>
+#include <thread>
 #include <modbuspp/server.h>
 #include "device_p.h"
 
@@ -27,10 +29,16 @@ namespace Modbus {
     public:
       Private (Server * q, Net net, const std::string & connection, const std::string & settings);
       virtual ~Private();
+      
+      bool open();
+      void close();
+      int poll();
+      static int receive (Private * d);
 
       int sock;
       Message * msg;
       std::map <int,BufferedSlave*> slave;
+      std::future<int> receiveTask;
 
       PIMP_DECLARE_PUBLIC (Server)
   };

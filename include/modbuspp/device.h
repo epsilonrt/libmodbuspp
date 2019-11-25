@@ -16,10 +16,8 @@
  */
 #pragma once
 
-//#include <string>
-//#include <vector>
 #include <stdexcept>
-#include <modbuspp/datamodel.h>
+#include <modbuspp/global.h>
 #include <modbuspp/timeout.h>
 
 namespace Modbus {
@@ -103,7 +101,7 @@ namespace Modbus {
        * @brief Returns true if the device is open; otherwise returns false.
        * @sa open()
        */
-      bool isOpen() const;
+      virtual bool isOpen() const;
       
       /**
        * @brief Returns true if the device is connected; otherwise returns false.
@@ -286,6 +284,11 @@ namespace Modbus {
        * Otherwise it shall return false and set errno.
        */
       bool setDebug (bool debug = true);
+      
+      /**
+       * @brief Return the debug flag
+       */
+      bool debug () const;
 
       /**
        * @brief last error message

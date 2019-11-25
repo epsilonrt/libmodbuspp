@@ -19,11 +19,10 @@
 #include <modbuspp/slave.h>
 #include <modbuspp/device.h>
 #include <modbuspp/netlayer.h>
-#include "datamodel_p.h"
 
 namespace Modbus {
 
-  class Slave::Private : public DataModel::Private {
+  class Slave::Private {
 
     public:
       Private (Slave * q, int s, Device * d);
@@ -35,6 +34,9 @@ namespace Modbus {
         return dev->backend().context();
       }
 
+      Slave * const q_ptr;
+      bool pduAddressing;
+      int id;
       Device * dev;
       PIMP_DECLARE_PUBLIC (Slave)
   };

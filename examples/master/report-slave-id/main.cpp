@@ -35,7 +35,7 @@ int main (int argc, char **argv) {
 
   if (mb.open ()) { // open a connection
     // success, do what you want here
-    SlaveId<uint8_t> i;
+    SlaveReport<uint8_t> i;
 
     if (slv.reportSlaveId (i) > 0) {
 

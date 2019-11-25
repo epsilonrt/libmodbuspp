@@ -29,6 +29,8 @@ namespace Modbus {
    * @class Message
    * @brief Modbus Message
    *
+   * @example server/tcp-gateway/main.cpp
+   * 
    * @author Pascal JEAN, aka epsilonrt
    * @copyright GNU Lesser General Public License
    */
@@ -60,24 +62,117 @@ namespace Modbus {
        */
       virtual ~Message();
 
+      /**
+       * @brief Returns the underlying ADU as a byte vector.
+       */
       std::vector<uint8_t> & adu ();
+
+      /**
+       * @overload 
+       */
       const std::vector<uint8_t> & adu () const;
+      
+      /**
+       * @brief Returns the ADU byte corresponding to the index provided
+       * 
+       * \c i must be between 0 and \c maxAduLength()-1
+       */
       uint8_t adu (uint16_t i);
 
+      /**
+       * @brief Returns the PDU byte corresponding to the offset provided
+       * 
+       * \c pduOffset has a maximum value of \c MaxPduLength-1, it can have a negative 
+       * value in order to access the bytes of the ADU that precedes the PDU.
+       */
       uint8_t byte (int pduOffset) const;
-      uint16_t word (int pduOffset) const;
-      void setByte (int pduOffset, uint8_t value);
-      void setWord (int pduOffset, uint16_t value);
 
-      int slaveId() const;
+      /**
+       * @brief Returns the PDU word corresponding to the offset provided
+       * 
+       * \c pduOffset has a maximum value of \c MaxPduLength-2, it can have a negative 
+       * value in order to access the words of the ADU that precedes the PDU.
+       */
+      uint16_t word (int pduOffset) const;
+      
+      /**
+       * @brief Write a byte in the PDU to the supplied offset
+       * 
+       * \c pduOffset has a maximum value of \c MaxPduLength-1, it can have a negative 
+       * value in order to access the bytes of the ADU that precedes the PDU.
+       */
+      void setByte (int pduOffset, uint8_t value);
+      
+      /**
+       * @brief Write a word in the PDU to the supplied offset
+       * 
+       * \c pduOffset has a maximum value of \c MaxPduLength-2, it can have a negative 
+       * value in order to access the wordss of the ADU that precedes the PDU.
+       */
+       void setWord (int pduOffset, uint16_t value);
+      
+      /**
+       * @brief Returns the number of the slave concerned by the request.
+       * 
+       * This value is at the offset[-1] of the PDU
+       */
+      int slave() const;
+
+      /**
+       * @brief Returns the function of the request.
+       * 
+       * This value is at the offset[0] of the PDU
+       */
       Function function() const;
+      
+      
+      /**
+       * @brief Returns the starting address of the request.
+       * 
+       * This value is at the offset[1] of the PDU
+       */
       uint16_t startingAddress() const;
+
+      /**
+       * @brief Returns the number of elements of the request.
+       * 
+       * This value is at the offset[3] of the PDU
+       */
       uint16_t quantity() const;
+      
+      /**
+       * @brief Returns a word value of the request
+       * 
+       * This value is at the offset[5+index] of the PDU
+       */
       uint16_t value (uint16_t index) const;
 
-      void setFunction (Function func);
+      /**
+       * @brief Sets the number of the slave concerned by the request.
+       * 
+       * This value is at the offset[-1] of the PDU
+       */
       void setSlaveId (int id);
+
+      /**
+       * @brief Sets the function of the request.
+       * 
+       * This value is at the offset[0] of the PDU
+       */
+      void setFunction (Function func);
+
+      /**
+       * @brief Sets the starting address of the request.
+       * 
+       * This value is at the offset[1] of the PDU
+       */
       void setStartingAdress (uint16_t addr);
+
+      /**
+       * @brief Sets the number of elements of the request.
+       * 
+       * This value is at the offset[3] of the PDU
+       */
       void setQuantity (uint16_t n);
 
       /**

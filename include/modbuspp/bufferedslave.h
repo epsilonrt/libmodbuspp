@@ -26,7 +26,8 @@ namespace Modbus {
     * @class BufferedSlave
     * @brief Buffered Slave
     *
-    * @example slave/..../main.cpp
+    * @example server/clock-server/main.cpp
+    * @example server/tcp-gateway/main.cpp
     *
     * @author Pascal JEAN, aka epsilonrt
     * @copyright GNU Lesser General Public License
@@ -39,6 +40,14 @@ namespace Modbus {
 
       /**
        * @brief Constructor
+       * 
+       * Constructor of a new buffered slave with the slaveAddr identifier. 
+       * If the device \c dev is provided, usually of the class \c Master and 
+       * \c dev->isOpen() returns true:
+       * - The requested data is actually read, then stored in the memory 
+       * buffer before being returned.
+       * - The data provided is actually written, after being stored in 
+       * the memory buffer.
        */
       BufferedSlave (int slaveAddr, Device * dev = 0);
 
@@ -47,16 +56,11 @@ namespace Modbus {
        */
       virtual ~BufferedSlave();
 
-      using Slave::readInputRegisters;
-      using Slave::readInputRegister;
-      using Slave::readRegister;
-      using Slave::readRegisters;
-      using Slave::writeRegisters;
-      using Slave::writeRegister;
-      using Slave::reportSlaveId;
-
       /**
-       * @brief
+       * @brief Setting a block of data in the memory buffer.
+       * 
+       * A single block of type \c t can be defined for a given slave. 
+       * The block has nmeb elements and starts at startAddr.
        * @param t
        * @param nmemb
        * @param startAddr
@@ -64,14 +68,28 @@ namespace Modbus {
        */
       int setBlock (Table t, int nmemb, int startAddr = 1);
       
-      int readFromDevice (const Message * req);
-      int readFromDevice (const Message & req);
-      int writeToDevice (const Message * req);
-      int writeToDevice (const Message & req);
-      
+      /**
+       * @brief 
+       * @param cb
+       */
       void setBeforeReplyCallback (Message::Callback cb);
+      
+      /**
+       * @brief 
+       * @param cb
+       */
       void setAfterReplyCallback (Message::Callback cb);
+      
+      /**
+       * @brief 
+       * @return 
+       */
       Message::Callback beforeReplyCallback() const;
+      
+      /**
+       * @brief 
+       * @return 
+       */
       Message::Callback afterReplyCallback() const;
 
       /**
@@ -159,11 +177,64 @@ namespace Modbus {
        */
       int writeInputRegister (int addr, uint16_t value);
 
+
+      /**
+       * @brief Write many input data
+       *
+       * Data is a template class for storing, transmitting, and receiving
+       * arithmetic data in multiple 16-bit Modbus registers.
+       *
+       * This function shall write the content of the \b nb input data
+       * from the array \b src at address \b addr of the device.
+       *
+       * @return number of written input Modbus registers (16-bit) if successful.
+       * Otherwise it shall return -1.
+       */
+      template <typename T, Endian e> int writeInputRegisters (int addr, const Data<T, e> * src, int nb = 1) {
+        std::vector<uint16_t> buf;
+
+        for (int i = 0; i < nb; i++) {
+          for (auto & r : src[i].registers()) {
+            buf.push_back (r);
+          }
+        }
+        return writeInputRegisters (addr, buf.data(), buf.size());;
+      }
+
+      /**
+       * @brief Write a single input data
+       *
+       * Data is a template class for storing, transmitting, and receiving
+       * arithmetic data in multiple 16-bit Modbus registers.
+       *
+       * This function shall write a single input data
+       * from \b value at address \b addr of the device.
+       *
+       * @return number of written input Modbus registers (16-bit) if successful.
+       * Otherwise it shall return -1.
+       */
+      template <typename T, Endian e> int writeInputRegister (int addr, const Data<T, e> & value) {
+
+        return writeInputRegisters (addr, value.registers().data(), value.registers().size());
+      }
+
+      using Slave::readInputRegisters;
+      using Slave::readInputRegister;
+      using Slave::readRegister;
+      using Slave::readRegisters;
+      using Slave::writeRegisters;
+      using Slave::writeRegister;
+      using Slave::reportSlaveId;
+
     protected:
       class Private;
       BufferedSlave (Private &dd);
       modbus_mapping_t * map();
       const modbus_mapping_t * map() const;
+      int readFromDevice (const Message * req);
+      int readFromDevice (const Message & req);
+      int writeToDevice (const Message * req);
+      int writeToDevice (const Message & req);
 
     private:
       PIMP_DECLARE_PRIVATE (BufferedSlave)

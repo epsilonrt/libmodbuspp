@@ -29,16 +29,16 @@ set (hdr_modbuspp
   ${MODBUSPP_INC_DIR}/modbuspp.h
   ${MODBUSPP_INC_DIR}/modbuspp/bufferedslave.h
   ${MODBUSPP_INC_DIR}/modbuspp/data.h
-  ${MODBUSPP_INC_DIR}/modbuspp/datamodel.h
   ${MODBUSPP_INC_DIR}/modbuspp/device.h
   ${MODBUSPP_INC_DIR}/modbuspp/global.h
   ${MODBUSPP_INC_DIR}/modbuspp/master.h
   ${MODBUSPP_INC_DIR}/modbuspp/message.h
   ${MODBUSPP_INC_DIR}/modbuspp/netlayer.h
+  ${MODBUSPP_INC_DIR}/modbuspp/popl.h
   ${MODBUSPP_INC_DIR}/modbuspp/rtulayer.h
   ${MODBUSPP_INC_DIR}/modbuspp/server.h
   ${MODBUSPP_INC_DIR}/modbuspp/slave.h
-  ${MODBUSPP_INC_DIR}/modbuspp/slaveid.h
+  ${MODBUSPP_INC_DIR}/modbuspp/slavereport.h
   ${MODBUSPP_INC_DIR}/modbuspp/swap.h
   ${MODBUSPP_INC_DIR}/modbuspp/tcplayer.h
   ${MODBUSPP_INC_DIR}/modbuspp/timeout.h

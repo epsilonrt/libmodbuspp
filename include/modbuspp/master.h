@@ -114,7 +114,7 @@ namespace Modbus {
        *  protocol, a Modbus device must only accept message holding its slave
        *  number or the special broadcast number.
        * - \b TCP: The slave number is only required in TCP if the message must
-       *  reach a device on a serial network. Some not compliant devices or
+       *  reach a device on a serial link. Some not compliant devices or
        *  software (such as modpoll) uses the slave ID as unit identifier,
        *  that's incorrect (cf page 23 of Modbus Messaging Implementation
        *  Guide v1.0b) but without the slave value, the faulty remote device or
@@ -129,52 +129,60 @@ namespace Modbus {
       Slave & addSlave (int slaveAddr);
       
       /**
-       * @brief 
+       * @brief Returns the slave whose address is provided.
        * 
-       * The broadcast address is \b Broadcast. This special
-       * value must be use when you want all Modbus devices of the network
-       * receive the request.
+       * The slave must have been added with \c addSlave() else a 
+       * std::out_of_range exception is thrown.
        * 
-       * @param slaveAddr
-       * @return  the slave by reference
+       * If the Device that drives the slave to an RTU backend, we can access 
+       * to the general call through the slave at address 0 
+       * (added by the constructor).
+       * 
+       * If the Device that drives the slave to a TCP backend, we can access to 
+       * TCP messages through the slave at address 255 (added by the constructor).
        */
       Slave & slave (int slaveAddr = -1);
       
       /**
-       * @brief 
-       * @param slaveAddr
-       * @return 
+       * @overload 
        */
       const Slave & slave (int slaveAddr = -1) const;
       
       /**
-       * @brief 
-       * @param slaveAddr
-       * @return  the slave by reference
+       * @brief Returns a pointer to the slave whose address is provided.
+       * 
+       * The slave must have been added with \c addSlave() else a 
+       * a nullptr is returned.
+       * 
+       * If the Device that drives the slave to an RTU backend, we can access 
+       * to the general call through the slave at address 0 
+       * (added by the constructor).
+       * 
+       * If the Device that drives the slave to a TCP backend, we can access to 
+       * TCP messages through the slave at address 255 (added by the constructor).
        */
       Slave * slavePtr (int slaveAddr = -1);
       
       /**
-       * @brief 
-       * @param slaveAddr
-       * @return  the pointer on the slave
+       * @overload 
        */
       const Slave * slavePtr (int slaveAddr = -1) const;
       
       /**
-       * @brief 
+       * @brief Slave table access operator
+       * 
+       * master being an object of class Master, \c master[i] is equivalent to
+       * \c master.slave(i)
        */
       Slave &operator[] (int);
-      
+
       /**
-       * @brief 
+       * @overload 
        */
       const Slave &operator[] (int) const;
       
       /**
-       * @brief 
-       * @param slaveAddr
-       * @return 
+       * @brief Check if the slave at the given address \c slaveAddrexists
        */
       bool hasSlave (int slaveAddr) const;
 

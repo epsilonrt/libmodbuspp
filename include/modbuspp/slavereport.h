@@ -22,19 +22,19 @@
 namespace Modbus {
 
   /**
-   * @class SlaveId
-   * @brief For storing and manipulate slave identifier datas returns by the MODBUS 17 function
+   * @class SlaveReport
+   * @brief For storing and manipulate server identifier datas returns by the MODBUS 17 function
    */
   template <typename T, Endian e = EndianBig>
-  class SlaveId {
+  class SlaveReport {
 
   public:
       /**
        * @brief Default constructor
        */
-      SlaveId() : m_endian (e), m_size (0) {}
+      SlaveReport() : m_endian (e), m_size (0) {}
       
-      SlaveId (int len, const uint8_t * reply) : SlaveId() {
+      SlaveReport (int len, const uint8_t * reply) : SlaveReport() {
         memcpy(m_data, reply, len);
         m_size = len;
       }
@@ -53,7 +53,7 @@ namespace Modbus {
       }
 
       /**
-       * @brief Slave ID
+       * @brief Server ID
        * @return the returned value is of type T which depends on the device
        */
       T id() const {

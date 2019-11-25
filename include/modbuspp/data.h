@@ -25,7 +25,7 @@
 
 namespace Modbus {
 
-  class DataModel;
+  class Slave;
 
   /**
    * @class Data
@@ -39,6 +39,11 @@ namespace Modbus {
    * @param e is the order of bytes and words in the data model used by the 
    * user's Modbus network. By default it is the big endian order for bytes 
    * and words that is used.
+   * 
+   * @example master/read-holding-data/main.cpp
+   * @example master/report-slave-id/main.cpp
+   * @example master/write-holding-data/main.cpp
+   * @example server/clock-server/main.cpp
    * 
    * @author Pascal JEAN, aka epsilonrt
    * @copyright GNU Lesser General Public License
@@ -74,7 +79,7 @@ namespace Modbus {
       }
 
       /**
-       * @brief  Overload of the reference operator on the T value
+       * @overload
        */
       operator T&() const {
         return m_value;
@@ -88,7 +93,7 @@ namespace Modbus {
       }
 
       /**
-       * @brief Access to the T value
+       * @overload
        */
       const T& value() const {
         return m_value;
@@ -102,7 +107,7 @@ namespace Modbus {
       }
 
       /**
-       * @brief Overload of the pointer operator on the T value
+       * @overload
        */
       const T* operator&() const {
         return & m_value;
@@ -199,7 +204,7 @@ namespace Modbus {
         print ( (const uint8_t *) m_registers.data(), size());
       }
 
-      friend class DataModel;
+      friend class Slave;
 
   protected:
 

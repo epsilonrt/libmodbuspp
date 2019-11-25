@@ -26,11 +26,11 @@ namespace Modbus {
   // ---------------------------------------------------------------------------
 
   // ---------------------------------------------------------------------------
-  Slave::Slave (Slave::Private &dd) : DataModel (dd) {}
+  Slave::Slave (Slave::Private &dd) : d_ptr (&dd) {}
 
   // ---------------------------------------------------------------------------
   Slave::Slave (int slaveAddr, Device * dev) :
-    DataModel (*new Private (this, slaveAddr, dev)) {}
+    d_ptr (new Private (this, slaveAddr, dev)) {}
 
   // ---------------------------------------------------------------------------
   Slave::~Slave() = default;
@@ -67,7 +67,7 @@ namespace Modbus {
 
     if (d->dev->isOpen()) {
 
-      if (modbus_set_slave (d->ctx(), d->slave) == 0) {
+      if (modbus_set_slave (d->ctx(), d->id) == 0) {
         
         return modbus_read_registers (d->ctx(),
                                       pduAddress (addr), nb, dest);
@@ -83,7 +83,7 @@ namespace Modbus {
 
     if (d->dev->isOpen()) {
 
-      if (modbus_set_slave (d->ctx(), d->slave) == 0) {
+      if (modbus_set_slave (d->ctx(), d->id) == 0) {
         
         return modbus_read_input_registers (d->ctx(),
                                             pduAddress (addr), nb, dest);
@@ -99,7 +99,7 @@ namespace Modbus {
 
     if (d->dev->isOpen()) {
 
-      if (modbus_set_slave (d->ctx(), d->slave) == 0) {
+      if (modbus_set_slave (d->ctx(), d->id) == 0) {
         
         return modbus_write_bits (d->ctx(),
                                   pduAddress (addr), nb, (const uint8_t *) src);
@@ -114,7 +114,7 @@ namespace Modbus {
 
     if (d->dev->isOpen()) {
 
-      if (modbus_set_slave (d->ctx(), d->slave) == 0) {
+      if (modbus_set_slave (d->ctx(), d->id) == 0) {
         
         return modbus_write_bit (d->ctx(),
                                  pduAddress (addr), (uint8_t) value);
@@ -129,7 +129,7 @@ namespace Modbus {
 
     if (d->dev->isOpen()) {
 
-      if (modbus_set_slave (d->ctx(), d->slave) == 0) {
+      if (modbus_set_slave (d->ctx(), d->id) == 0) {
         
         return modbus_write_registers (d->ctx(), pduAddress (addr), nb, src);
       }
@@ -143,7 +143,7 @@ namespace Modbus {
 
     if (d->dev->isOpen()) {
 
-      if (modbus_set_slave (d->ctx(), d->slave) == 0) {
+      if (modbus_set_slave (d->ctx(), d->id) == 0) {
         
         return modbus_write_register (d->ctx(),
                                       pduAddress (addr), value);
@@ -160,7 +160,7 @@ namespace Modbus {
 
     if (d->dev->isOpen()) {
 
-      if (modbus_set_slave (d->ctx(), d->slave) == 0) {
+      if (modbus_set_slave (d->ctx(), d->id) == 0) {
         
         return modbus_write_and_read_registers (d->ctx(),
                                                 pduAddress (waddr), wnb, src,
@@ -176,12 +176,47 @@ namespace Modbus {
 
     if (d->dev->isOpen() && d->dev->net() == Rtu) {
 
-      if (modbus_set_slave (d->ctx(), d->slave) == 0) {
+      if (modbus_set_slave (d->ctx(), d->id) == 0) {
         
         return modbus_report_slave_id (d->ctx(), max_dest, dest);
       }
     }
     return -1;
+  }
+
+  // ---------------------------------------------------------------------------
+  void Slave::setPduAddressing (bool pdu) {
+    PIMP_D (Slave);
+
+    d->pduAddressing = pdu;
+  }
+
+  // ---------------------------------------------------------------------------
+  bool  Slave::pduAddressing() const {
+    PIMP_D (const Slave);
+
+    return d->pduAddressing;
+  }
+
+  // ---------------------------------------------------------------------------
+  int Slave::pduAddress (int dataAddr) const {
+    PIMP_D (const Slave);
+
+    return dataAddr - (d->pduAddressing ? 0 : 1);
+  }
+
+  // ---------------------------------------------------------------------------
+  int Slave::number() const {
+    PIMP_D (const Slave);
+
+    return d->id;
+  }
+
+  // ---------------------------------------------------------------------------
+  // static
+  void Slave::setBoolArray (bool * dest, const uint8_t * src, size_t n) {
+    
+    modbus_set_bits_from_bytes ((uint8_t *) dest, 0, n, src);
   }
 
   // ---------------------------------------------------------------------------
@@ -192,7 +227,7 @@ namespace Modbus {
 
   // ---------------------------------------------------------------------------
   Slave::Private::Private (Slave * q, int s, Device * d) :
-    DataModel::Private (q, s), dev (d) {}
+    q_ptr (q), pduAddressing (false), id (s), dev (d) {}
 
   // ---------------------------------------------------------------------------
   Slave::Private::~Private() = default;

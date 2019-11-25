@@ -19,8 +19,8 @@ simple example:
 uint16_t values[2]; // array to store the values of the input registers
 Master mb (Rtu, port, "19200E1"); // new master on RTU
 mb.open(); // open a connection
-mb.setSlave (33); // to the slave at address 33
-mb.readInputRegisters (1, values, 2);
+Slave & slv = mb.addSlave (33); // to the slave at address 33
+slv.readInputRegisters (1, values, 2);
 cout << values[0] << endl;
 cout << values[1] << endl;
 ```
@@ -80,8 +80,8 @@ int main (int argc, char **argv) {
     // success, do what you want here
     uint16_t values[2];
 
-    mb.setSlave (33); // to the slave at address 33
-    if (mb.readInputRegisters (1, values, 2) == 2) {
+    Slave & slv = mb.addSlave (33); // to the slave at address 33
+    if (slv.readInputRegisters (1, values, 2) == 2) {
 
       cout << "R0=" << values[0] << endl;
       cout << "R1=" << values[1] << endl;
@@ -119,7 +119,7 @@ With [Codelite](https://codelite.org/) it's easier and funny, right ?
 ![Debugging with Codelite](https://raw.githubusercontent.com/epsilonrt/piduino/master/doc/images/codelite-2.png)
 
 You will find several examples in the folder 
-[/usr/share/doc/modbuspp/examples](https://github.com/epsilonrt/libmodbuspp/tree/master/examples/master)
+[/usr/share/doc/modbuspp/examples](https://github.com/epsilonrt/libmodbuspp/tree/master/examples)
 
 ## Documentation
 

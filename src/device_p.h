@@ -35,11 +35,13 @@ namespace Modbus {
         return backend->context();
       }
       int defaultSlave (int addr) const;
+      bool isConnected () const;
 
       Device * const q_ptr;
       bool isOpen;
       NetLayer * backend;
       bool recoveryLink;
+      bool debug;
 
       PIMP_DECLARE_PUBLIC (Device)
   };

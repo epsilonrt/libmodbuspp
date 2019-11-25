@@ -50,11 +50,22 @@ namespace Modbus {
       Net net() const;
 
       /**
-       * @brief Return the maximum ADU length
+       * @brief Returns the maximum ADU length
        */
       uint16_t maxAduLength() const;
 
+      /**
+       * @brief Returns the connection used
+       * 
+       * Serial port or host depending on the backend.
+       */
       const std::string & connection() const;
+      
+      /**
+       * @brief Returns the connection settings
+       * 
+       * IP port or speed, parity and stop bit depending on the backend
+       */
       const std::string & settings() const;
 
       /**
@@ -65,6 +76,10 @@ namespace Modbus {
        * selected variant.
        */
       modbus_t * context();
+      
+      /**
+       * @overload
+       */
       const modbus_t * context() const;
 
       /**

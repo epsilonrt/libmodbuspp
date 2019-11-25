@@ -1,7 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<CodeLite_Project Name="unit-test-server" Version="10.0.0" InternalType="Console">
+<CodeLite_Project Name="clock-server" Version="10.0.0" InternalType="Console">
   <Description/>
   <Dependencies/>
+  <VirtualDirectory Name="src">
+    <File Name="main.cpp"/>
+  </VirtualDirectory>
+  <VirtualDirectory Name="doc">
+    <File Name="README.md"/>
+  </VirtualDirectory>
   <Settings Type="Executable">
     <GlobalSettings>
       <Compiler Options="-std=c++14;$(shell pkg-config --cflags libmodbuspp)" C_Options="-std=c99;$(shell pkg-config --cflags libmodbuspp)" Assembler="">
@@ -94,9 +100,6 @@
       </Completion>
     </Configuration>
   </Settings>
-  <VirtualDirectory Name="src">
-    <File Name="main.cpp"/>
-  </VirtualDirectory>
   <Dependencies Name="Debug"/>
   <Dependencies Name="Release"/>
 </CodeLite_Project>
