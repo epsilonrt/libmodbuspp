@@ -93,7 +93,7 @@ if (srv.open ()) { // open a connection
 
 This example realizes a MODBUS time server which has the slave address 10.
 The source code of this program is searchable in the examples folder
-[clock-server](https://github.com/epsilonrt/libmodbuspp/blob/master/examples/server/clock-server/main.cpp)
+[clock-server](https://github.com/epsilonrt/libmodbuspp/blob/slave/examples/server/clock-server/main.cpp).
 
 As can be seen in this example libmodbuspp also has a template class
 [Modbus::Data](http://www.epsilonrt.fr/modbuspp/classModbus_1_1Data.html)
@@ -158,7 +158,7 @@ if (mb.open()) { // Opening the master link if successful, create the server
 It is a gateway relaying requests received by TCP/IP to a slave (address 33) 
 connected in RTU.
 The source code of this program is searchable in the examples folder
-[tcp-gateway](https://github.com/epsilonrt/libmodbuspp/blob/master/examples/server/tcp-gateway/main.cpp)
+[tcp-gateway](https://github.com/epsilonrt/libmodbuspp/blob/master/examples/server/tcp-gateway/main.cpp).
 
 libmodbuspp comes with full documentation in manual and [html](http://www.epsilonrt.fr/modbuspp/) format.
 
