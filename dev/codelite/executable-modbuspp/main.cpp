@@ -25,8 +25,8 @@ int main (int argc, char **argv) {
     // success, do what you want here
     uint16_t value;
 
-    mb.setSlave (33); // to the slave at address 33
-    mb.readInputRegisters (1, &value);
+    Slave & slv = mb.addSlave (33); // to the slave at address 33
+    slv.readInputRegisters (1, &value);
     // ....
     mb.close();
   }
