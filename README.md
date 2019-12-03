@@ -9,16 +9,16 @@ a wrapper, having no other dependency than libmodbus and libstdc++.
 libmodbuspp is a free software library to send/receive data according to the MODBUS protocol. 
 This library supports RTU (serial) and TCP (Ethernet) communications.
 libmodbussp allows you to implement MODBUS servers and clients.
-libmodbussp will be used in version 2 of the utility [mbpoll](https://github.com/epsilonrt/mbpoll)
+libmodbussp will be used in version 2 of the utility [mbpoll](https://github.com/epsilonrt/mbpoll).
 Like libmodbus, libmodbuspp is cross-platform and can be compiled on
 Gnu/Linux and other Unix, Windows and MacOs.
 
-The Modbus::Master class allows you to design clients (also called masters),
-who communicate with servers (also called slaves).
-That is, [Modbus::Master](http://www.epsilonrt.fr/modbuspp/classModbus_1_1Master.html) 
-can read or write data to slaves.
+The [Modbus::Master](http://www.epsilonrt.fr/modbuspp/classModbus_1_1Master.html)
+class allows you to design clients (also called masters), who communicate with 
+servers (also called slaves).
+That is, Modbus::Master can read or write data to slaves.
 To do this, Modbus::Master is associated with the 
-[Modbus::Slave](http://www.epsilonrt.fr/modbuspp/classModbus_1_1Slave.html)  
+[Modbus::Slave](http://www.epsilonrt.fr/modbuspp/classModbus_1_1Slave.html) 
 class which allows to perform the read and write operations, 
 here are an example of use:
 
@@ -36,10 +36,10 @@ This example reads the input registers number 1 and 2 of the MODBUS slave
 (server) at address 33. The source code of this program is searchable
 in the examples folder 
 [read-input-registers](https://github.com/epsilonrt/libmodbuspp/blob/master/examples/master/read-input-registers/main.cpp)
+
 The Modbus::Server class is used to design servers. An object of the class
 Modbus::Server allows to implement one or **more** slaves that can be
-dissociated by the use of a different address. 
-
+dissociated by the use of a different address.
 The Modbus::Server class is associated with the 
 [Modbus::BufferedSlave](http://www.epsilonrt.fr/modbuspp/classModbus_1_1BufferedSlave.html) 
 class to implement slaves.
@@ -92,8 +92,9 @@ if (srv.open ()) { // open a connection
 ```
 
 This example realizes a MODBUS time server which has the slave address 10.
-The source code of this program is searchable in the examples folder  
+The source code of this program is searchable in the examples folder
 [clock-server](https://github.com/epsilonrt/libmodbuspp/blob/master/examples/server/clock-server/main.cpp)
+
 As can be seen in this example libmodbuspp also has a template class
 [Modbus::Data](http://www.epsilonrt.fr/modbuspp/classModbus_1_1Data.html)
 that allows to easily manage registers of a size greater than or 
@@ -156,7 +157,7 @@ if (mb.open()) { // Opening the master link if successful, create the server
 
 It is a gateway relaying requests received by TCP/IP to a slave (address 33) 
 connected in RTU.
-The source code of this program is searchable in the examples folder  
+The source code of this program is searchable in the examples folder
 [tcp-gateway](https://github.com/epsilonrt/libmodbuspp/blob/master/examples/server/tcp-gateway/main.cpp)
 
 libmodbuspp comes with full documentation in manual and [html](http://www.epsilonrt.fr/modbuspp/) format.
