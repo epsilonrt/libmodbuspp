@@ -22,7 +22,7 @@ namespace Modbus {
 
   /**
    * @class TcpLayer
-   * @brief TCP network layer
+   * @brief TCP/IP v4 & v6 network layer
    *
    * This class can not and should not be instantiated by the user.
    * It provides access to properties and methods specific to the TCP layer.

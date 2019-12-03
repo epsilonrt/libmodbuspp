@@ -52,7 +52,7 @@ int main (int argc, char **argv) {
 
   // ModBus Data
   bool daylight;// daylight saving time, true = summer time
-  Data<int32_t> gmtoff; // GMT offset, +/- minutes
+  Data<int32_t,EndianLittleLittle> gmtoff; // GMT offset, +/- minutes
   uint16_t mb_time[8]; // date and time
 
   if (argc > 1) {
@@ -80,7 +80,7 @@ int main (int argc, char **argv) {
 
   BufferedSlave & slv = srv.addSlave (10); // Adding a new slave to the server
 
-  cout << "Slave id: " << slv.slaveId() << endl << endl;
+  cout << "Slave id: " << slv.number() << endl << endl;
   if (srv.debug()) {
     cout << "Mapping of registers:" << endl
          << "--- Input Registers" << endl
