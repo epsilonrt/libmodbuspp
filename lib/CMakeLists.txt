@@ -51,15 +51,22 @@ set(hdr_public ${hdr_modbuspp} ${CMAKE_CURRENT_BINARY_DIR}/config.h)
 
 set (libsrc ${src_modbuspp})
 
-include_directories(BEFORE
+# this is the "object library" target: compiles the sources only once
+add_library(objlib OBJECT ${libsrc})
+
+target_include_directories(objlib BEFORE PRIVATE
   ${LIBMODBUS_INCLUDE_DIRS} 
   ${MODBUSPP_INC_DIR} 
   ${MODBUSPP_SRC_DIR}
   ${CMAKE_CURRENT_BINARY_DIR}
-  )
+)
+target_compile_definitions(objlib PUBLIC MODBUSPP_WITH_CONFIG_H)
 
-add_library(modbuspp-shared SHARED ${libsrc})
-target_compile_definitions(modbuspp-shared PUBLIC MODBUSPP_WITH_CONFIG_H)
+# shared libraries need PIC
+set_property(TARGET objlib PROPERTY POSITION_INDEPENDENT_CODE 1)
+
+# shared and static libraries built from the same object files
+add_library(modbuspp-shared SHARED $<TARGET_OBJECTS:objlib>)
 set_target_properties(modbuspp-shared PROPERTIES 
   OUTPUT_NAME modbuspp 
   CLEAN_DIRECT_OUTPUT 1 
@@ -69,8 +76,7 @@ set_target_properties(modbuspp-shared PROPERTIES
   )
 
 if(MODBUSPP_WITH_STATIC)
-  add_library(modbuspp-static STATIC ${libsrc})
-  target_compile_definitions(modbuspp-static PUBLIC MODBUSPP_WITH_CONFIG_H)
+  add_library(modbuspp-static STATIC $<TARGET_OBJECTS:objlib>)
   set_target_properties(modbuspp-static PROPERTIES
     OUTPUT_NAME modbuspp 
     CLEAN_DIRECT_OUTPUT 1 
@@ -147,7 +153,7 @@ install (TARGETS modbuspp-shared
 if(MODBUSPP_WITH_STATIC)
   install (TARGETS modbuspp-static 
     EXPORT modbuspp
-    ARCHIVE DESTINATION "${INSTALL_LIB_DIR}" COMPONENT lib
+    ARCHIVE DESTINATION "${INSTALL_LIB_DIR}" COMPONENT dev
   )
 endif(MODBUSPP_WITH_STATIC)
 
