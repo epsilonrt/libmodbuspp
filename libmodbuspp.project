@@ -1,5 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CodeLite_Project Name="libmodbuspp" Version="10.0.0" InternalType="Console">
+  <VirtualDirectory Name="examples">
+    <VirtualDirectory Name="master">
+      <VirtualDirectory Name="read-holding-data">
+        <File Name="examples/master/read-holding-data/main.cpp"/>
+        <File Name="examples/master/read-holding-data/README.md"/>
+      </VirtualDirectory>
+      <VirtualDirectory Name="read-input-registers">
+        <File Name="examples/master/read-input-registers/main.cpp"/>
+        <File Name="examples/master/read-input-registers/README.md"/>
+      </VirtualDirectory>
+      <VirtualDirectory Name="write-holding-data">
+        <File Name="examples/master/write-holding-data/main.cpp"/>
+        <File Name="examples/master/write-holding-data/README.md"/>
+      </VirtualDirectory>
+      <VirtualDirectory Name="read-coils">
+        <File Name="examples/master/read-coils/main.cpp"/>
+        <File Name="examples/master/read-coils/README.md"/>
+      </VirtualDirectory>
+      <VirtualDirectory Name="report-slave-id">
+        <File Name="examples/master/report-slave-id/main.cpp"/>
+        <File Name="examples/master/report-slave-id/README.md"/>
+      </VirtualDirectory>
+    </VirtualDirectory>
+    <VirtualDirectory Name="server">
+      <VirtualDirectory Name="tcp-gateway">
+        <File Name="examples/server/tcp-gateway/main.cpp"/>
+        <File Name="examples/server/tcp-gateway/README.md"/>
+      </VirtualDirectory>
+      <VirtualDirectory Name="clock-server">
+        <File Name="examples/server/clock-server/main.cpp"/>
+        <File Name="examples/server/clock-server/README.md"/>
+      </VirtualDirectory>
+    </VirtualDirectory>
+  </VirtualDirectory>
   <Plugins>
     <Plugin Name="qmake">
       <![CDATA[00020001N0005Debug0000000000000001N0007Release000000000000]]>
@@ -33,41 +67,6 @@
     <File Name="doc/main_page_header.dox"/>
     <VirtualDirectory Name="resources">
       <File Name="doc/CMakeLists.txt"/>
-    </VirtualDirectory>
-  </VirtualDirectory>
-  <VirtualDirectory Name="examples">
-    <VirtualDirectory Name="master">
-      <VirtualDirectory Name="read-coils">
-        <File Name="examples/master/read-coils/main.cpp"/>
-        <File Name="examples/master/read-coils/read-coils.mk"/>
-        <File Name="examples/master/read-coils/read-coils.txt"/>
-        <File Name="examples/master/read-coils/README.md"/>
-      </VirtualDirectory>
-      <VirtualDirectory Name="read-input-registers">
-        <File Name="examples/master/read-input-registers/main.cpp"/>
-        <File Name="examples/master/read-input-registers/read-input-registers.txt"/>
-        <File Name="examples/master/read-input-registers/read-input-registers.mk"/>
-        <File Name="examples/master/read-input-registers/README.md"/>
-        <VirtualDirectory Name="Debug">
-          <File Name="examples/master/read-input-registers/Debug/read-input-registers"/>
-        </VirtualDirectory>
-      </VirtualDirectory>
-      <VirtualDirectory Name="read-holding-data">
-        <File Name="examples/master/read-holding-data/main.cpp"/>
-        <File Name="examples/master/read-holding-data/read-holding-data.txt"/>
-        <File Name="examples/master/read-holding-data/read-holding-data.mk"/>
-      </VirtualDirectory>
-      <VirtualDirectory Name="write-holding-data">
-        <File Name="examples/master/write-holding-data/main.cpp"/>
-        <File Name="examples/master/write-holding-data/write-holding-data.txt"/>
-        <File Name="examples/master/write-holding-data/write-holding-data.mk"/>
-      </VirtualDirectory>
-      <VirtualDirectory Name="report-slave-id">
-        <File Name="examples/master/report-slave-id/report-slave-id.txt"/>
-        <File Name="examples/master/report-slave-id/main.cpp"/>
-        <File Name="examples/master/report-slave-id/report-slave-id.mk"/>
-        <File Name="examples/master/report-slave-id/README.md"/>
-      </VirtualDirectory>
     </VirtualDirectory>
   </VirtualDirectory>
   <VirtualDirectory Name="dev">
