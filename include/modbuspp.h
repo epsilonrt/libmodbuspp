@@ -20,4 +20,6 @@
 #include <modbuspp/tcplayer.h>
 #include <modbuspp/master.h>
 #include <modbuspp/server.h>
+#include <modbuspp/request.h>
+#include <modbuspp/response.h>
 /* ========================================================================== */

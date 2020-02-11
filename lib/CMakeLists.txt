@@ -42,6 +42,8 @@ set (hdr_modbuspp
   ${MODBUSPP_INC_DIR}/modbuspp/swap.h
   ${MODBUSPP_INC_DIR}/modbuspp/tcplayer.h
   ${MODBUSPP_INC_DIR}/modbuspp/timeout.h
+  ${MODBUSPP_INC_DIR}/modbuspp/request.h
+  ${MODBUSPP_INC_DIR}/modbuspp/response.h
 )
 
 configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/config.h.in

@@ -58,6 +58,7 @@ namespace Modbus {
   const int TcpSlave = MODBUS_TCP_SLAVE; ///< Can be used in TCP mode to restore the default value
   const int Unknown = -1; ///< Value corresponding to an unknown parameter
   const uint16_t MaxPduLength = MODBUS_MAX_PDU_LENGTH; ///< maximum size of a PDU
+  const uint8_t ExceptionFlag = 0x80;
 
   /**
    * @enum Net
@@ -187,5 +188,23 @@ namespace Modbus {
     UnknownFunction = Unknown
   };
 
+  /**
+   * @enum ExceptionCode
+   * @brief Enumerations of MODBUS exception code managed by libmodbuspp
+   */
+  enum ExceptionCode {
+    IllegalFunction = MODBUS_EXCEPTION_ILLEGAL_FUNCTION,
+    IllegalDataAddress = MODBUS_EXCEPTION_ILLEGAL_DATA_ADDRESS,
+    IllegalDataValue = MODBUS_EXCEPTION_ILLEGAL_DATA_VALUE,
+    SlaveOrServerFailure = MODBUS_EXCEPTION_SLAVE_OR_SERVER_FAILURE,
+    Acknowledge = MODBUS_EXCEPTION_ACKNOWLEDGE,
+    SlaveOrServerBusy = MODBUS_EXCEPTION_SLAVE_OR_SERVER_BUSY,
+    NegativeAcknowledge = MODBUS_EXCEPTION_NEGATIVE_ACKNOWLEDGE,
+    MemoryParity = MODBUS_EXCEPTION_MEMORY_PARITY,
+    NotDefined = MODBUS_EXCEPTION_NOT_DEFINED,
+    GatewayPath = MODBUS_EXCEPTION_GATEWAY_PATH,
+    GatewayTarget = MODBUS_EXCEPTION_GATEWAY_TARGET,
+    ExceptionMax = MODBUS_EXCEPTION_MAX
+  };
 }
 /* ========================================================================== */

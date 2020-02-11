@@ -1,39 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CodeLite_Project Name="libmodbuspp" Version="10.0.0" InternalType="Console">
-  <VirtualDirectory Name="examples">
-    <VirtualDirectory Name="master">
-      <VirtualDirectory Name="read-holding-data">
-        <File Name="examples/master/read-holding-data/main.cpp"/>
-        <File Name="examples/master/read-holding-data/README.md"/>
-      </VirtualDirectory>
-      <VirtualDirectory Name="read-input-registers">
-        <File Name="examples/master/read-input-registers/main.cpp"/>
-        <File Name="examples/master/read-input-registers/README.md"/>
-      </VirtualDirectory>
-      <VirtualDirectory Name="write-holding-data">
-        <File Name="examples/master/write-holding-data/main.cpp"/>
-        <File Name="examples/master/write-holding-data/README.md"/>
-      </VirtualDirectory>
-      <VirtualDirectory Name="read-coils">
-        <File Name="examples/master/read-coils/main.cpp"/>
-        <File Name="examples/master/read-coils/README.md"/>
-      </VirtualDirectory>
-      <VirtualDirectory Name="report-slave-id">
-        <File Name="examples/master/report-slave-id/main.cpp"/>
-        <File Name="examples/master/report-slave-id/README.md"/>
-      </VirtualDirectory>
-    </VirtualDirectory>
-    <VirtualDirectory Name="server">
-      <VirtualDirectory Name="tcp-gateway">
-        <File Name="examples/server/tcp-gateway/main.cpp"/>
-        <File Name="examples/server/tcp-gateway/README.md"/>
-      </VirtualDirectory>
-      <VirtualDirectory Name="clock-server">
-        <File Name="examples/server/clock-server/main.cpp"/>
-        <File Name="examples/server/clock-server/README.md"/>
-      </VirtualDirectory>
-    </VirtualDirectory>
-  </VirtualDirectory>
   <Plugins>
     <Plugin Name="qmake">
       <![CDATA[00020001N0005Debug0000000000000001N0007Release000000000000]]>
@@ -56,6 +22,8 @@
       <File Name="include/modbuspp/message.h"/>
       <File Name="include/modbuspp/slavereport.h"/>
       <File Name="include/modbuspp/popl.h"/>
+      <File Name="include/modbuspp/request.h"/>
+      <File Name="include/modbuspp/response.h"/>
     </VirtualDirectory>
     <File Name="include/modbuspp.h"/>
   </VirtualDirectory>
@@ -107,6 +75,8 @@
     <File Name="src/bufferedslave_p.h"/>
     <File Name="src/message.cpp"/>
     <File Name="src/message_p.h"/>
+    <File Name="src/request.cpp"/>
+    <File Name="src/response.cpp"/>
   </VirtualDirectory>
   <VirtualDirectory Name="lib">
     <VirtualDirectory Name="resources">

@@ -26,6 +26,7 @@
 namespace Modbus {
 
   class Slave;
+  class Message;
 
   /**
    * @class Data
@@ -205,6 +206,7 @@ namespace Modbus {
       }
 
       friend class Slave;
+      friend class Message;
 
   protected:
 

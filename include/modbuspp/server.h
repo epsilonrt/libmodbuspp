@@ -17,7 +17,6 @@
 #pragma once
 
 #include <modbuspp/master.h>
-#include <modbuspp/message.h>
 #include <modbuspp/bufferedslave.h>
 
 namespace Modbus {
@@ -124,7 +123,7 @@ namespace Modbus {
       /**
        * @brief Performs all server operations
        * 
-       * Wait at most \c timeoutMs ms for a request from a client and then 
+       * Wait at most @a timeoutMs ms for a request from a client and then 
        * perform the necessary operations before responding.
        * 
        * @return return the number of Modbus data of the response if successful.
@@ -160,7 +159,7 @@ namespace Modbus {
       /**
        * @brief Returns the slave whose address is provided.
        * 
-       * The slave must have been added with \c addSlave() else a 
+       * The slave must have been added with @a addSlave() else a 
        * std::out_of_range exception is thrown.
        * 
        * If the Device that drives the slave to an RTU backend, we can access 
@@ -180,7 +179,7 @@ namespace Modbus {
       /**
        * @brief Returns a pointer to the slave whose address is provided.
        * 
-       * The slave must have been added with \c addSlave() else a 
+       * The slave must have been added with @a addSlave() else a 
        * a nullptr is returned.
        * 
        * If the Device that drives the slave to an RTU backend, we can access 
@@ -200,8 +199,8 @@ namespace Modbus {
       /**
        * @brief Slave table access operator
        * 
-       * server being an object of class Server, \c server[i] is equivalent to
-       * \c server.slave(i)
+       * server being an object of class Server, @a server[i] is equivalent to
+       * @a server.slave(i)
        */
       BufferedSlave &operator[] (int);
 
@@ -211,7 +210,7 @@ namespace Modbus {
       const BufferedSlave &operator[] (int) const;
 
       /**
-       * @brief Check if the slave at the given address \c slaveAddrexists
+       * @brief Check if the slave at the given address @a slaveAddrexists
        */
       bool hasSlave (int slaveAddr) const;
 

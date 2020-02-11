@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with the libmodbuspp Library; if not, see <http://www.gnu.org/licenses/>.
  */
-#include <modbuspp/message.h>
 #include "bufferedslave_p.h"
 #include "config.h"
 
@@ -78,7 +77,7 @@ namespace Modbus {
   }
 
   // ---------------------------------------------------------------------------
-  int BufferedSlave::readFromDevice (const Message * req) {
+  int BufferedSlave::readFromDevice (const Request * req) {
 
     if (req) {
       PIMP_D (BufferedSlave);
@@ -163,13 +162,13 @@ namespace Modbus {
   }
 
   // ---------------------------------------------------------------------------
-  int BufferedSlave::readFromDevice (const Message & req) {
+  int BufferedSlave::readFromDevice (const Request & req) {
 
     return readFromDevice (&req);
   }
 
   // ---------------------------------------------------------------------------
-  int BufferedSlave::writeToDevice (const Message * req) {
+  int BufferedSlave::writeToDevice (const Request * req) {
 
     if (req) {
       PIMP_D (BufferedSlave);

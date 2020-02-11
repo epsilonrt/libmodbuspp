@@ -17,10 +17,11 @@
 #pragma once
 
 #include <modbuspp/slave.h>
+#include <modbuspp/request.h>
 
 namespace Modbus {
   
-  class Message;
+  class Request;
   
   /**
     * @class BufferedSlave
@@ -42,8 +43,8 @@ namespace Modbus {
        * @brief Constructor
        * 
        * Constructor of a new buffered slave with the slaveAddr identifier. 
-       * If the device \c dev is provided, usually of the class \c Master and 
-       * \c dev->isOpen() returns true:
+       * If the device @a dev is provided, usually of the class @a Master and 
+       * @a dev->isOpen() returns true:
        * - The requested data is actually read, then stored in the memory 
        * buffer before being returned.
        * - The data provided is actually written, after being stored in 
@@ -59,7 +60,7 @@ namespace Modbus {
       /**
        * @brief Setting a block of data in the memory buffer.
        * 
-       * A single block of type \c t can be defined for a given slave. 
+       * A single block of type @a t can be defined for a given slave. 
        * The block has nmeb elements and starts at startAddr.
        * @param t
        * @param nmemb
@@ -231,10 +232,10 @@ namespace Modbus {
       BufferedSlave (Private &dd);
       modbus_mapping_t * map();
       const modbus_mapping_t * map() const;
-      int readFromDevice (const Message * req);
-      int readFromDevice (const Message & req);
-      int writeToDevice (const Message * req);
-      int writeToDevice (const Message & req);
+      int readFromDevice (const Request * req);
+      int readFromDevice (const Request & req);
+      int writeToDevice (const Request * req);
+      int writeToDevice (const Request & req);
 
     private:
       PIMP_DECLARE_PRIVATE (BufferedSlave)

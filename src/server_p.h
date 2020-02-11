@@ -36,7 +36,7 @@ namespace Modbus {
       static int receive (Private * d);
 
       int sock;
-      Message * msg;
+      Request * req;
       std::map <int,BufferedSlave*> slave;
       std::future<int> receiveTask;
 

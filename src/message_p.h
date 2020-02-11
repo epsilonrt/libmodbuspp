@@ -31,6 +31,13 @@ namespace Modbus {
       Net net;
       std::vector<uint8_t> adu;
       int pduIndex;
+      int crcIndex;
+      uint16_t maxAduLength;
+      char suffix;
+      char prefix;
+      static uint16_t crc16 (uint8_t * buf, uint16_t count);
+      static const uint8_t CrcLoTable[];
+      static const uint8_t CrcHiTable[];
   };
 }
 

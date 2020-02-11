@@ -131,7 +131,7 @@ namespace Modbus {
       /**
        * @brief Returns the slave whose address is provided.
        * 
-       * The slave must have been added with \c addSlave() else a 
+       * The slave must have been added with @a addSlave() else a 
        * std::out_of_range exception is thrown.
        * 
        * If the Device that drives the slave to an RTU backend, we can access 
@@ -151,7 +151,7 @@ namespace Modbus {
       /**
        * @brief Returns a pointer to the slave whose address is provided.
        * 
-       * The slave must have been added with \c addSlave() else a 
+       * The slave must have been added with @a addSlave() else a 
        * a nullptr is returned.
        * 
        * If the Device that drives the slave to an RTU backend, we can access 
@@ -171,8 +171,8 @@ namespace Modbus {
       /**
        * @brief Slave table access operator
        * 
-       * master being an object of class Master, \c master[i] is equivalent to
-       * \c master.slave(i)
+       * master being an object of class Master, @a master[i] is equivalent to
+       * @a master.slave(i)
        */
       Slave &operator[] (int);
 
@@ -182,7 +182,7 @@ namespace Modbus {
       const Slave &operator[] (int) const;
       
       /**
-       * @brief Check if the slave at the given address \c slaveAddrexists
+       * @brief Check if the slave at the given address @a slaveAddrexists
        */
       bool hasSlave (int slaveAddr) const;
 

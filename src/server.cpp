@@ -42,7 +42,7 @@ namespace Modbus {
     Device (*new Private (this, net, connection, settings)) {
     PIMP_D (Server);
 
-    d->msg = new Message (*this);
+    d->req = new Request (*this);
   }
 
   // ---------------------------------------------------------------------------
@@ -99,37 +99,39 @@ namespace Modbus {
           }
         }
         else if (rc > 0) {
-          int id = d->msg->slave();
+          int id = d->req->slave();
 
           if (d->slave.count (id) > 0) {
 
             if (modbus_set_slave (d->ctx(), id) == 0) {
               int ret;
               BufferedSlave * slv = d->slave[id];
-
+              
+              d->req->adu().resize(rc);
+              
               // route the message to a possible device to copy its registers to the map.
-              ret = slv->readFromDevice (d->msg);
+              ret = slv->readFromDevice (d->req);
               if (ret >= 0) {
 
                 if (slv->beforeReplyCallback()) {
-                  ret = slv->beforeReplyCallback() (*d->msg, this);
+                  ret = slv->beforeReplyCallback() (*d->req, this);
                   if (ret != 0) { // -1 error, 1 exit, 0 continue
                     return ret;
                   }
                 }
 
-                rc = modbus_reply (d->ctx(), d->msg->adu().data(), rc, slv->map());
+                rc = modbus_reply (d->ctx(), d->req->adu().data(), rc, slv->map());
                 if (rc >= 0) {
 
                   if (slv->afterReplyCallback()) {
-                    ret = slv->afterReplyCallback() (*d->msg, this);
+                    ret = slv->afterReplyCallback() (*d->req, this);
                     if (ret != 0) { // -1 error, 1 exit, 0 continue
                       return ret;
                     }
                   }
                   
                   // route the message to a possible device to write its registers from map.
-                  ret = slv->writeToDevice (d->msg);
+                  ret = slv->writeToDevice (d->req);
                   if (ret < 0) {
                     rc = ret;
                   }
@@ -225,12 +227,12 @@ namespace Modbus {
   // ---------------------------------------------------------------------------
   Server::Private::Private (Server * q, Net net, const std::string & connection,
                             const std::string & settings) :
-    Device::Private (q, net, connection, settings), sock (-1), msg (0) {}
+    Device::Private (q, net, connection, settings), sock (-1), req (0) {}
 
   // ---------------------------------------------------------------------------
   Server::Private::~Private() {
 
-    delete msg;
+    delete req;
   }
 
   // ---------------------------------------------------------------------------
@@ -280,7 +282,7 @@ namespace Modbus {
         return -1;
       }
     }
-    return modbus_receive (d->ctx(), d->msg->adu().data());
+    return modbus_receive (d->ctx(), d->req->adu().data());
   }
 
 }
