@@ -15,6 +15,7 @@
  * along with the libmodbuspp Library; if not, see <http://www.gnu.org/licenses/>.
  */
 #include <sstream>
+#include <iostream>
 #ifdef _WIN32
 # include <winsock2.h>
 #else
@@ -46,7 +47,10 @@ namespace Modbus {
   }
 
   // ---------------------------------------------------------------------------
-  Server::~Server() = default;
+  Server::~Server() {
+    
+    terminate();
+  }
 
 
   // ---------------------------------------------------------------------------
@@ -65,15 +69,52 @@ namespace Modbus {
 
     if (isOpen()) {
       PIMP_D (Server);
-
+      
+      terminate();
       d->close();
     }
   }
 
   // ---------------------------------------------------------------------------
+  bool Server::start () {
+
+    if (!isRunning() && isOpen()) {
+      PIMP_D (Server);
+
+      // Fetch std::future object associated with promise
+      std::future<void> running = d->stopDaemon.get_future();
+
+      // Starting Thread & move the future object in lambda function by reference
+      d->daemon = std::thread (&Private::loop, std::move (running), d);
+    }
+    return isRunning();
+  }
+
+  // ---------------------------------------------------------------------------
+  void Server::terminate () {
+
+    if (isRunning()) {
+      PIMP_D (Server);
+
+      // Set the value in promise
+      d->stopDaemon.set_value();
+      // Wait for thread to join
+      d->daemon.join();
+      std::cout << "<TERMINATE>" << std::endl;
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  bool Server::isRunning() const {
+    PIMP_D (const Server);
+
+    return d->daemon.joinable();
+  }
+
+  // ---------------------------------------------------------------------------
   int Server::poll (long timeout) {
 
-    if (isOpen()) {
+    if (!isRunning() && isOpen()) {
       PIMP_D (Server);
 
       if (!d->receiveTask.valid()) {
@@ -84,63 +125,8 @@ namespace Modbus {
       if (d->receiveTask.wait_for (std::chrono::milliseconds (timeout)) == std::future_status::ready) {
 
         // message received ?
-
         int rc = d->receiveTask.get();
-
-        if (rc == -1 && errno != EMBBADCRC) {
-
-          if (recoveryLink()) {
-            d->close();
-            if (d->open()) {
-
-              errno = 0;
-              rc = 0;
-            }
-          }
-        }
-        else if (rc > 0) {
-          int id = d->req->slave();
-
-          if (d->slave.count (id) > 0) {
-
-            if (modbus_set_slave (d->ctx(), id) == 0) {
-              int ret;
-              BufferedSlave * slv = d->slave[id];
-              
-              d->req->adu().resize(rc);
-              
-              // route the message to a possible device to copy its registers to the map.
-              ret = slv->readFromDevice (d->req);
-              if (ret >= 0) {
-
-                if (slv->beforeReplyCallback()) {
-                  ret = slv->beforeReplyCallback() (*d->req, this);
-                  if (ret != 0) { // -1 error, 1 exit, 0 continue
-                    return ret;
-                  }
-                }
-
-                rc = modbus_reply (d->ctx(), d->req->adu().data(), rc, slv->map());
-                if (rc >= 0) {
-
-                  if (slv->afterReplyCallback()) {
-                    ret = slv->afterReplyCallback() (*d->req, this);
-                    if (ret != 0) { // -1 error, 1 exit, 0 continue
-                      return ret;
-                    }
-                  }
-                  
-                  // route the message to a possible device to write its registers from map.
-                  ret = slv->writeToDevice (d->req);
-                  if (ret < 0) {
-                    rc = ret;
-                  }
-                }
-              }
-            }
-          }
-        }
-        return rc;
+        return d->task (rc);
       }
       return 0;
     }
@@ -271,9 +257,69 @@ namespace Modbus {
   }
 
   // ---------------------------------------------------------------------------
+  int Server::Private::task (int rc) {
+    PIMP_Q (Server);
+
+    if (rc == -1 && errno != EMBBADCRC) {
+
+      if (q->recoveryLink()) {
+        close();
+        if (open()) {
+
+          errno = 0;
+          rc = 0;
+        }
+      }
+    }
+    else if (rc > 0) {
+      int id = req->slave();
+
+      if (slave.count (id) > 0) {
+
+        if (modbus_set_slave (ctx(), id) == 0) {
+          int ret;
+          BufferedSlave * slv = slave[id];
+
+          req->adu().resize (rc);
+
+          // route the message to a possible device to copy its registers to the map.
+          ret = slv->readFromDevice (req);
+          if (ret >= 0) {
+
+            if (slv->beforeReplyCallback()) {
+              ret = slv->beforeReplyCallback() (*req, q);
+              if (ret != 0) { // -1 error, 1 exit, 0 continue
+                return ret;
+              }
+            }
+
+            rc = modbus_reply (ctx(), req->adu().data(), rc, slv->map());
+            if (rc >= 0) {
+
+              if (slv->afterReplyCallback()) {
+                ret = slv->afterReplyCallback() (*req, q);
+                if (ret != 0) { // -1 error, 1 exit, 0 continue
+                  return ret;
+                }
+              }
+
+              // route the message to a possible device to write its registers from map.
+              ret = slv->writeToDevice (req);
+              if (ret < 0) {
+                rc = ret;
+              }
+            }
+          }
+        }
+      }
+    }
+    return rc;
+  }
+
+  // ---------------------------------------------------------------------------
   // static
   int Server::Private::receive (Private * d) {
-
+    int rc;
     if ( (d->backend->net() == Tcp) && !d->isConnected()) {
 
       // accept blocking call !
@@ -282,9 +328,21 @@ namespace Modbus {
         return -1;
       }
     }
-    return modbus_receive (d->ctx(), d->req->adu().data());
+    rc = modbus_receive (d->ctx(), d->req->adu().data());
+    return rc;
   }
 
+  // ---------------------------------------------------------------------------
+  // static
+  void * Server::Private::loop (std::future<void> run, Private * d) {
+    int rc;
+
+    while (run.wait_for (std::chrono::milliseconds (1)) == std::future_status::timeout) {
+
+      rc = d->receive (d);
+      rc = d->task (rc);
+    }
+  }
 }
 
 /* ========================================================================== */

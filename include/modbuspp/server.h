@@ -119,6 +119,10 @@ namespace Modbus {
        * @brief Close a Modbus connection
        */
       virtual void close();
+      
+      bool start();
+      void terminate();
+      bool isRunning() const;
 
       /**
        * @brief Performs all server operations

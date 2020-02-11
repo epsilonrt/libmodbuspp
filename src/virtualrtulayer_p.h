@@ -16,35 +16,15 @@
  */
 #pragma once
 
-#include <map>
-#include <future>
-#include <thread>
-#include <modbuspp/server.h>
-#include "device_p.h"
+#include <modbuspp/virtualrtulayer.h>
+#include "netlayer_p.h"
 
 namespace Modbus {
 
-  class Server::Private : public Device::Private {
+  class VirtualRtuLayer::Private  : public NetLayer::Private {
 
     public:
-      Private (Server * q, Net net, const std::string & connection, const std::string & settings);
-      virtual ~Private();
-      
-      bool open();
-      void close();
-      int task(int rc);
-      
-      static int receive (Private * d);
-      static void * loop (std::future<void> run, Private * d);
-
-      int sock;
-      Request * req;
-      std::map <int,BufferedSlave*> slave;
-      std::future<int> receiveTask;
-      std::thread daemon;
-      std::promise<void> stopDaemon;
-
-      PIMP_DECLARE_PUBLIC (Server)
+      Private (const std::string & name); 
   };
 }
 

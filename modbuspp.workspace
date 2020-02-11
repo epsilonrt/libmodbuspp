@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CodeLite_Workspace Name="modbuspp" Database="" Version="10.0.0">
-  <Project Name="libmodbuspp" Path="libmodbuspp.project" Active="Yes"/>
+  <Project Name="libmodbuspp" Path="libmodbuspp.project" Active="No"/>
   <Project Name="libmodbuspp-doc" Path="doc/libmodbuspp-doc.project" Active="No"/>
   <VirtualDirectory Name="examples">
     <VirtualDirectory Name="master">
@@ -11,7 +11,7 @@
       <Project Name="write-holding-data" Path="examples/master/write-holding-data/write-holding-data.project" Active="No"/>
     </VirtualDirectory>
     <VirtualDirectory Name="server">
-      <Project Name="clock-server" Path="examples/server/clock-server/clock-server.project" Active="No"/>
+      <Project Name="clock-server" Path="examples/server/clock-server/clock-server.project" Active="Yes"/>
       <Project Name="tcp-gw-to-clock-server" Path="examples/server/tcp-gw-to-clock-server/tcp-gw-to-clock-server.project" Active="No"/>
       <Project Name="tcp-gw-to-serial" Path="examples/server/tcp-gw-to-serial/tcp-gw-to-serial.project" Active="No"/>
       <Project Name="tcp-gw-callback" Path="examples/server/tcp-gw-callback/tcp-gw-callback.project" Active="No"/>

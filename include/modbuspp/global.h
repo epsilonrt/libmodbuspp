@@ -81,6 +81,14 @@ namespace Modbus {
      * used for communications over TCP IPv4 and IPv6 networks.
      */
     Tcp,
+    /**
+     * @brief Virtual RTU backend
+     *
+     * The Virtual RTU backend (Remote Terminal Unit) is used in serial communication
+     * and makes use of a compact, binary representation of the data for
+     * protocol communication.
+     */
+    VirtualRtu,
     NoNet = Unknown  ///< Unknown network backend
   };
 

@@ -16,6 +16,7 @@
  */
 #include <modbuspp/rtulayer.h>
 #include <modbuspp/tcplayer.h>
+#include <modbuspp/virtualrtulayer.h>
 #include "device_p.h"
 #include "config.h"
 #include <chrono>
@@ -130,6 +131,17 @@ namespace Modbus {
       return * reinterpret_cast<RtuLayer *> (d->backend);
     }
     throw std::domain_error ("Error: Unable to return RTU layer !");
+  }
+
+  // ---------------------------------------------------------------------------
+  VirtualRtuLayer & Device::virtualRtu() {
+
+    if (net() == VirtualRtu) {
+      PIMP_D (Device);
+
+      return * reinterpret_cast<VirtualRtuLayer *> (d->backend);
+    }
+    throw std::domain_error ("Error: Unable to return Virtual RTU layer !");
   }
 
   // ---------------------------------------------------------------------------
@@ -250,6 +262,10 @@ namespace Modbus {
 
       case Rtu:
         backend = new RtuLayer (connection, settings);
+        break;
+
+      case VirtualRtu:
+        backend = new VirtualRtuLayer (connection);
         break;
 
       default:

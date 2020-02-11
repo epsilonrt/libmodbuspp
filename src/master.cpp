@@ -40,6 +40,7 @@ namespace Modbus {
         addSlave (TcpSlave);
         break;
 
+      case VirtualRtu:
       case Rtu:
         addSlave (Broadcast);
         break;

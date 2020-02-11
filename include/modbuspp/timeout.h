@@ -47,6 +47,14 @@ namespace Modbus {
        * @brief Return the timeout in seconds
        */
       double value() const;
+      
+      /**
+       * @brief Return the timeout in milliseconds
+       */
+      unsigned long millis() const {
+        
+        return static_cast<unsigned long> (value() * 1000.0);
+      }
 
       /**
        * @brief Set value from a double

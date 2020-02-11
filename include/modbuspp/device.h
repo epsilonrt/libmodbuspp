@@ -25,6 +25,7 @@ namespace Modbus {
   class NetLayer;
   class RtuLayer;
   class TcpLayer;
+  class VirtualRtuLayer;
 
   /**
    * @class Device
@@ -251,6 +252,14 @@ namespace Modbus {
        * the device. If it does not, a \b std::domain_error exception is thrown.
        */
       RtuLayer & rtu();
+      
+      /**
+       * @brief underlying RTU layer (backend)
+       *
+       * This function shall return the RTU layer if it is the layer used by
+       * the device. If it does not, a \b std::domain_error exception is thrown.
+       */
+      VirtualRtuLayer & virtualRtu();
 
       /**
        * @brief underlying TCP layer (backend)
