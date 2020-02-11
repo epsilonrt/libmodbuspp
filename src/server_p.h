@@ -32,13 +32,17 @@ namespace Modbus {
       
       bool open();
       void close();
-      int poll();
+      int task(int rc);
+      
+      static void * loop (std::future<void> run, Private * d);
       static int receive (Private * d);
 
       int sock;
       Request * req;
       std::map <int,BufferedSlave*> slave;
       std::future<int> receiveTask;
+      std::thread daemon;
+      std::promise<void> stopDaemon;
 
       PIMP_DECLARE_PUBLIC (Server)
   };

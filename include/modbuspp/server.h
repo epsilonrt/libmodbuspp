@@ -130,6 +130,22 @@ namespace Modbus {
        * Otherwise it shall return -1 and set errno.
        */
       int poll (long timeoutMs = 0);
+      
+      /**
+       * @brief Start the server in a new thread
+       * @return true if started
+       */
+      bool run();
+      
+      /**
+       * @brief Stops the server if it is started in a thread
+       */
+      void terminate();
+      
+      /**
+       * @brief Returns if the server is launched in a thread
+       */
+      bool isRunning() const;
 
       /**
        * @brief Adds a slave 

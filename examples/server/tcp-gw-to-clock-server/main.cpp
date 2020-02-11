@@ -161,6 +161,9 @@ int main (int argc, char **argv) {
       // - redirection of requests to the serial link
       // - recovery of information coming from the serial link and storage in a memory buffer
       // - response to the TCP client with its information
+      
+      // srv.run(); // if you want to start the server in a thread, 
+                    // you must comment the poll () call line below
       for (;;) {
         srv.poll (1000);
       }

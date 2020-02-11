@@ -2,12 +2,12 @@
 ## Auto Generated makefile by CodeLite IDE
 ## any manual changes will be erased      
 ##
-## Debug
+## Release
 ProjectName            :=tcp-gw-to-serial
-ConfigurationName      :=Debug
+ConfigurationName      :=Release
 WorkspacePath          :=/home/pascal/src/libmodbuspp
 ProjectPath            :=/home/pascal/src/libmodbuspp/examples/server/tcp-gw-to-serial
-IntermediateDirectory  :=./Debug
+IntermediateDirectory  :=./Release
 OutDir                 := $(IntermediateDirectory)
 CurrentFileName        :=
 CurrentFilePath        :=
@@ -28,7 +28,7 @@ LibraryPathSwitch      :=-L
 PreprocessorSwitch     :=-D
 SourceSwitch           :=-c 
 OutputFile             :=$(IntermediateDirectory)/$(ProjectName)
-Preprocessors          :=
+Preprocessors          :=$(PreprocessorSwitch)NDEBUG 
 ObjectSwitch           :=-o 
 ArchiveOutputSwitch    := 
 PreprocessOnlySwitch   :=-E
@@ -50,8 +50,8 @@ LibPath                := $(LibraryPathSwitch).
 AR       := /usr/bin/ar rcu
 CXX      := /usr/bin/g++
 CC       := /usr/bin/gcc
-CXXFLAGS := -std=c++14 $(shell pkg-config --cflags libmodbuspp) -g -O0 -Wall $(Preprocessors)
-CFLAGS   := -std=c99 $(shell pkg-config --cflags libmodbuspp) -g -O0 -Wall $(Preprocessors)
+CXXFLAGS := -std=c++14 $(shell pkg-config --cflags libmodbuspp) -O2 -Wall $(Preprocessors)
+CFLAGS   := -std=c99 $(shell pkg-config --cflags libmodbuspp) -O2 -Wall $(Preprocessors)
 ASFLAGS  := 
 AS       := /usr/bin/as
 
@@ -79,11 +79,11 @@ $(OutputFile): $(IntermediateDirectory)/.d $(Objects)
 	$(LinkerName) $(OutputSwitch)$(OutputFile) @$(ObjectsFileList) $(LibPath) $(Libs) $(LinkOptions)
 
 MakeIntermediateDirs:
-	@test -d ./Debug || $(MakeDirCommand) ./Debug
+	@test -d ./Release || $(MakeDirCommand) ./Release
 
 
 $(IntermediateDirectory)/.d:
-	@test -d ./Debug || $(MakeDirCommand) ./Debug
+	@test -d ./Release || $(MakeDirCommand) ./Release
 
 PreBuild:
 
@@ -105,6 +105,6 @@ $(IntermediateDirectory)/main.cpp$(PreprocessSuffix): main.cpp
 ## Clean
 ##
 clean:
-	$(RM) -r ./Debug/
+	$(RM) -r ./Release/
 
 
