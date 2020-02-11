@@ -1,18 +1,19 @@
 /**
-  @brief MODBUS TCP-RTU gateway
+  @brief MODBUS TCP gateway to serial port (RTU)
 
   This example shows how to create a MODBUS TCP-RTU gateway that relays requests
   to slaves connected on a serial link.
   Here the TCP gateway server listens on IPv4 localhost on port 1502 and relays
-  requests to the serial link / dev / ttyUSB0. These settings can be changed
+  requests to the serial link /dev/ttyUSB0. These settings can be changed
   through the command line option line:
 
-      Allowed options:
-        -h, --help                        produce help message
-        -H, --host arg (=127.0.0.1)       listening address of the server
-        -p, --port arg (=1502)            server listening port
-        -P, --serial arg (=/dev/ttyUSB0)  serial port
-        -s, --settings arg (=38400E1)     serial port settings
+    Allowed options:
+      -h, --help                        produce help message
+      -H, --host arg (=127.0.0.1)       listening address of the server
+      -p, --port arg (=1502)            server listening port
+      -P, --serial arg (=/dev/ttyUSB0)  serial port where we speak
+      -s, --settings arg (=38400E1)     serial port settings
+      -R, --rs485                       RS-485 mode (/RTS on (0) after sending)
 
   In this example, the slaves connected on the link are sensors of humidity
   (id: 32) and pressure (id: 33) of the SolarPi telemetry system.
@@ -54,9 +55,6 @@
 using namespace std;
 using namespace Modbus;
 
-int beforeReplyCB (Message & msg, Device * dev);
-int afterReplyCB (Message & msg, Device * dev);
-
 // -----------------------------------------------------------------------------
 int main (int argc, char **argv) {
   string host;
@@ -72,6 +70,7 @@ int main (int argc, char **argv) {
   CmdLine.add<popl::Value<string>> ("p", "port", "server listening port", "1502", &port);
   CmdLine.add<popl::Value<string>> ("P", "serial", "serial port", "/dev/ttyUSB0", &serial);
   CmdLine.add<popl::Value<string>> ("s", "settings", "serial port settings", "38400E1", &settings);
+  auto rs485_option = CmdLine.add<popl::Switch> ("R", "rs485", "RS-485 mode (/RTS on (0) after sending)");
   CmdLine.parse (argc, argv);
   // print auto-generated help message then exit
   if (help_option->count() == 1) {
@@ -81,10 +80,11 @@ int main (int argc, char **argv) {
 
   // Creating the MODBUS master link that controls the serial link
   Master mb (Rtu, serial , settings); // new master on RTU
-  // if you have to handle the DE signal of the line driver with RTS,
-  // you should uncomment the lines below...
-  // mb.rtu().setRts(RtsDown);
-  // mb.rtu().setSerialMode(Rs485);
+  if (rs485_option->count() == 1) {
+
+    mb.rtu().setRts (RtsDown);
+    mb.rtu().setSerialMode (Rs485);
+  }
 
   // Enabling debug mode to display transmitted and received frames
   mb.setDebug();
@@ -126,21 +126,11 @@ int main (int argc, char **argv) {
     // 7       32-bit  MPX     Maximum ADC standard value, float in LSB ADC 962.56
     press.setBlock (HoldingRegister, 8); // 32-bit * 4
 
-    // The user can define functions that will be called before and/or after
-    // the server responds to the client.
-    // These functions receive the client request as an object of the class
-    // Message and a pointer to the object of the class Device that manages the
-    // master link (& mb in this example)
-    press.setBeforeReplyCallback (beforeReplyCB);
-    press.setAfterReplyCallback (afterReplyCB);
-
     // We do the same thing with the humidity sensor at address 32, this slave
     // has only 2 input registers.
     BufferedSlave & hum = srv.addSlave (32, &mb);
     hum.setBlock (InputRegister, 2);
     hum.setBlock (HoldingRegister, 8); // 32-bit * 4
-    hum.setBeforeReplyCallback (beforeReplyCB);
-    hum.setAfterReplyCallback (afterReplyCB);
 
     cout << "Modbus TCP Gateway" << endl << "listening on " <<
          srv.backend().connection() << ":" << srv.backend().settings() << endl;
@@ -161,20 +151,6 @@ int main (int argc, char **argv) {
 
   }
 
-  return 0;
-}
-
-// -----------------------------------------------------------------------------
-// function called before the response to TCP client
-int beforeReplyCB (Message & msg, Device * dev) {
-  cout << "<-------------- " << msg.slave() << "-------------->" << endl;
-  return 0;
-}
-
-// -----------------------------------------------------------------------------
-// function called after the response to TCP client
-int afterReplyCB (Message & msg, Device * dev) {
-  cout << "<////////////// " << msg.slave() << " //////////////>" << endl;
   return 0;
 }
 /* ========================================================================== */

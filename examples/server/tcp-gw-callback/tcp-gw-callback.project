@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<CodeLite_Project Name="tcp-gateway" Version="10.0.0" InternalType="Console">
+<CodeLite_Project Name="tcp-gw-callback" Version="10.0.0" InternalType="Console">
   <Description/>
   <Dependencies/>
   <VirtualDirectory Name="src">

@@ -2,13 +2,13 @@
  * @brief libmodbuspp clock-server example
  *
  * Shows how to use libmodbuspp to build a MODBUS time server.
- * 
+ *
  * @code
- * clock-server [tcp|rtu] [host_ip or serial_port] [ip_port or serial_settings]
+ * clock-server [-m tcp|rtu] [-c host_ip or serial_port] [-s ip_port or serial_settings]
  * @endcode
- * 
+ *
  * Once the server has started you can test it with mbpoll :
- * 
+ *
  * @code
     $ mbpoll -mtcp -p1502 -a10 -t3 -c8 localhost
     mbpoll 1.4-12 - FieldTalk(tm) Modbus(R) Master Simulator
@@ -24,53 +24,73 @@
     Data type.............: 16-bit register, input register table
 
     -- Polling slave 10... Ctrl-C to stop)
-    [1]: 	37
-    [2]: 	40
-    [3]: 	15
-    [4]: 	28
-    [5]: 	11
-    [6]: 	2019
-    [7]: 	4
-    [8]: 	332
+    [1]:  37
+    [2]:  40
+    [3]:  15
+    [4]:  28
+    [5]:  11
+    [6]:  2019
+    [7]:  4
+    [8]:  332
  * @endcode
  */
 #include <ctime>
 #include <iostream>
 #include <modbuspp.h>
+#include <modbuspp/popl.h>
 
 using namespace std;
 using namespace Modbus;
 
+const int SlaveAddress = 10;
+
 // -----------------------------------------------------------------------------
 int main (int argc, char **argv) {
-  Net net (Tcp);
-  string connection ("127.0.0.1");
-  string settings = "1502";
+  Net net;
+  string connection;
+  string settings;
+  string mode;
 
   time_t now, before;
   tm * t;
 
   // ModBus Data
   bool daylight;// daylight saving time, true = summer time
-  Data<int32_t,EndianLittleLittle> gmtoff; // GMT offset, +/- minutes
+  Data<int32_t, EndianLittleLittle> gmtoff; // GMT offset, +/- minutes
   uint16_t mb_time[8]; // date and time
 
-  if (argc > 1) {
-    // processing of command line parameters...
-    string str (argv[1]);
+  // parsing options from the command line
+  // watch https://github.com/badaix/popl to understand how we use popl ...
+  popl::OptionParser CmdLine ("Allowed options");
+  auto help_option = CmdLine.add<popl::Switch> ("h", "help", "produce help message");
+  CmdLine.add<popl::Value<string>> ("m", "mode", "mode (rtu or tcp)", "tcp", &mode);
+  CmdLine.add<popl::Value<string>> ("c", "connection",
+                                    "host or serial port when using ModBus protocol\n"
+                                    "(e.g. /dev/ttyS1 for RTU, 127.0.0.1 for TCP)",
+                                    "127.0.0.1", &connection);
+  CmdLine.add<popl::Value<string>> ("s", "settings", "connection settings\n"
+                                    "(e.g. 38400E1 for RTU, 1502 port for TCP)", 
+                                    "1502", &settings);
+  CmdLine.parse (argc, argv);
+  
+  // print auto-generated help message then exit
+  if (help_option->count() == 1) {
+    cout << CmdLine << endl;
+    exit (EXIT_SUCCESS);
+  }
 
-    if (str == "rtu") {
-      
-      net = Rtu;
-      connection = "/dev/ttyUSB0";
-      settings = "38400E1";
-    }
-    if (argc > 2) {
-      connection = argv[2];
-    }
-    if (argc > 3) {
-      settings = argv[3];
-    }
+  if (mode == "rtu") {
+    
+    net = Rtu;
+  }
+  else if (mode == "tcp") {
+    
+    net = Tcp;
+  }
+  else {
+    cerr << "invalid mode " << mode << ", must be tcp or rtu" << endl;
+    cerr << CmdLine << endl;
+    exit (EXIT_FAILURE);
   }
 
   Server srv (net, connection, settings); // new Modbus Server
@@ -78,7 +98,7 @@ int main (int argc, char **argv) {
   srv.setRecoveryLink();
   cout << "Modbus Time Server" << endl;
 
-  BufferedSlave & slv = srv.addSlave (10); // Adding a new slave to the server
+  BufferedSlave & slv = srv.addSlave (SlaveAddress); // Adding a new slave to the server
 
   cout << "Slave id: " << slv.number() << endl << endl;
   if (srv.debug()) {
