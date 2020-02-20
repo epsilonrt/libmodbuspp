@@ -17,11 +17,11 @@
     </VirtualDirectory>
     <VirtualDirectory Name="router">
       <Project Name="router-json" Path="examples/router/router-json/router-json.project" Active="No"/>
-      <Project Name="router-simple" Path="examples/router/router-simple/router-simple.project"/>
+      <Project Name="router-simple" Path="examples/router/router-simple/router-simple.project" Active="No"/>
     </VirtualDirectory>
   </VirtualDirectory>
   <BuildMatrix>
-    <WorkspaceConfiguration Name="Debug" Selected="yes">
+    <WorkspaceConfiguration Name="Debug" Selected="no">
       <Environment/>
       <Project Name="libmodbuspp" ConfigName="Debug"/>
       <Project Name="libmodbuspp-doc" ConfigName="Debug"/>
@@ -31,7 +31,7 @@
       <Project Name="clock-server" ConfigName="Debug"/>
       <Project Name="router-simple" ConfigName="Debug"/>
     </WorkspaceConfiguration>
-    <WorkspaceConfiguration Name="Release" Selected="no">
+    <WorkspaceConfiguration Name="Release" Selected="yes">
       <Environment/>
       <Project Name="libmodbuspp" ConfigName="Release"/>
       <Project Name="libmodbuspp-doc" ConfigName="Release"/>

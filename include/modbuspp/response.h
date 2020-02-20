@@ -25,8 +25,6 @@ namespace Modbus {
    * @class Response
    * @brief Modbus Response Message
    *
-   * @example 
-   *
    * @author Pascal JEAN, aka epsilonrt
    * @copyright GNU Lesser General Public License
    */

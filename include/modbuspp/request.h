@@ -24,8 +24,6 @@ namespace Modbus {
    * @class Request
    * @brief Modbus Request Message
    *
-   * @example 
-   *
    * @author Pascal JEAN, aka epsilonrt
    * @copyright GNU Lesser General Public License
    */
