@@ -1,0 +1,37 @@
+﻿{
+  "modbuspp-router": {
+    "mode": "tcp",
+    "connection": "localhost",
+    "settings": "1502",
+    "recovery-link": true,
+    "debug": true,
+    "response-timeout": 500,
+    "byte-timeout": 500,
+    "masters": [
+      {
+        "name": "rs232",
+        "mode": "rtu",
+        "connection": "/dev/ttyUSB0",
+        "settings": "38400E1",
+        "debug": true,
+        "response-timeout": 500,
+        "byte-timeout": 500,
+        "slaves": [
+          {
+            "id": 33,
+            "blocks": [
+              {
+                "table": "input-register",
+                "quantity": 6
+              },
+              {
+                "table": "holding-register",
+                "quantity": 8
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

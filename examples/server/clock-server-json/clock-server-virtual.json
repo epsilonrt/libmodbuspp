@@ -1,0 +1,31 @@
+{
+  "modbuspp-server": {
+    "mode": "rtu",
+    "connection": "/dev/tnt1",
+    "settings": "38400E1",
+    "debug": true,
+    "response-timeout": 500,
+    "byte-timeout": 500,
+    "slaves": [
+      {
+        "id": 10,
+        "pdu-adressing": false,
+        "blocks": [
+          {
+            "table": "input-register",
+            "starting-address": 1,
+            "quantity": 8
+          },
+          {
+            "table": "holding-register",
+            "quantity": 2
+          },
+          {
+            "table": "coil",
+            "quantity": 1
+          }
+        ]
+      }
+    ]
+  }
+}

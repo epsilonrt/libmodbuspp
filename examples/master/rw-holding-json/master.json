@@ -1,0 +1,24 @@
+{
+  "modbuspp-master": {
+    "mode": "rtu",
+    "connection": "/dev/ttyUSB0",
+    "settings": "38400E1",
+    "debug": true,
+    "response-timeout": 500,
+    "byte-timeout": 500,
+    "rtu": {
+      "mode": "rs232",
+      "rts": "none",
+      "rts-delay": 1000
+    },
+    "slaves": [
+      {
+        "id": 33,
+        "pdu-adressing": false
+      },
+      {
+        "id": 34
+      }
+    ]
+  }
+}

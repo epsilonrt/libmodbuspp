@@ -1,0 +1,36 @@
+﻿{
+  "modbuspp-router": {
+    "mode": "rtu",
+    "connection": "/dev/tnt1",
+    "settings": "38400E1",
+    "debug": true,
+    "response-timeout": 500,
+    "byte-timeout": 500,
+    "masters": [
+      {
+        "name": "rs485",
+        "mode": "rtu",
+        "connection": "/dev/ttyUSB0",
+        "settings": "38400E1",
+        "debug": true,
+        "response-timeout": 500,
+        "byte-timeout": 500,
+        "slaves": [
+          {
+            "id": 33,
+            "blocks": [
+              {
+                "table": "input-register",
+                "quantity": 6
+              },
+              {
+                "table": "holding-register",
+                "quantity": 8
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

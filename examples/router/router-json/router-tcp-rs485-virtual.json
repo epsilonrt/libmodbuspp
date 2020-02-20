@@ -1,0 +1,69 @@
+﻿{
+  "modbuspp-router": {
+    "mode": "tcp",
+    "connection": "localhost",
+    "settings": "1502",
+    "recovery-link": true,
+    "debug": true,
+    "response-timeout": 500,
+    "byte-timeout": 500,
+    "masters": [
+      {
+        "name": "rs485",
+        "mode": "rtu",
+        "connection": "/dev/ttyS1",
+        "settings": "38400E1",
+        "debug": true,
+        "response-timeout": 500,
+        "byte-timeout": 500,
+        "rtu": {
+          "mode": "rs485",
+          "rts": "down"
+        },
+        "slaves": [
+          {
+            "id": 33,
+            "blocks": [
+              {
+                "table": "input-register",
+                "quantity": 6
+              },
+              {
+                "table": "holding-register",
+                "quantity": 8
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "virtual-clock",
+        "mode": "rtu",
+        "connection": "/dev/tnt0",
+        "settings": "38400E1",
+        "debug": true,
+        "response-timeout": 3000,
+        "byte-timeout": 500,
+        "slaves": [
+          {
+            "id": 10,
+            "blocks": [
+              {
+                "table": "input-register",
+                "quantity": 8
+              },
+              {
+                "table": "holding-register",
+                "quantity": 2
+              },
+              {
+                "table": "coil",
+                "quantity": 1
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

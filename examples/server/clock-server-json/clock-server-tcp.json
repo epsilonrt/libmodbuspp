@@ -1,0 +1,32 @@
+{
+  "modbuspp-server": {
+    "mode": "tcp",
+    "connection": "localhost",
+    "settings": "1502",
+    "recovery-link": true,
+    "debug": true,
+    "response-timeout": 500,
+    "byte-timeout": 500,
+    "slaves": [
+      {
+        "id": 10,
+        "pdu-adressing": false,
+        "blocks": [
+          {
+            "table": "input-register",
+            "starting-address": 1,
+            "quantity": 8
+          },
+          {
+            "table": "holding-register",
+            "quantity": 2
+          },
+          {
+            "table": "coil",
+            "quantity": 1
+          }
+        ]
+      }
+    ]
+  }
+}
