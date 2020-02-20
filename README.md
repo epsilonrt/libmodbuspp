@@ -275,9 +275,9 @@ so you should do the following :
 This repository provides Piduino packages for `i386`, `amd64`, `armhf` and 
 `arm64` architectures.  
 In the above commands, the repository is a Debian Stretch distribution, but you 
-can also choose Ubuntu Xenial or Bionic by replacing `stretch` with `xenial` or 
-`bionic`. It may be necessary to install the `software-properties-common` 
-package for `add-apt-repository`.
+can also choose Buster, Ubuntu Xenial or Bionic by replacing `stretch` with 
+`bsuter`, `xenial` or `bionic`. It may be necessary to install the 
+`software-properties-common` package for `add-apt-repository`.
 
 For Raspbian you have to do a little different :
 
