@@ -1,6 +1,6 @@
 # libmodbuspp
 
-_A C++ wrapper for the [libmodbus](https://libmodbus.org/) library_
+_Much more than a C++ wrapper for the libmodbus library_
 
 ## Abstract
 
@@ -11,7 +11,7 @@ This library supports RTU (serial) and TCP (Ethernet) communications.
 libmodbussp allows you to implement MODBUS servers and clients.
 libmodbussp will be used in version 2 of the utility [mbpoll](https://github.com/epsilonrt/mbpoll).
 Like libmodbus, libmodbuspp is cross-platform and can be compiled on
-Gnu/Linux and other Unix, Windows and MacOs.
+Gnu/Linux and other Unix, Windows™ and macOS™.
 
 The [Modbus::Master](http://www.epsilonrt.fr/modbuspp/classModbus_1_1Master.html)
 class allows you to design clients (also called masters), who communicate with 
@@ -25,8 +25,8 @@ here are an example of use:
 ```cpp
 uint16_t values[2]; // array to store the values of the input registers
 Master mb (Rtu, "COM1", "19200E1"); // new master on RTU
-mb.open(); // open a connection
 Slave & slv = mb.addSlave (33); // to the slave at address 33
+mb.open(); // open a connection
 slv.readInputRegisters (1, values, 2);
 cout << values[0] << endl;
 cout << values[1] << endl;
@@ -37,9 +37,9 @@ This example reads the input registers number 1 and 2 of the MODBUS slave
 in the examples folder 
 [read-input-registers](https://github.com/epsilonrt/libmodbuspp/blob/master/examples/master/read-input-registers/main.cpp)
 
-The Modbus::Server class is used to design servers. An object of the class
-Modbus::Server allows to implement one or **more** slaves that can be
-dissociated by the use of a different address.
+The [Modbus::Server](http://www.epsilonrt.fr/modbuspp/classModbus_1_1Server.html) 
+class is used to design servers. An object of the class Modbus::Server allows to 
+implement one or **more** slaves that can be dissociated by the use of a different address.
 The Modbus::Server class is associated with the 
 [Modbus::BufferedSlave](http://www.epsilonrt.fr/modbuspp/classModbus_1_1BufferedSlave.html) 
 class to implement slaves.
@@ -110,8 +110,8 @@ for example:
 Data<float,EndianBigLittle> voltage;
 ```
 
-allows to define a floating number (32-bit) with a byte order in big Indian 
-and a word organization in little Indian (CDAB).
+allows to define a floating number (32-bit) with a byte order in big Endian 
+and a word organization in little Endian (CDAB).
 
 A Modbus::BufferedSlave object is also able to relay the requests it receives to:
 
@@ -120,45 +120,142 @@ the server (Modbus::Server).
 * callback functions that the user of the library can define in order to
 to perform a custom processing of requests.
 
-This gives the objects in the Modbus::Server class routing capabilities.
-Here is an example of a server that illustrates this routing capability:
+The processing of messages by the callback functions is simplified thanks to the 
+[Modbus::Request](http://www.epsilonrt.fr/modbuspp/classModbus_1_1Request.html) 
+and [Modbus::Response](http://www.epsilonrt.fr/modbuspp/classModbus_1_1Response.html) 
+classes (derived from the 
+[Modbus::Message](http://www.epsilonrt.fr/modbuspp/classModbus_1_1Message.html) class).
 
-```cpp
-// Creating the MODBUS master link that controls the serial link
-Master mb (Rtu, "/dev/ttyUSB0", "38400E1"); // new master on RTU
-if (mb.open()) { // Opening the master link if successful, create the server
-  // New TCP server listens on host and port
-  Server srv (Tcp, "127.0.0.1", "1502");
-  // Declaration of a slave with the address 33 accessible via the TCP server
-  // and physically connected to the serial link managed by mb
-  BufferedSlave & press = srv.addSlave (33, &mb);
-  // Declaration of the input register block of the press slave
-  press.setBlock (InputRegister, 6);
-  // Declaration of the block of holding registers of the press slave,
-  press.setBlock (HoldingRegister, 8); // 32-bit * 4
-  // Message and a pointer to the object of the class Device that manages the
-  // master link (& mb in this example)
-  press.setBeforeReplyCallback (beforeReplyCB);
-  press.setAfterReplyCallback (afterReplyCB);
-  if (srv.open ()) {
-    // if the startup is successful, we perform a polling loop that performs
-    // all server operations:
-    // - receive requests on TCP
-    // - redirection of requests to the serial link
-    // - recovery of information coming from the serial link and storage in a memory buffer
-    // - response to the TCP client with its information
-    for (;;) {
-      srv.poll (1000);
-    }
-    srv.close();
+The [Modbus::Router](http://www.epsilonrt.fr/modbuspp/classModbus_1_1Router.html) 
+class performs a MODBUS message routing using the additional 
+address which is a byte which precedes the byte of the function code. 
+This additional address is also called "Unit Identifier" in MODBUS-TCP and 
+address fields or slave address in MODBUS-OSL.
+
+A Router object is in permanent listening on its link from the outside, it is 
+seen by the remote client as a server which groups all the slaves connected on 
+the link or links from the inside.
+
+As the Router class is derived from the Server class, it also makes it possible 
+to create slaves consisting only of primary tables (discrete inputs, 
+input registers, etc.) in memory.
+
+Whether outside or inside, the links can be over TCP-IP or serial link (RTU).
+
+The connection from the outside is configured either with setBackend() or with 
+setConfig() (or the corresponding variants of the Router constructor).
+
+Inside bindings are added using addMaster() methods. This makes sense because 
+these links control slaves. As the MODBUS masters do not have an address on the 
+bus, they are identified by a name.
+
+Here is a diagram showing an example of use:
+
+![Router example](doc/images/router.png)
+
+The routing elements are BufferedSlave which are added using addSlave(). 
+The master parameter indicates the route to take to communicate with this slave. 
+If this parameter is zero, the slave is made up only of primary tables. 
+The slaves are naturally identified by the identifiers (additional address).
+
+All this can be described in a JSON file, which allows you to simply modify the 
+routing structure without having to recompile.
+
+The [json file](https://github.com/epsilonrt/libmodbuspp/blob/master/examples/router/router-json/router-tcp-rs232-virtual.json)
+below corresponds to the description of a router listening on TCP-IP 
+(port 1502 of localhost). It has two routing links to a hardware serial link 
+(`/dev/ttyUSB0`) where slave 33 is located (SolarPi pressure sensor) and a virtual 
+serial link (`/dev/tnt0`) where slave 10 is located 
+([clock-server-json](https://github.com/epsilonrt/libmodbuspp/blob/master/examples/server/clock-server-json)):
+
+```json
+{
+  "modbuspp-router": {
+    "mode": "tcp",
+    "connection": "localhost",
+    "settings": "1502",
+    "recovery-link": true,
+    "debug": true,
+    "response-timeout": 500,
+    "byte-timeout": 500,
+    "masters": [
+      {
+        "name": "rs232",
+        "mode": "rtu",
+        "connection": "/dev/ttyUSB0",
+        "settings": "38400E1",
+        "debug": true,
+        "response-timeout": 500,
+        "byte-timeout": 500,
+        "slaves": [
+          {
+            "id": 33,
+            "blocks": [
+              {
+                "table": "input-register",
+                "quantity": 6
+              },
+              {
+                "table": "holding-register",
+                "quantity": 8
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "virtual-clock",
+        "mode": "rtu",
+        "connection": "/dev/tnt0",
+        "settings": "38400E1",
+        "debug": true,
+        "response-timeout": 3000,
+        "byte-timeout": 500,
+        "slaves": [
+          {
+            "id": 10,
+            "blocks": [
+              {
+                "table": "input-register",
+                "quantity": 8
+              },
+              {
+                "table": "holding-register",
+                "quantity": 2
+              },
+              {
+                "table": "coil",
+                "quantity": 1
+              }
+            ]
+          }
+        ]
+      }
+    ]
   }
 }
 ```
 
-It is a gateway relaying requests received by TCP/IP to a slave (address 33) 
-connected in RTU.
+The program to perform this routing is very simple :
+
+```cpp
+string  jsonfile = argv[1];
+Router router (jsonfile, "modbuspp-router");
+
+if (router.open ()) {
+
+  router.run();
+  while (router.isOpen()) {
+
+    std::this_thread::yield();
+  }
+}
+```
+
+How beautiful is that ? :-)
+
 The source code of this program is searchable in the examples folder
-[tcp-gateway](https://github.com/epsilonrt/libmodbuspp/blob/master/examples/server/tcp-gateway/main.cpp).
+[router-json](https://github.com/epsilonrt/libmodbuspp/blob/master/examples/router/router-json/main.cpp).
 
 libmodbuspp comes with full documentation in manual and [html](http://www.epsilonrt.fr/modbuspp/) format.
 
@@ -210,12 +307,12 @@ int main (int argc, char **argv) {
   string port ("/dev/ttyUSB0");
 
   Master mb (Rtu, port , "38400E1"); // new master on RTU
+  Slave & slv = mb.addSlave (33); // to the slave at address 33
 
   if (mb.open ()) { // open a connection
     // success, do what you want here
     uint16_t values[2];
 
-    Slave & slv = mb.addSlave (33); // to the slave at address 33
     if (slv.readInputRegisters (1, values, 2) == 2) {
 
       cout << "R0=" << values[0] << endl;
@@ -265,8 +362,11 @@ The classes provided by the library are documented by man pages:
 * The **Modbus_Master** page for the `Modbus::Master` class  
 * The **Modbus_Slave** page for the `Modbus::Slave` class  
 * The **Modbus_Server** page for the `Modbus::Server` class  
+* The **Modbus_Router** page for the `Modbus::Router` class  
 * The **Modbus_BufferedSlave** page for the `Modbus::BufferedSlave` class  
 * The **Modbus_Data** page for the `Modbus::Data` class  
+* The **Modbus_Request** page for the `Modbus::Request` class  
+* The **Modbus_Response** page for the `Modbus::Response` class  
 * The **Modbus_RtuLayer** page for the `Modbus::RtuLayer` class  
 * The **Modbus_TcpLayer** page for the `Modbus::TcpLayer` class  
 * The **Modbus_Timeout** page for the `Modbus::Timeout` class  
