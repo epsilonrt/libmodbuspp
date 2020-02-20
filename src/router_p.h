@@ -16,25 +16,24 @@
  */
 #pragma once
 
-#include <map>
-#include <modbuspp/master.h>
-#include "device_p.h"
+#include <modbuspp/router.h>
+#include "server_p.h"
 
 namespace Modbus {
 
-  class Master::Private : public Device::Private {
+  class Router::Private : public Server::Private {
 
     public:
-      Private (Master * q);
+      Private (Router * q);
       virtual ~Private();
-      virtual void setBackend (Net net, const std::string & connection,
-                               const std::string & settings);
       virtual void setConfig (const nlohmann::json & config);
 
-      virtual Slave * addSlave (int slaveAddr);
+      virtual bool open();
 
-      std::map <int, std::shared_ptr<Slave>> slave;
-      PIMP_DECLARE_PUBLIC (Master)
+      Master * addMaster (const std::string & name);
+
+      std::map <std::string, std::shared_ptr<Master>> master;
+      PIMP_DECLARE_PUBLIC (Router)
   };
 }
 

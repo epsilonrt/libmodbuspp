@@ -20,9 +20,9 @@
 #include <modbuspp/request.h>
 
 namespace Modbus {
-  
+
   class Request;
-  
+
   /**
     * @class BufferedSlave
     * @brief Buffered Slave
@@ -41,16 +41,23 @@ namespace Modbus {
 
       /**
        * @brief Constructor
-       * 
-       * Constructor of a new buffered slave with the slaveAddr identifier. 
-       * If the device @a dev is provided, usually of the class @a Master and 
-       * @a dev->isOpen() returns true:
-       * - The requested data is actually read, then stored in the memory 
+       *
+       * Constructor of a new buffered slave with the slaveAddr identifier.
+       * If the device @b dev is provided, usually of the class @b Master and
+       * @b dev->isOpen() returns true:
+       * - The requested data is actually read, then stored in the memory
        * buffer before being returned.
-       * - The data provided is actually written, after being stored in 
+       * - The data provided is actually written, after being stored in
        * the memory buffer.
        */
       BufferedSlave (int slaveAddr, Device * dev = 0);
+
+      /**
+       * @brief Default Constructor
+       *
+       * object cannot be used without calling setNumber()
+       */
+      BufferedSlave ();
 
       /**
        * @brief Destructor
@@ -58,38 +65,43 @@ namespace Modbus {
       virtual ~BufferedSlave();
 
       /**
+       * @brief returns true if number() is sets
+       */
+      bool isValid() const;
+
+      /**
        * @brief Setting a block of data in the memory buffer.
-       * 
-       * A single block of type @a t can be defined for a given slave. 
+       *
+       * A single block of type @b t can be defined for a given slave.
        * The block has nmeb elements and starts at startAddr.
        * @param t
        * @param nmemb
        * @param startAddr
        * @return
        */
-      int setBlock (Table t, int nmemb, int startAddr = 1);
-      
+      int setBlock (Table t, int nmemb, int startAddr = -1);
+
       /**
-       * @brief 
+       * @brief
        * @param cb
        */
       void setBeforeReplyCallback (Message::Callback cb);
-      
+
       /**
-       * @brief 
+       * @brief
        * @param cb
        */
       void setAfterReplyCallback (Message::Callback cb);
-      
+
       /**
-       * @brief 
-       * @return 
+       * @brief
+       * @return
        */
       Message::Callback beforeReplyCallback() const;
-      
+
       /**
-       * @brief 
-       * @return 
+       * @brief
+       * @return
        */
       Message::Callback afterReplyCallback() const;
 
@@ -185,16 +197,18 @@ namespace Modbus {
        * Data is a template class for storing, transmitting, and receiving
        * arithmetic data in multiple 16-bit Modbus registers.
        *
-       * This function shall write the content of the \b nb input data
-       * from the array \b src at address \b addr of the device.
+       * This function shall write the content of the @b nb input data
+       * from the array @b src at address @b addr of the device.
        *
        * @return number of written input Modbus registers (16-bit) if successful.
        * Otherwise it shall return -1.
        */
-      template <typename T, Endian e> int writeInputRegisters (int addr, const Data<T, e> * src, int nb = 1) {
+      template <typename T, Endian e> int writeInputRegisters (int addr, Data<T, e> * src, int nb = 1) {
         std::vector<uint16_t> buf;
 
         for (int i = 0; i < nb; i++) {
+
+          src[i].updateRegisters();
           for (auto & r : src[i].registers()) {
             buf.push_back (r);
           }
@@ -209,13 +223,14 @@ namespace Modbus {
        * arithmetic data in multiple 16-bit Modbus registers.
        *
        * This function shall write a single input data
-       * from \b value at address \b addr of the device.
+       * from @b value at address @b addr of the device.
        *
        * @return number of written input Modbus registers (16-bit) if successful.
        * Otherwise it shall return -1.
        */
-      template <typename T, Endian e> int writeInputRegister (int addr, const Data<T, e> & value) {
+      template <typename T, Endian e> int writeInputRegister (int addr, Data<T, e> & value) {
 
+        value.updateRegisters();
         return writeInputRegisters (addr, value.registers().data(), value.registers().size());
       }
 

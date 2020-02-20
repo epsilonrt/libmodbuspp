@@ -50,6 +50,7 @@ set(INSTALL_BIN_DIR bin CACHE PATH "Installation directory for executables")
 set(INSTALL_INCLUDE_DIR include/${PROJECT_NAME} CACHE PATH
   "Installation directory for header files")
 set(INSTALL_CODELITE_DIR /usr/share/codelite CACHE PATH "Installation directory for codelite templates")
+option(MODBUSPP_USE_EXTERNAL_JSON "Use an external JSON library" OFF)
 
 set(DEF_INSTALL_CMAKE_DIR lib)
 set(DEF_INSTALL_DOC_DIR share/doc)
@@ -72,6 +73,14 @@ find_package(PkgConfig REQUIRED)
 pkg_check_modules (LIBMODBUS REQUIRED libmodbus>=3.1.4)
 
 find_package(Gzip)
+
+if(MODBUSPP_USE_EXTERNAL_JSON)
+  find_package(nlohmann_json 3.2.0 REQUIRED)
+else()
+  set(JSON_BuildTests OFF CACHE INTERNAL "")
+  set(JSON_Install OFF CACHE INTERNAL "")
+  add_subdirectory(3rdparty/json)
+endif()
 
 set (MODBUSPP_CFLAGS_OTHER ${CMAKE_THREAD_LIBS_INIT} ${LIBMODBUS_CFLAGS})
 set (MODBUSPP_LDFLAGS_OTHER ${LIBMODBUS_LDFLAGS} -lpthread)

@@ -16,14 +16,13 @@
  */
 #pragma once
 
-#include <modbuspp/master.h>
-#include <modbuspp/bufferedslave.h>
+#include <modbuspp/server.h>
 
 namespace Modbus {
 
   /**
-    * @class Server
-    * @brief Server connected to Modbus (Server)
+    * @class Router
+    * @brief Router connected to Modbus (Router)
     *
     * The Modbus slave is waiting for request from Modbus Masters (clients) and
     * must answer when it is concerned by the request.
@@ -32,7 +31,7 @@ namespace Modbus {
     *
     * @code
        // instantiate a variable by choosing the network and the parameters to connect to it
-       Server srv (net, connection, settings);
+       Router srv (net, connection, settings);
 
        // Adding a new slave to the server
        BufferedSlave & slv = srv.addSlave (10);
@@ -60,13 +59,13 @@ namespace Modbus {
     * @author Pascal JEAN, aka epsilonrt
     * @copyright GNU Lesser General Public License
     */
-  class Server : public Device {
+  class Router : public Server {
 
     public:
       /**
        * @brief Constructor
        *
-       * Constructs a Modbus master for the @b net network.
+       * Constructs a Modbus router for the @b net network.
        *
        * For the Tcp backend :
        * - @b connection specifies the host name or IP
@@ -84,7 +83,7 @@ namespace Modbus {
        * - @b settings specifies communication settings as a string in the
        *  format BBBBPS. BBBB specifies the baud rate of the communication, PS
        *  specifies the parity and the bits of stop.
-       *
+       * 
        *  According to Modbus RTU specifications :
        *    - the possible combinations for PS are E1, O1 and N2.
        *    - the number of bits of data must be 8, also there is no possibility
@@ -95,7 +94,7 @@ namespace Modbus {
        * An exception std::invalid_argument is thrown if one of the parameters
        * is incorrect.
        */
-      Server (Net net, const std::string & connection,
+      Router (Net net, const std::string & connection,
               const std::string & settings);
 
       /**
@@ -104,15 +103,28 @@ namespace Modbus {
        * The file describes the configuration to apply, its format is as follows:
        *
        * @code
-            {
-              "modbuspp-server": {
-                "mode": "tcp",
-                "connection": "localhost",
-                "settings": "1502",
-                "recovery-link": true,
+        {
+          "modbuspp-router": {
+            "mode": "tcp",
+            "connection": "localhost",
+            "settings": "1502",
+            "recovery-link": true,
+            "debug": true,
+            "response-timeout": 500,
+            "byte-timeout": 500,
+            "masters": [
+              {
+                "name": "rs485",
+                "mode": "rtu",
+                "connection": "/dev/ttyS1",
+                "settings": "38400E1",
                 "debug": true,
                 "response-timeout": 500,
                 "byte-timeout": 500,
+                "rtu": {
+                  "mode": "rs485",
+                  "rts": "down"
+                },
                 "slaves": [
                   {
                     "id": 33,
@@ -131,12 +143,23 @@ namespace Modbus {
                     ]
                   }
                 ]
+              },
+              {
+                "name": "virtual",
+                "mode": "rtu",
+                "connection": "/dev/tnt0",
+                "settings": "38400E1",
+                "debug": true,
+                "response-timeout": 3000,
+                "byte-timeout": 500
               }
-            }
+            ]
+          }
+        }
        * @endcode
        *
        * Only the first 3 elements are mandatory : @b mode, @b connection and @b settings,
-       * the others are optional. In this example "modbuspp-server" is the key
+       * the others are optional. In this example "modbuspp-router" is the key
        * to the JSON object that should be used. If the key provided is empty,
        * the file contains only one object corresponding to the configuration.
        *
@@ -148,14 +171,14 @@ namespace Modbus {
        * @param key name of the object key in the JSON file corresponding to
        * the configuration to be applied
        */
-      explicit Server (const std::string & jsonfile, const std::string & key = std::string());
+      explicit Router (const std::string & jsonfile, const std::string & key = std::string());
 
       /**
        * @brief Default constructor
        *
        * object cannot be used without calling @b setBackend() or @b setConfig()
        */
-      Server ();
+      Router ();
 
       /**
        * @brief Destructor
@@ -163,39 +186,12 @@ namespace Modbus {
        * The destructor closes the connection if it is open and releases all
        * affected resources.
        */
-      virtual ~Server();
+      virtual ~Router();
 
       /**
        * @overload
        */
       virtual void close();
-
-      /**
-       * @brief Performs all server operations
-       *
-       * Wait at most @b timeoutMs ms for a request from a client and then
-       * perform the necessary operations before responding.
-       *
-       * @return return the number of Modbus data of the response if successful.
-       * Otherwise it shall return -1 and set errno.
-       */
-      int poll (long timeoutMs = 0);
-      
-      /**
-       * @brief Start the server in a new thread
-       * @return true if started
-       */
-      bool run();
-
-      /**
-       * @brief Shutdown the connection then stops the server if it is started in a thread
-       */
-      void terminate();
-
-      /**
-       * @brief Returns if the server is launched in a thread
-       */
-      bool isRunning() const;
 
       /**
        * @brief Adds a slave
@@ -213,7 +209,7 @@ namespace Modbus {
        *  that's incorrect (cf page 23 of Modbus Messaging Implementation
        *  Guide v1.0b) but without the slave value, the faulty remote device or
        *  software drops the requests !
-       *
+       * 
        *  The special value @b TcpSlave (255) can be used in TCP mode
        *  to restore the default value.
        * .
@@ -221,7 +217,14 @@ namespace Modbus {
        * @return the slave by reference
        * @sa slave()
        */
-      BufferedSlave & addSlave (int slaveAddr, Device * master = 0);
+      Master & addMaster (const std::string & name,
+                          Net net, const std::string & connection,
+                          const std::string & settings);
+
+      /**
+       * @overload
+       */
+      Master & addMaster (const std::string & name);
 
       /**
        * @brief Returns the slave whose address is provided.
@@ -236,12 +239,12 @@ namespace Modbus {
        * If the Device that drives the slave to a TCP backend, we can access to
        * TCP messages through the slave at address 255 (added by the constructor).
        */
-      BufferedSlave & slave (int slaveAddr = -1);
+      Master & master (const std::string & name);
 
       /**
        * @overload
        */
-      const BufferedSlave & slave (int slaveAddr = -1) const;
+      const Master & master (const std::string & name) const;
 
       /**
        * @brief Returns a pointer to the slave whose address is provided.
@@ -256,42 +259,42 @@ namespace Modbus {
        * If the Device that drives the slave to a TCP backend, we can access to
        * TCP messages through the slave at address 255 (added by the constructor).
        */
-      BufferedSlave * slavePtr (int slaveAddr = -1);
+      Master * masterPtr (const std::string & name);
 
       /**
        * @overload
        */
-      const BufferedSlave * slavePtr (int slaveAddr = -1) const;
+      const Master * masterPtr (const std::string & name) const;
 
       /**
        * @brief Slave table access operator
        *
-       * server being an object of class Server, @b server[i] is equivalent to
+       * server being an object of class Router, @b server[i] is equivalent to
        * @b server.slave(i)
        */
-      BufferedSlave &operator[] (int);
+      Master &operator[] (const std::string &);
 
       /**
        * @overload
        */
-      const BufferedSlave &operator[] (int) const;
+      const Master &operator[] (const std::string &) const;
 
       /**
        * @brief Check if the slave at the given address @b slaveAddrexists
        */
-      bool hasSlave (int slaveAddr) const;
+      bool hasMaster (const std::string & name) const;
 
       /**
-       * @brief Returns the list of slaves as a map indexed by identifier number 
+       * @brief Returns the list of masters as a map indexed by name 
        */
-      const std::map <int, std::shared_ptr<BufferedSlave>> & slaves() const;
+      const std::map <std::string, std::shared_ptr<Master>> & masters() const;
 
     protected:
       class Private;
-      Server (Private &dd);
+      Router (Private &dd);
 
     private:
-      PIMP_DECLARE_PRIVATE (Server)
+      PIMP_DECLARE_PRIVATE (Router)
   };
 }
 

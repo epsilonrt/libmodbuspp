@@ -25,8 +25,10 @@ namespace Modbus {
   class BufferedSlave::Private : public Slave::Private {
 
     public:
+      Private (BufferedSlave * q);
       Private (BufferedSlave * q, int s, Device * d);
       virtual ~Private();
+      
       int setDiscreteInputBlock (int addr, int nmemb);
       int setCoilBlock (int addr, int nmemb);
       int setHoldingRegisterBlock (int addr, int nmemb);

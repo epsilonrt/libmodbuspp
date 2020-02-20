@@ -19,14 +19,17 @@
 #include <modbuspp/slave.h>
 #include <modbuspp/device.h>
 #include <modbuspp/netlayer.h>
+#include "json_p.h"
 
 namespace Modbus {
 
   class Slave::Private {
 
     public:
+      Private (Slave * q);
       Private (Slave * q, int s, Device * d);
       virtual ~Private();
+
       inline modbus_t * ctx() {
         return dev->backend().context();
       }

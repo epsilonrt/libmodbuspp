@@ -27,19 +27,22 @@ namespace Modbus {
   class Server::Private : public Device::Private {
 
     public:
-      Private (Server * q, Net net, const std::string & connection, const std::string & settings);
+      Private (Server * q);
       virtual ~Private();
-      
-      bool open();
-      void close();
-      int task(int rc);
-      
+      virtual void setConfig (const nlohmann::json & config);
+
+      virtual bool open();
+      virtual void close();
+      int task (int rc);
+
+      BufferedSlave * addSlave (int slaveAddr, Device * master);
+
       static void * loop (std::future<void> run, Private * d);
       static int receive (Private * d);
 
       int sock;
-      Request * req;
-      std::map <int,BufferedSlave*> slave;
+      std::shared_ptr<Request> req;
+      std::map <int, std::shared_ptr<BufferedSlave>> slave;
       std::future<int> receiveTask;
       std::thread daemon;
       std::promise<void> stopDaemon;

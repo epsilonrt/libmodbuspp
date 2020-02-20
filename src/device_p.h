@@ -16,18 +16,28 @@
  */
 #pragma once
 
+#include <fstream>
+#include <exception>
 #include <modbuspp/device.h>
 #include <modbuspp/netlayer.h>
+#include "json_p.h"
 
 namespace Modbus {
-  
+
   class Device::Private {
 
     public:
-      Private (Device * q, Net net, const std::string & connection,
-               const std::string & settings);
-      Private (Device * q, const Private & other);
+      Private (Device * q);
       virtual ~Private();
+      virtual void setBackend (Net net, const std::string & connection,
+                               const std::string & settings);
+      virtual void setConfig (const nlohmann::json & config);
+
+      void setConfigFromFile (const std::string & jsonfile,
+                              const std::string & key);
+
+      virtual bool open();
+      virtual void close();
       inline modbus_t * ctx() {
         return backend->context();
       }

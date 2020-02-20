@@ -16,6 +16,7 @@
  */
 #pragma once
 
+#include <map>
 #include <modbuspp/device.h>
 #include <modbuspp/slave.h>
 
@@ -53,40 +54,61 @@ namespace Modbus {
 
     public:
       /**
-       * @brief Constructor
-       *
-       * Constructs a Modbus master for the \b net network.
-       *
-       * For the Tcp backend :
-       * - \b connection specifies the host name or IP
-       * address of the host to connect to, eg. "192.168.0.5" , "::1" or
-       * "server.com". A NULL value can be used to listen any addresses in server mode,
-       * - \b settings is the service name/port number to connect to.
-       * To use the default Modbus port use the string "502". On many Unix
-       * systems, it’s convenient to use a port number greater than or equal
-       * to 1024 because it’s not necessary to have administrator privileges.
-       * .
-       * The default slave TCP (255) is added to the list of slaves.
-       * 
-       * For the Rtu backend :
-       * - \b connection specifies the name of the serial port handled by the
-       *  OS, eg. "/dev/ttyS0" or "/dev/ttyUSB0",
-       * - \b settings specifies communication settings as a string in the
-       *  format BBBBPS. BBBB specifies the baud rate of the communication, PS
-       *  specifies the parity and the bits of stop. \n
-       *  According to Modbus RTU specifications :
-       *    - the possible combinations for PS are E1, O1 and N2.
-       *    - the number of bits of data must be 8, also there is no possibility
-       *      to change this setting
-       *    .
-       * .
-       * The broadcast slave (0)) is added to the list of slaves.
-       * 
-       * An exception std::invalid_argument is thrown if one of the parameters
-       * is incorrect.
+       * @overload
        */
-      Master (Net net = Tcp, const std::string & connection = "*",
-              const std::string & settings = "502");
+      Master (Net net, const std::string & connection, const std::string & settings);
+
+      /**
+       * @brief constructor from a JSON file
+       * 
+       * The file describes the configuration to apply, its format is as follows:
+       * 
+       * @code
+          {
+            "modbuspp-master": {
+              "mode": "rtu",
+              "connection": "/dev/ttyS1",
+              "settings": "38400E1",
+              "debug": true,
+              "response-timeout": 500,
+              "byte-timeout": 500,
+              "rtu": {
+                "mode": "rs485",
+                "rts": "down"
+              },
+              "slaves": [
+                {
+                  "id": 33,
+                  "pdu-adressing": false
+                },
+                {
+                  "id": 34,
+                  "pdu-adressing": true
+                }
+              ]
+            }
+          }
+       * @endcode
+       * 
+       * Only the first 3 elements are mandatory : @b mode, @b connection and @b settings, 
+       * the others are optional. In this example "modbuspp-master" is the key 
+       * to the JSON object that should be used. If the key provided is empty, 
+       * the file contains only one object corresponding to the configuration.
+       * 
+       * For slave objects, only the @b id field is required.
+       * 
+       * @param key name of the object key in the JSON file corresponding to 
+       * the configuration to be applied
+       * @param jsonfile JSON file path
+       */
+      explicit Master (const std::string & jsonfile, const std::string & key = std::string());
+
+      /**
+       * @brief Default constructor
+       *
+       * object cannot be used without calling @b setBackend() or @b setConfig()
+       */
+      Master ();
 
       /**
        * @brief Destructor
@@ -97,29 +119,28 @@ namespace Modbus {
       virtual ~Master();
 
       /**
-       * @brief Set the link recovery  mode after disconnection.
-       *
        * @overload
        */
-      void setRecoveryLink (bool recovery = true);
+      bool setRecoveryLink (bool recovery = true);
 
       /**
        * @brief Adds a slave 
        *
-       * This function shall add a slave with the \b slaveAddr value.
+       * This function shall add a slave with the @b slaveAddr value.
        *
        * The behavior depends of network and the role of the device:
-       * - \b RTU: Define the slave ID of the remote device to talk in master
+       * - @b RTU: Define the slave ID of the remote device to talk in master
        *  mode or set the internal slave ID in slave mode. According to the
        *  protocol, a Modbus device must only accept message holding its slave
        *  number or the special broadcast number.
-       * - \b TCP: The slave number is only required in TCP if the message must
+       * - @b TCP: The slave number is only required in TCP if the message must
        *  reach a device on a serial link. Some not compliant devices or
        *  software (such as modpoll) uses the slave ID as unit identifier,
        *  that's incorrect (cf page 23 of Modbus Messaging Implementation
        *  Guide v1.0b) but without the slave value, the faulty remote device or
-       *  software drops the requests ! \n
-       *  The special value \b TcpSlave (255) can be used in TCP mode
+       *  software drops the requests !
+       * 
+       *  The special value @b TcpSlave (255) can be used in TCP mode
        *  to restore the default value.
        * .
        *
@@ -131,7 +152,7 @@ namespace Modbus {
       /**
        * @brief Returns the slave whose address is provided.
        * 
-       * The slave must have been added with @a addSlave() else a 
+       * The slave must have been added with @b addSlave() else a 
        * std::out_of_range exception is thrown.
        * 
        * If the Device that drives the slave to an RTU backend, we can access 
@@ -151,7 +172,7 @@ namespace Modbus {
       /**
        * @brief Returns a pointer to the slave whose address is provided.
        * 
-       * The slave must have been added with @a addSlave() else a 
+       * The slave must have been added with @b addSlave() else a 
        * a nullptr is returned.
        * 
        * If the Device that drives the slave to an RTU backend, we can access 
@@ -171,8 +192,8 @@ namespace Modbus {
       /**
        * @brief Slave table access operator
        * 
-       * master being an object of class Master, @a master[i] is equivalent to
-       * @a master.slave(i)
+       * master being an object of class Master, @b master[i] is equivalent to
+       * @b master.slave(i)
        */
       Slave &operator[] (int);
 
@@ -182,9 +203,14 @@ namespace Modbus {
       const Slave &operator[] (int) const;
       
       /**
-       * @brief Check if the slave at the given address @a slaveAddrexists
+       * @brief Check if the slave at the given address @b slaveAddrexists
        */
       bool hasSlave (int slaveAddr) const;
+      
+      /**
+       * @brief Returns the list of slaves as a map indexed by identifier number 
+       */
+      const std::map <int, std::shared_ptr<Slave>> & slaves() const;
 
     protected:
       class Private;

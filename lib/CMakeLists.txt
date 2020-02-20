@@ -35,6 +35,9 @@ set (hdr_modbuspp
   ${MODBUSPP_INC_DIR}/modbuspp/message.h
   ${MODBUSPP_INC_DIR}/modbuspp/netlayer.h
   ${MODBUSPP_INC_DIR}/modbuspp/popl.h
+  ${MODBUSPP_INC_DIR}/modbuspp/request.h
+  ${MODBUSPP_INC_DIR}/modbuspp/response.h
+  ${MODBUSPP_INC_DIR}/modbuspp/router.h
   ${MODBUSPP_INC_DIR}/modbuspp/rtulayer.h
   ${MODBUSPP_INC_DIR}/modbuspp/server.h
   ${MODBUSPP_INC_DIR}/modbuspp/slave.h
@@ -42,8 +45,6 @@ set (hdr_modbuspp
   ${MODBUSPP_INC_DIR}/modbuspp/swap.h
   ${MODBUSPP_INC_DIR}/modbuspp/tcplayer.h
   ${MODBUSPP_INC_DIR}/modbuspp/timeout.h
-  ${MODBUSPP_INC_DIR}/modbuspp/request.h
-  ${MODBUSPP_INC_DIR}/modbuspp/response.h
 )
 
 configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/config.h.in
@@ -56,11 +57,14 @@ set (libsrc ${src_modbuspp})
 # this is the "object library" target: compiles the sources only once
 add_library(objlib OBJECT ${libsrc})
 
+get_target_property(JSON_INCLUDE_DIRS nlohmann_json::nlohmann_json INTERFACE_INCLUDE_DIRECTORIES)
+
 target_include_directories(objlib BEFORE PRIVATE
   ${LIBMODBUS_INCLUDE_DIRS} 
   ${MODBUSPP_INC_DIR} 
   ${MODBUSPP_SRC_DIR}
   ${CMAKE_CURRENT_BINARY_DIR}
+  ${JSON_INCLUDE_DIRS}
 )
 target_compile_definitions(objlib PUBLIC MODBUSPP_WITH_CONFIG_H)
 
@@ -69,6 +73,7 @@ set_property(TARGET objlib PROPERTY POSITION_INDEPENDENT_CODE 1)
 
 # shared and static libraries built from the same object files
 add_library(modbuspp-shared SHARED $<TARGET_OBJECTS:objlib>)
+target_link_libraries(modbuspp-shared PRIVATE nlohmann_json::nlohmann_json)
 set_target_properties(modbuspp-shared PROPERTIES 
   OUTPUT_NAME modbuspp 
   CLEAN_DIRECT_OUTPUT 1 
@@ -79,6 +84,7 @@ set_target_properties(modbuspp-shared PROPERTIES
 
 if(MODBUSPP_WITH_STATIC)
   add_library(modbuspp-static STATIC $<TARGET_OBJECTS:objlib>)
+  target_link_libraries(modbuspp-static PRIVATE nlohmann_json::nlohmann_json)
   set_target_properties(modbuspp-static PROPERTIES
     OUTPUT_NAME modbuspp 
     CLEAN_DIRECT_OUTPUT 1 

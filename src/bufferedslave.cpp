@@ -29,6 +29,9 @@ namespace Modbus {
   BufferedSlave::BufferedSlave (BufferedSlave::Private &dd) : Slave (dd) {}
 
   // ---------------------------------------------------------------------------
+  BufferedSlave::BufferedSlave () : Slave (*new Private (this)) {}
+
+  // ---------------------------------------------------------------------------
   BufferedSlave::BufferedSlave (int s, Device * d) :
     Slave (*new Private (this, s, d)) {}
 
@@ -36,8 +39,19 @@ namespace Modbus {
   BufferedSlave::~BufferedSlave() = default;
 
   // ---------------------------------------------------------------------------
+  bool BufferedSlave::isValid() const {
+
+    return (number() >= 0);
+  }
+
+  // ---------------------------------------------------------------------------
   int BufferedSlave::setBlock (Table t, int nmemb, int startAddr) {
     PIMP_D (BufferedSlave);
+
+    if (startAddr < 0) {
+
+      startAddr = d->pduAddressing ? 0 : 1;
+    }
 
     switch (t) {
       case DiscreteInput:
@@ -57,7 +71,7 @@ namespace Modbus {
     PIMP_D (BufferedSlave);
     d->beforeReplyCB = cb;
   }
-  
+
   // ---------------------------------------------------------------------------
   Message::Callback BufferedSlave::beforeReplyCallback() const {
     PIMP_D (const BufferedSlave);
@@ -65,7 +79,7 @@ namespace Modbus {
   }
 
   // ---------------------------------------------------------------------------
-  Message::Callback BufferedSlave::afterReplyCallback() const{
+  Message::Callback BufferedSlave::afterReplyCallback() const {
     PIMP_D (const BufferedSlave);
     return d->afterReplyCB;
   }
@@ -82,78 +96,75 @@ namespace Modbus {
     if (req) {
       PIMP_D (BufferedSlave);
 
-      if (d->dev) {
+      if (isOpen()) {
+        int offset;
+        int start = req->startingAddress();
+        int nb = req->quantity();
 
-        if (d->dev->isOpen()) {
-          int offset;
-          int start = req->startingAddress();
-          int nb = req->quantity();
+        switch (req->function()) {
 
-          switch (req->function()) {
+          case ReadCoils: {
+            start = std::max (start, d->map->start_bits);
+            start = std::min (start, d->map->start_bits + d->map->nb_bits - 1);
+            offset = start - d->map->start_bits;
+            nb = std::min (nb, (d->map->nb_bits - offset));
+            bool * dest = reinterpret_cast <bool *> (&d->map->tab_bits[offset]);
 
-            case ReadCoils: {
-              start = std::max (start, d->map->start_bits);
-              start = std::min (start, d->map->start_bits + d->map->nb_bits - 1);
-              offset = start - d->map->start_bits;
-              nb = std::min (nb, (d->map->nb_bits - offset));
-              bool * dest = reinterpret_cast <bool *> (&d->map->tab_bits[offset]);
-
-              return Slave::readCoils (start + pduAddressing() ? 0 : 1, dest, nb);
-            }
-            break;
-
-            case ReadDiscreteInputs: {
-              start = std::max (start, d->map->start_input_bits);
-              start = std::min (start, d->map->start_input_bits + d->map->nb_input_bits - 1);
-              offset = start - d->map->start_input_bits;
-              nb = std::min (nb, (d->map->nb_input_bits - offset));
-              bool * dest = reinterpret_cast <bool *> (&d->map->tab_input_bits[offset]);
-
-              return Slave::readDiscreteInputs (start + pduAddressing() ? 0 : 1, dest, nb);
-            }
-            break;
-
-            case ReadHoldingRegisters: {
-              start = std::max (start, d->map->start_registers);
-              start = std::min (start, d->map->start_registers + d->map->nb_registers - 1);
-              offset = start - d->map->start_registers;
-              nb = std::min (nb, (d->map->nb_registers - offset));
-              uint16_t * dest = &d->map->tab_registers[offset];
-
-              return Slave::readRegisters (start + pduAddressing() ? 0 : 1, dest, nb);
-            }
-            break;
-
-            case ReadInputRegisters: {
-              start = std::max (start, d->map->start_input_registers);
-              start = std::min (start, d->map->start_input_registers + d->map->nb_input_registers - 1);
-              offset = start - d->map->start_input_registers;
-              nb = std::min (nb, (d->map->nb_input_registers - offset));
-              uint16_t * dest = &d->map->tab_input_registers[offset];
-
-              return Slave::readInputRegisters (start + pduAddressing() ? 0 : 1, dest, nb);
-            }
-            break;
-
-            case ReportServerId: {
-              d->idReport.resize (MaxPduLength, 0);
-
-              nb = Slave::reportSlaveId (d->idReport.size(), d->idReport.data());
-              if (nb < 0) {
-
-                d->idReport.resize (nb);
-              }
-              return nb;
-            }
-            break;
-
-            case ReadWriteMultipleRegisters:
-              // TODO
-              break;
-
-            default:
-              break;
+            return Slave::readCoils (start + pduAddressing() ? 0 : 1, dest, nb);
           }
+          break;
+
+          case ReadDiscreteInputs: {
+            start = std::max (start, d->map->start_input_bits);
+            start = std::min (start, d->map->start_input_bits + d->map->nb_input_bits - 1);
+            offset = start - d->map->start_input_bits;
+            nb = std::min (nb, (d->map->nb_input_bits - offset));
+            bool * dest = reinterpret_cast <bool *> (&d->map->tab_input_bits[offset]);
+
+            return Slave::readDiscreteInputs (start + pduAddressing() ? 0 : 1, dest, nb);
+          }
+          break;
+
+          case ReadHoldingRegisters: {
+            start = std::max (start, d->map->start_registers);
+            start = std::min (start, d->map->start_registers + d->map->nb_registers - 1);
+            offset = start - d->map->start_registers;
+            nb = std::min (nb, (d->map->nb_registers - offset));
+            uint16_t * dest = &d->map->tab_registers[offset];
+
+            return Slave::readRegisters (start + pduAddressing() ? 0 : 1, dest, nb);
+          }
+          break;
+
+          case ReadInputRegisters: {
+            start = std::max (start, d->map->start_input_registers);
+            start = std::min (start, d->map->start_input_registers + d->map->nb_input_registers - 1);
+            offset = start - d->map->start_input_registers;
+            nb = std::min (nb, (d->map->nb_input_registers - offset));
+            uint16_t * dest = &d->map->tab_input_registers[offset];
+
+            return Slave::readInputRegisters (start + pduAddressing() ? 0 : 1, dest, nb);
+          }
+          break;
+
+          case ReportServerId: {
+            d->idReport.resize (MaxPduLength, 0);
+
+            nb = Slave::reportSlaveId (d->idReport.size(), d->idReport.data());
+            if (nb < 0) {
+
+              d->idReport.resize (nb);
+            }
+            return nb;
+          }
+          break;
+
+          case ReadWriteMultipleRegisters:
+            // TODO
+            break;
+
+          default:
+            break;
         }
       }
       return 0;
@@ -173,62 +184,59 @@ namespace Modbus {
     if (req) {
       PIMP_D (BufferedSlave);
 
-      if (d->dev) {
+      if (isOpen()) {
+        int offset;
+        int start = req->startingAddress();
+        int nb = req->quantity();
 
-        if (d->dev->isOpen()) {
-          int offset;
-          int start = req->startingAddress();
-          int nb = req->quantity();
+        switch (req->function()) {
 
-          switch (req->function()) {
+          case WriteSingleCoil: {
+            start = std::max (start, d->map->start_bits);
+            start = std::min (start, d->map->start_bits + d->map->nb_bits - 1);
+            offset = start - d->map->start_bits;
 
-            case WriteSingleCoil: {
-              start = std::max (start, d->map->start_bits);
-              start = std::min (start, d->map->start_bits + d->map->nb_bits - 1);
-              offset = start - d->map->start_bits;
-
-              return Slave::writeCoil (start + pduAddressing() ? 0 : 1, d->map->tab_bits[offset] != 0);
-            }
-            break;
-
-            case WriteMultipleCoils: {
-              start = std::max (start, d->map->start_bits);
-              start = std::min (start, d->map->start_bits + d->map->nb_bits - 1);
-              offset = start - d->map->start_bits;
-              nb = std::min (nb, (d->map->nb_bits - offset));
-              bool * src = reinterpret_cast <bool *> (&d->map->tab_bits[offset]);
-
-              return Slave::writeCoils (start + pduAddressing() ? 0 : 1, src, nb);
-            }
-            break;
-
-            case WriteSingleRegister: {
-              start = std::max (start, d->map->start_registers);
-              start = std::min (start, d->map->start_registers + d->map->nb_registers - 1);
-              offset = start - d->map->start_registers;
-
-              return Slave::writeRegister (start + pduAddressing() ? 0 : 1, d->map->tab_registers[offset]);
-            }
-            break;
-
-            case WriteMultipleRegisters: {
-              start = std::max (start, d->map->start_registers);
-              start = std::min (start, d->map->start_registers + d->map->nb_registers - 1);
-              offset = start - d->map->start_registers;
-              nb = std::min (nb, (d->map->nb_registers - offset));
-              uint16_t * src = &d->map->tab_registers[offset];
-
-              return Slave::writeRegisters (start + pduAddressing() ? 0 : 1, src, nb);
-            }
-            break;
-
-            case ReadWriteMultipleRegisters:
-              // TODO
-              break;
-
-            default:
-              break;
+            return Slave::writeCoil (start + pduAddressing() ? 0 : 1, d->map->tab_bits[offset] != 0);
           }
+          break;
+
+          case WriteMultipleCoils: {
+            start = std::max (start, d->map->start_bits);
+            start = std::min (start, d->map->start_bits + d->map->nb_bits - 1);
+            offset = start - d->map->start_bits;
+            nb = std::min (nb, (d->map->nb_bits - offset));
+            bool * src = reinterpret_cast <bool *> (&d->map->tab_bits[offset]);
+
+            return Slave::writeCoils (start + pduAddressing() ? 0 : 1, src, nb);
+          }
+          break;
+
+          case WriteSingleRegister: {
+            start = std::max (start, d->map->start_registers);
+            start = std::min (start, d->map->start_registers + d->map->nb_registers - 1);
+            offset = start - d->map->start_registers;
+
+            return Slave::writeRegister (start + pduAddressing() ? 0 : 1, d->map->tab_registers[offset]);
+          }
+          break;
+
+          case WriteMultipleRegisters: {
+            start = std::max (start, d->map->start_registers);
+            start = std::min (start, d->map->start_registers + d->map->nb_registers - 1);
+            offset = start - d->map->start_registers;
+            nb = std::min (nb, (d->map->nb_registers - offset));
+            uint16_t * src = &d->map->tab_registers[offset];
+
+            return Slave::writeRegisters (start + pduAddressing() ? 0 : 1, src, nb);
+          }
+          break;
+
+          case ReadWriteMultipleRegisters:
+            // TODO
+            break;
+
+          default:
+            break;
         }
       }
       return 0;
@@ -251,16 +259,13 @@ namespace Modbus {
 
       nb = std::min (nb, (d->map->nb_bits - offset));
 
-      if (d->dev) {
-        if (d->dev->isOpen()) {
-          int rc = Slave::readCoils (addr, (bool *) src, nb);
-          if (rc < 0) {
+      if (isOpen()) {
+        int rc = Slave::readCoils (addr, (bool *) src, nb);
+        if (rc < 0) {
 
-            return rc;
-          }
+          return rc;
         }
       }
-
       memcpy (dest, src, nb * sizeof (dest[0]));
       return nb;
     }
@@ -281,18 +286,16 @@ namespace Modbus {
 
       nb = std::min (nb, (d->map->nb_input_bits - offset));
 
-      if (d->dev) {
-        if (d->dev->isOpen()) {
-          int rc = Slave::readDiscreteInputs (addr, (bool *) src, nb);
-          if (rc < 0) {
+      if (isOpen()) {
+        int rc = Slave::readDiscreteInputs (addr, (bool *) src, nb);
+        if (rc < 0) {
 
-            return rc;
-          }
+          return rc;
         }
       }
-
       memcpy (dest, src, nb * sizeof (dest[0]));
       return nb;
+
     }
     return -1;
   }
@@ -311,16 +314,13 @@ namespace Modbus {
 
       nb = std::min (nb, (d->map->nb_registers - offset));
 
-      if (d->dev) {
-        if (d->dev->isOpen()) {
-          int rc = Slave::readRegisters (addr, src, nb);
-          if (rc < 0) {
+      if (isOpen()) {
+        int rc = Slave::readRegisters (addr, src, nb);
+        if (rc < 0) {
 
-            return rc;
-          }
+          return rc;
         }
       }
-
       memcpy (dest, src, nb * sizeof (dest[0]));
       return nb;
     }
@@ -341,13 +341,11 @@ namespace Modbus {
 
       nb = std::min (nb, (d->map->nb_input_registers - offset));
 
-      if (d->dev) {
-        if (d->dev->isOpen()) {
-          int rc = Slave::readInputRegisters (addr, src, nb);
-          if (rc < 0) {
+      if (isOpen()) {
+        int rc = Slave::readInputRegisters (addr, src, nb);
+        if (rc < 0) {
 
-            return rc;
-          }
+          return rc;
         }
       }
 
@@ -372,16 +370,15 @@ namespace Modbus {
       nb = std::min (nb, (d->map->nb_bits - offset));
 
       memcpy (dest, src, nb * sizeof (dest[0]));
-      if (d->dev) {
-        if (d->dev->isOpen()) {
-          if (nb == 1) {
+      if (isOpen()) {
 
-            return Slave::writeCoil (addr, dest[0] != 0);
-          }
-          else {
+        if (nb == 1) {
 
-            return  Slave::writeCoils (addr, (bool *) dest, nb);
-          }
+          return Slave::writeCoil (addr, dest[0] != 0);
+        }
+        else {
+
+          return  Slave::writeCoils (addr, (bool *) dest, nb);
         }
       }
 
@@ -412,16 +409,14 @@ namespace Modbus {
       nb = std::min (nb, (d->map->nb_registers - offset));
 
       memcpy (dest, src, nb * sizeof (dest[0]));
-      if (d->dev) {
-        if (d->dev->isOpen()) {
-          if (nb == 1) {
+      if (isOpen()) {
+        if (nb == 1) {
 
-            return Slave::writeRegister (addr, dest[0]);
-          }
-          else {
+          return Slave::writeRegister (addr, dest[0]);
+        }
+        else {
 
-            return  Slave::writeRegisters (addr, dest, nb);
-          }
+          return  Slave::writeRegisters (addr, dest, nb);
         }
       }
       return nb;
@@ -458,12 +453,10 @@ namespace Modbus {
       write_nb = std::min (write_nb, (d->map->nb_registers - offsetWrite));
 
       memcpy (srcWrite, write_src, write_nb * sizeof (srcWrite[0]));
-      if (d->dev) {
-        if (d->dev->isOpen()) {
+      if (isOpen()) {
 
-          read_nb =  Slave::writeReadRegisters (write_addr, srcWrite, write_nb,
-                                                read_addr, destRead, read_nb);
-        }
+        read_nb =  Slave::writeReadRegisters (write_addr, srcWrite, write_nb,
+                                              read_addr, destRead, read_nb);
       }
 
       if (read_nb >= 0) {
@@ -481,18 +474,16 @@ namespace Modbus {
   int BufferedSlave::reportSlaveId (uint16_t max_dest, uint8_t * dest) {
     PIMP_D (BufferedSlave);
 
-    if (d->dev) {
-      if (d->dev->isOpen()) {
+    if (isOpen()) {
 
-        d->idReport.resize (MaxPduLength, 0);
+      d->idReport.resize (MaxPduLength, 0);
 
-        int rc = Slave::reportSlaveId (d->idReport.size(), d->idReport.data());
-        if (rc < 0) {
+      int rc = Slave::reportSlaveId (d->idReport.size(), d->idReport.data());
+      if (rc < 0) {
 
-          return rc;
-        }
-        d->idReport.resize (rc);
+        return rc;
       }
+      d->idReport.resize (rc);
     }
     max_dest = std::min (max_dest, static_cast<uint16_t> (d->idReport.size()));
     memcpy (dest, d->idReport.data(), max_dest);
@@ -568,12 +559,20 @@ namespace Modbus {
   //                         BufferedSlave::Private Class
   //
   // ---------------------------------------------------------------------------
+  
+  // ---------------------------------------------------------------------------
+  BufferedSlave::Private::Private (BufferedSlave * q) :
+    Slave::Private (q), map (modbus_mapping_new (0, 0, 0, 0)),
+    beforeReplyCB (0), afterReplyCB (0) {
+
+  }
 
   // ---------------------------------------------------------------------------
   BufferedSlave::Private::Private (BufferedSlave * q, int s, Device * d) :
-    Slave::Private (q, s, d), map (modbus_mapping_new (0, 0, 0, 0)),
-    beforeReplyCB (0), afterReplyCB (0) {
+    Private (q) {
 
+    id = s;
+    dev = d;
   }
 
   // ---------------------------------------------------------------------------
@@ -752,6 +751,35 @@ namespace Modbus {
     return nmemb;
   }
 
-}
+  // ---------------------------------------------------------------------------
+  //
+  //                         Modbus::Json Namespace
+  //
+  // ---------------------------------------------------------------------------
+  namespace Json {
 
+    // -------------------------------------------------------------------------
+    void setConfig (BufferedSlave * s, const nlohmann::json & j) {
+
+      setConfig (reinterpret_cast<Slave *> (s), j);
+      if (j.contains ("blocks")) {
+
+        auto blocks = j["blocks"];
+        for (const auto & b : blocks) {
+          auto t = b["table"].get<Table>();
+          auto nmemb = b["quantity"].get<int>();
+          int startAddr = -1;
+
+          if (j.contains ("starting-address")) {
+
+            auto i = b["starting-address"].get<int>();
+            startAddr = i;
+          }
+
+          s->setBlock (t, nmemb, startAddr);
+        }
+      }
+    }
+  }
+}
 /* ========================================================================== */

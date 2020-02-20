@@ -29,6 +29,9 @@ namespace Modbus {
   Slave::Slave (Slave::Private &dd) : d_ptr (&dd) {}
 
   // ---------------------------------------------------------------------------
+  Slave::Slave () : d_ptr (new Private (this)) {}
+
+  // ---------------------------------------------------------------------------
   Slave::Slave (int slaveAddr, Device * dev) :
     d_ptr (new Private (this, slaveAddr, dev)) {}
 
@@ -36,10 +39,51 @@ namespace Modbus {
   Slave::~Slave() = default;
 
   // ---------------------------------------------------------------------------
-  int Slave::readCoils (int addr, bool * dest, int nb) {
+  int Slave::number() const {
+    PIMP_D (const Slave);
+
+    return d->id;
+  }
+
+  // ---------------------------------------------------------------------------
+  void Slave::setNumber (int id) {
     PIMP_D (Slave);
 
-    if (d->dev->isOpen()) {
+    d->id = id;
+  }
+
+  // ---------------------------------------------------------------------------
+  Device * Slave::device() const {
+    PIMP_D (const Slave);
+
+    return d->dev;
+  }
+
+  // ---------------------------------------------------------------------------
+  void Slave::setDevice (Device * dev) {
+    PIMP_D (Slave);
+
+    d->dev = dev;
+  }
+
+  // ---------------------------------------------------------------------------
+  bool Slave::isValid() const {
+
+    return (device() != 0) && (number() >= 0);
+  }
+
+  // ---------------------------------------------------------------------------
+  bool Slave::isOpen() const {
+    PIMP_D (const Slave);
+
+    return d->dev ? d->dev->isOpen() : false;
+  }
+
+  // ---------------------------------------------------------------------------
+  int Slave::readCoils (int addr, bool * dest, int nb) {
+
+    if (isOpen()) {
+      PIMP_D (Slave);
 
       return modbus_read_bits (d->ctx(),
                                pduAddress (addr), nb, (uint8_t *) dest);
@@ -50,25 +94,24 @@ namespace Modbus {
 
   // ---------------------------------------------------------------------------
   int Slave::readDiscreteInputs (int addr, bool * dest, int nb) {
-    PIMP_D (Slave);
 
-    if (d->dev->isOpen()) {
+    if (isOpen()) {
+      PIMP_D (Slave);
 
       return modbus_read_input_bits (d->ctx(),
                                      pduAddress (addr), nb, (uint8_t *) dest);
     }
     return -1;
-
   }
 
   // ---------------------------------------------------------------------------
   int Slave::readRegisters (int addr, uint16_t * dest, int nb) {
-    PIMP_D (Slave);
 
-    if (d->dev->isOpen()) {
+    if (isOpen()) {
+      PIMP_D (Slave);
 
       if (modbus_set_slave (d->ctx(), d->id) == 0) {
-        
+
         return modbus_read_registers (d->ctx(),
                                       pduAddress (addr), nb, dest);
       }
@@ -79,12 +122,12 @@ namespace Modbus {
 
   // ---------------------------------------------------------------------------
   int Slave::readInputRegisters (int addr, uint16_t * dest, int nb) {
-    PIMP_D (Slave);
 
-    if (d->dev->isOpen()) {
+    if (isOpen()) {
+      PIMP_D (Slave);
 
       if (modbus_set_slave (d->ctx(), d->id) == 0) {
-        
+
         return modbus_read_input_registers (d->ctx(),
                                             pduAddress (addr), nb, dest);
       }
@@ -95,12 +138,12 @@ namespace Modbus {
 
   // ---------------------------------------------------------------------------
   int Slave::writeCoils (int addr, const bool * src, int nb) {
-    PIMP_D (Slave);
 
-    if (d->dev->isOpen()) {
+    if (isOpen()) {
+      PIMP_D (Slave);
 
       if (modbus_set_slave (d->ctx(), d->id) == 0) {
-        
+
         return modbus_write_bits (d->ctx(),
                                   pduAddress (addr), nb, (const uint8_t *) src);
       }
@@ -110,12 +153,12 @@ namespace Modbus {
 
   // ---------------------------------------------------------------------------
   int Slave::writeCoil (int addr, bool value) {
-    PIMP_D (Slave);
 
-    if (d->dev->isOpen()) {
+    if (isOpen()) {
+      PIMP_D (Slave);
 
       if (modbus_set_slave (d->ctx(), d->id) == 0) {
-        
+
         return modbus_write_bit (d->ctx(),
                                  pduAddress (addr), (uint8_t) value);
       }
@@ -125,12 +168,12 @@ namespace Modbus {
 
   // ---------------------------------------------------------------------------
   int Slave::writeRegisters (int addr, const uint16_t * src, int nb) {
-    PIMP_D (Slave);
 
-    if (d->dev->isOpen()) {
+    if (isOpen()) {
+      PIMP_D (Slave);
 
       if (modbus_set_slave (d->ctx(), d->id) == 0) {
-        
+
         return modbus_write_registers (d->ctx(), pduAddress (addr), nb, src);
       }
     }
@@ -139,12 +182,12 @@ namespace Modbus {
 
   // ---------------------------------------------------------------------------
   int Slave::writeRegister (int addr, uint16_t value) {
-    PIMP_D (Slave);
 
-    if (d->dev->isOpen()) {
+    if (isOpen()) {
+      PIMP_D (Slave);
 
       if (modbus_set_slave (d->ctx(), d->id) == 0) {
-        
+
         return modbus_write_register (d->ctx(),
                                       pduAddress (addr), value);
       }
@@ -156,12 +199,12 @@ namespace Modbus {
   // ---------------------------------------------------------------------------
   int Slave::writeReadRegisters (int waddr, const uint16_t * src, int wnb,
                                  int raddr, uint16_t * dest, int rnb) {
-    PIMP_D (Slave);
 
-    if (d->dev->isOpen()) {
+    if (isOpen()) {
+      PIMP_D (Slave);
 
       if (modbus_set_slave (d->ctx(), d->id) == 0) {
-        
+
         return modbus_write_and_read_registers (d->ctx(),
                                                 pduAddress (waddr), wnb, src,
                                                 pduAddress (raddr), rnb, dest);
@@ -172,13 +215,15 @@ namespace Modbus {
 
   // ---------------------------------------------------------------------------
   int Slave::reportSlaveId (uint16_t max_dest, uint8_t *dest) {
-    PIMP_D (Slave);
 
-    if (d->dev->isOpen() && d->dev->net() == Rtu) {
+    if (isOpen()) {
+      PIMP_D (Slave);
 
-      if (modbus_set_slave (d->ctx(), d->id) == 0) {
-        
-        return modbus_report_slave_id (d->ctx(), max_dest, dest);
+      if (d->dev->net() == Rtu) {
+        if (modbus_set_slave (d->ctx(), d->id) == 0) {
+
+          return modbus_report_slave_id (d->ctx(), max_dest, dest);
+        }
       }
     }
     return -1;
@@ -206,17 +251,10 @@ namespace Modbus {
   }
 
   // ---------------------------------------------------------------------------
-  int Slave::number() const {
-    PIMP_D (const Slave);
-
-    return d->id;
-  }
-
-  // ---------------------------------------------------------------------------
   // static
   void Slave::setBoolArray (bool * dest, const uint8_t * src, size_t n) {
-    
-    modbus_set_bits_from_bytes ((uint8_t *) dest, 0, n, src);
+
+    modbus_set_bits_from_bytes ( (uint8_t *) dest, 0, n, src);
   }
 
   // ---------------------------------------------------------------------------
@@ -226,12 +264,40 @@ namespace Modbus {
   // ---------------------------------------------------------------------------
 
   // ---------------------------------------------------------------------------
+  Slave::Private::Private (Slave * q) :
+    q_ptr (q), pduAddressing (false), id (-1), dev (0) {}
+
+  // ---------------------------------------------------------------------------
   Slave::Private::Private (Slave * q, int s, Device * d) :
-    q_ptr (q), pduAddressing (false), id (s), dev (d) {}
+    Private (q) {
+
+    id = s;
+    dev = d;
+  }
 
   // ---------------------------------------------------------------------------
   Slave::Private::~Private() = default;
 
+  // ---------------------------------------------------------------------------
+  //
+  //                         Modbus::Json Namespace
+  //
+  // ---------------------------------------------------------------------------
+  namespace Json {
+
+    // -------------------------------------------------------------------------
+    void setConfig (Slave * s, const nlohmann::json & j) {
+
+      auto i = j["id"].get<int>();
+      s->setNumber (i);
+
+      if (j.contains ("pdu-adressing")) {
+
+        auto b = j["pdu-adressing"].get<bool>();
+        s->setPduAddressing (b);
+      }
+    }
+  }
 }
 
 /* ========================================================================== */

@@ -14,16 +14,23 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with the libmodbuspp Library; if not, see <http://www.gnu.org/licenses/>.
  */
+#include <fstream>
+#include <iostream> // for debug
 #include <sstream>
 #ifdef _WIN32
 # include <winsock2.h>
+# if defined(SD_BOTH) && ! defined(SHUT_RDWR)
+#   define SHUT_RDWR SD_BOTH
+# endif
 #else
 # include <sys/socket.h>
+#include <fcntl.h>
 #endif
 #include <unistd.h>
-
 #include "server_p.h"
 #include "config.h"
+
+using json = nlohmann::json;
 
 namespace Modbus {
 
@@ -37,40 +44,39 @@ namespace Modbus {
   Server::Server (Server::Private &dd) : Device (dd) {}
 
   // ---------------------------------------------------------------------------
+  Server::Server () :
+    Device (*new Private (this)) {}
+
+  // ---------------------------------------------------------------------------
   Server::Server (Net net, const std::string & connection,
-                  const std::string & settings) :
-    Device (*new Private (this, net, connection, settings)) {
+                  const std::string & settings) : Server () {
     PIMP_D (Server);
 
-    d->req = new Request (*this);
+    d->setBackend (net, connection, settings);
+  }
+
+  // ---------------------------------------------------------------------------
+  Server::Server (const std::string & jsonfile,
+                  const std::string & key) : Server () {
+    PIMP_D (Server);
+
+    d->setConfigFromFile (jsonfile, key);
   }
 
   // ---------------------------------------------------------------------------
   Server::~Server() {
 
+    // std::cout << "-- ~Server --" << std::endl;
     terminate();
-  }
-
-
-  // ---------------------------------------------------------------------------
-  bool Server::open() {
-
-    if (!isOpen()) {
-      PIMP_D (Server);
-
-      return d->open();
-    }
-    return isOpen();
   }
 
   // ---------------------------------------------------------------------------
   void Server::close() {
 
     if (isOpen()) {
-      PIMP_D (Server);
 
       terminate();
-      d->close();
+      Device::close();
     }
   }
 
@@ -107,20 +113,11 @@ namespace Modbus {
   BufferedSlave & Server::addSlave (int slaveAddr, Device * master) {
     PIMP_D (Server);
 
-    if (modbus_set_slave (d->ctx(), slaveAddr) != 0) {
-      std::ostringstream oss;
+    if (isOpen()) {
 
-      oss << "Error: Unable to add slave[" << slaveAddr << "]\n" << lastError();
-      throw std::invalid_argument (oss.str());
+      throw std::logic_error ("Unable to add slave when open !");
     }
-
-    if (hasSlave (slaveAddr)) {
-
-      return slave (slaveAddr);
-    }
-    BufferedSlave * s = new BufferedSlave (slaveAddr, master);
-    d->slave[slaveAddr] = s;
-    return *s;
+    return *d->addSlave (slaveAddr, master);
   }
 
   // ---------------------------------------------------------------------------
@@ -142,7 +139,7 @@ namespace Modbus {
     PIMP_D (Server);
     int i = d->defaultSlave (slaveAddr);
 
-    return hasSlave (i) ? d->slave.at (i) : 0;
+    return hasSlave (i) ? d->slave.at (i).get() : nullptr;
   }
 
   // ---------------------------------------------------------------------------
@@ -150,7 +147,7 @@ namespace Modbus {
     PIMP_D (const Server);
     int i = d->defaultSlave (slaveAddr);
 
-    return hasSlave (i) ? d->slave.at (i) : 0;
+    return hasSlave (i) ? d->slave.at (i).get() : nullptr;
   }
 
   // ---------------------------------------------------------------------------
@@ -184,9 +181,14 @@ namespace Modbus {
 
   // ---------------------------------------------------------------------------
   void Server::terminate () {
+    PIMP_D (Server);
+
+    if (d->sock != -1) {
+
+      ::shutdown (d->sock, SHUT_RDWR);
+    }
 
     if (isRunning()) {
-      PIMP_D (Server);
 
       // Set the value in promise
       d->stopDaemon.set_value();
@@ -203,55 +205,97 @@ namespace Modbus {
   }
 
   // ---------------------------------------------------------------------------
+  const std::map <int, std::shared_ptr<BufferedSlave>> & Server::slaves() const {
+    PIMP_D (const Server);
+
+    return d->slave;
+  }
+
+  // ---------------------------------------------------------------------------
   //
   //                         Server::Private Class
   //
   // ---------------------------------------------------------------------------
 
   // ---------------------------------------------------------------------------
-  Server::Private::Private (Server * q, Net net, const std::string & connection,
-                            const std::string & settings) :
-    Device::Private (q, net, connection, settings), sock (-1), req (0) {}
+  Server::Private::Private (Server * q) :
+    Device::Private (q), sock (-1), req (0) {}
 
   // ---------------------------------------------------------------------------
-  Server::Private::~Private() {
+  Server::Private::~Private() = default;
 
-    delete req;
+  // ---------------------------------------------------------------------------
+  // virtual
+  void Server::Private::setConfig (const nlohmann::json & config) {
+    PIMP_Q (Server);
+
+    Json::setConfig (q, config);
+  }
+
+  // ---------------------------------------------------------------------------
+  BufferedSlave * Server::Private::addSlave (int slaveAddr, Device * master) {
+
+    if (modbus_set_slave (ctx(), slaveAddr) != 0) {
+      std::ostringstream oss;
+
+      oss << "Error: Unable to add slave[" << slaveAddr << "]\n" << lastError();
+      throw std::invalid_argument (oss.str());
+    }
+
+    std::shared_ptr<BufferedSlave> s;
+
+    if (slave.count (slaveAddr)) {
+
+      s = slave[slaveAddr];
+      s->setDevice (master);
+    }
+    else {
+
+      s = std::make_shared<BufferedSlave> (slaveAddr, master);
+      slave[slaveAddr] = s;
+    }
+    return s.get();
   }
 
   // ---------------------------------------------------------------------------
   bool Server::Private::open() {
-    PIMP_Q (Server);
+    bool isOk = false;
 
     switch (backend->net()) {
 
       case Tcp:
         sock = modbus_tcp_pi_listen (ctx(), 1);
-        isOpen = (sock != -1);
+        isOk = (sock != -1);
         break;
 
       case Rtu:
-        return q->Device::open();
+        isOk = Device::Private::open();
 
       default:
         break;
     }
 
-    return isOpen;
+    if (isOk && !req) {
+      PIMP_Q (Server);
+
+      req = std::make_shared<Request> (*q);
+    }
+
+    return isOk;
   }
 
   // ---------------------------------------------------------------------------
   void Server::Private::close() {
-    PIMP_Q (Server);
 
     if (backend->net() == Tcp) {
 
       if (sock != -1) {
+
         ::close (sock);
         sock = -1;
       }
     }
-    q->Device::close();
+    Device::Private::close();
   }
 
   // ---------------------------------------------------------------------------
@@ -261,11 +305,16 @@ namespace Modbus {
     if (rc == -1 && errno != EMBBADCRC) {
 
       if (q->recoveryLink()) {
+
         close();
         if (open()) {
 
           errno = 0;
           rc = 0;
+        }
+        else {
+
+          throw std::runtime_error ("Unable to recovery link !");
         }
       }
     }
@@ -276,12 +325,12 @@ namespace Modbus {
 
         if (modbus_set_slave (ctx(), id) == 0) {
           int ret;
-          BufferedSlave * slv = slave[id];
+          BufferedSlave * slv = slave[id].get();
 
           req->adu().resize (rc);
 
           // route the message to a possible device to copy its registers to the map.
-          ret = slv->readFromDevice (req);
+          ret = slv->readFromDevice (req.get());
           if (ret >= 0) {
 
             if (slv->beforeReplyCallback()) {
@@ -302,7 +351,7 @@ namespace Modbus {
               }
 
               // route the message to a possible device to write its registers from map.
-              ret = slv->writeToDevice (req);
+              ret = slv->writeToDevice (req.get());
               if (ret < 0) {
                 rc = ret;
               }
@@ -335,10 +384,33 @@ namespace Modbus {
   void * Server::Private::loop (std::future<void> run, Private * d) {
     int rc;
 
-    while (run.wait_for (std::chrono::milliseconds (1)) == std::future_status::timeout) {
+    while (run.wait_for (std::chrono::milliseconds (100)) == std::future_status::timeout) {
 
       rc = d->receive (d);
       rc = d->task (rc);
+    }
+  }
+  // ---------------------------------------------------------------------------
+  //
+  //                         Modbus::Json Namespace
+  //
+  // ---------------------------------------------------------------------------
+  namespace Json {
+
+    // -------------------------------------------------------------------------
+    void setConfig (Server * srv, const nlohmann::json & j) {
+
+      setConfig (reinterpret_cast<Device *> (srv), j);
+      if (j.contains ("slaves")) {
+
+        auto slaves = j["slaves"];
+        for (const auto & config : slaves) {
+
+          auto id = config["id"].get<int>();
+          BufferedSlave & slv = srv->addSlave (id);
+          setConfig (&slv, config);
+        }
+      }
     }
   }
 }

@@ -20,6 +20,9 @@
 #include "config.h"
 #include <chrono>
 #include <thread>
+#include <iostream> // for debug purposes
+
+using json = nlohmann::json;
 
 namespace Modbus {
 
@@ -33,42 +36,64 @@ namespace Modbus {
   Device::Device (Device::Private &dd) : d_ptr (&dd) {}
 
   // ---------------------------------------------------------------------------
+  Device::Device () :  d_ptr (new Private (this)) {}
+
+  // ---------------------------------------------------------------------------
   Device::Device (Net net, const std::string & connection,
-                  const std::string & settings) :
-    d_ptr (new Private (this, net, connection, settings)) {}
+                  const std::string & settings) : Device () {
+    PIMP_D (Device);
+
+    d->setBackend (net, connection, settings);
+  }
+
+  // ---------------------------------------------------------------------------
+  Device::Device (const std::string & jsonfile,
+                  const std::string & key) : Device () {
+    PIMP_D (Device);
+
+    d->setConfigFromFile (jsonfile, key);
+  }
 
   // ---------------------------------------------------------------------------
   Device::~Device() {
 
+    // std::cout << "-- ~Device --" << std::endl;
     close();
   }
 
   // ---------------------------------------------------------------------------
-  bool
-  Device::open () {
-    PIMP_D (Device);
+  std::string Device::connection() const {
 
-    if (!isOpen()) {
+    return isValid() ? backend().connection() : std::string ("No backend !");
+  }
 
-      d->isOpen = (modbus_connect (d->ctx()) == 0);
-      if (d->isOpen) {
-        // avoid that the slave takes the pulse of 40μs created by the
-        // driver when opening the port as a start bit.
+  // ---------------------------------------------------------------------------
+  std::string Device::settings() const {
 
-        std::this_thread::sleep_for (std::chrono::milliseconds (20));
+    return isValid() ? backend().settings() : std::string ("Unknown !");
+  }
+
+  // ---------------------------------------------------------------------------
+  bool Device::open() {
+
+    if (isValid()) {
+
+      if (!isOpen()) {
+        PIMP_D (Device);
+
+        d->isOpen = d->open();
       }
     }
     return isOpen();
   }
 
   // ---------------------------------------------------------------------------
-  void
-  Device::close() {
+  void Device::close() {
 
     if (isOpen()) {
       PIMP_D (Device);
 
-      modbus_close (d->ctx());
+      d->close();
       d->isOpen = false;
     }
   }
@@ -95,16 +120,52 @@ namespace Modbus {
   // ---------------------------------------------------------------------------
   bool
   Device::isConnected() const {
-    PIMP_D (const Device);
 
-    return d->isOpen && d->isConnected();
+    if (isValid()) {
+      PIMP_D (const Device);
+
+      return d->isOpen && d->isConnected();
+    }
+    return false;
   }
 
   // ---------------------------------------------------------------------------
-  void Device::setRecoveryLink (bool recovery) {
+  bool Device::isValid() const {
+    PIMP_D (const Device);
+
+    return d->backend != 0;
+  }
+
+  // ---------------------------------------------------------------------------
+  bool Device::setBackend (Net net, const std::string & connection,
+                           const std::string & settings) {
+    if (!isValid()) {
+      PIMP_D (Device);
+
+      d->setBackend (net, connection, settings);
+      return true;
+    }
+    return false;
+  }
+
+  // ---------------------------------------------------------------------------
+  bool Device::setConfig (const std::string & jsonfile,
+                          const std::string & key) {
+    if (!isValid()) {
+      PIMP_D (Device);
+
+      d->setConfigFromFile (jsonfile, key);
+      return true;
+    }
+    return false;
+  }
+
+  // ---------------------------------------------------------------------------
+  bool Device::setRecoveryLink (bool recovery) {
     PIMP_D (Device);
 
     d->recoveryLink = recovery;
+    return true;
   }
 
   // ---------------------------------------------------------------------------
@@ -116,9 +177,12 @@ namespace Modbus {
 
   // ---------------------------------------------------------------------------
   NetLayer & Device::backend() const {
-    PIMP_D (const Device);
+    if (isValid()) {
+      PIMP_D (const Device);
 
-    return *d->backend;
+      return *d->backend;
+    }
+    throw std::domain_error ("Error: Unable to return backend !");
   }
 
   // ---------------------------------------------------------------------------
@@ -144,23 +208,31 @@ namespace Modbus {
   }
 
   // ---------------------------------------------------------------------------
-  void Device::setResponseTimeout (const Timeout & t) {
-    PIMP_D (Device);
+  bool Device::setResponseTimeout (const Timeout & t) {
 
-    (void) modbus_set_response_timeout (d->ctx(), t.sec(), t.usec());
+    if (isValid()) {
+      PIMP_D (Device);
+
+      (void) modbus_set_response_timeout (d->ctx(), t.sec(), t.usec());
+    }
+    return isValid();
   }
 
   // ---------------------------------------------------------------------------
-  void Device::setResponseTimeout (const double & t) {
+  bool Device::setResponseTimeout (const double & t) {
 
-    setResponseTimeout (Timeout (t));
+    return setResponseTimeout (Timeout (t));
   }
 
   // ---------------------------------------------------------------------------
-  void Device::responseTimeout (Timeout & t) {
-    PIMP_D (Device);
+  bool Device::responseTimeout (Timeout & t) {
 
-    (void) modbus_get_response_timeout (d->ctx(), &t.m_sec, &t.m_usec);
+    if (isValid()) {
+      PIMP_D (Device);
+
+      (void) modbus_get_response_timeout (d->ctx(), &t.m_sec, &t.m_usec);
+    }
+    return isValid();
   }
 
   // ---------------------------------------------------------------------------
@@ -172,23 +244,31 @@ namespace Modbus {
   }
 
   // ---------------------------------------------------------------------------
-  void Device::setByteTimeout (const Timeout & t) {
-    PIMP_D (Device);
+  bool Device::setByteTimeout (const Timeout & t) {
 
-    (void) modbus_set_byte_timeout (d->ctx(), t.sec(), t.usec());
+    if (isValid()) {
+      PIMP_D (Device);
+
+      (void) modbus_set_byte_timeout (d->ctx(), t.sec(), t.usec());
+    }
+    return isValid();
   }
 
   // ---------------------------------------------------------------------------
-  void Device::setByteTimeout (const double & t) {
+  bool Device::setByteTimeout (const double & t) {
 
-    setByteTimeout (Timeout (t));
+    return setByteTimeout (Timeout (t));
   }
 
   // ---------------------------------------------------------------------------
-  void Device::byteTimeout (Timeout & t) {
-    PIMP_D (Device);
+  bool Device::byteTimeout (Timeout & t) {
 
-    (void) modbus_get_byte_timeout (d->ctx(), &t.m_sec, &t.m_usec);
+    if (isValid()) {
+      PIMP_D (Device);
+
+      (void) modbus_get_byte_timeout (d->ctx(), &t.m_sec, &t.m_usec);
+    }
+    return isValid();
   }
 
   // ---------------------------------------------------------------------------
@@ -201,27 +281,34 @@ namespace Modbus {
 
   // ---------------------------------------------------------------------------
   bool Device::setDebug (bool debug) {
-    PIMP_D (Device);
-    
-    int rc = modbus_set_debug (d->ctx(), debug ? TRUE : FALSE);
-    if (rc == 0) {
-      d->debug = debug;
+    int rc = -1;
+
+    if (isValid()) {
+      PIMP_D (Device);
+
+      int rc = modbus_set_debug (d->ctx(), debug ? TRUE : FALSE);
+      if (rc == 0) {
+        d->debug = debug;
+      }
     }
-    
     return (rc == 0);
   }
 
   // ---------------------------------------------------------------------------
   bool Device::debug () const {
     PIMP_D (const Device);
-    
+
     return d->debug;
   }
 
   // ---------------------------------------------------------------------------
   Net Device::net() const {
 
-    return backend().net();
+    if (isValid()) {
+
+      return backend().net();
+    }
+    return NoNet;
   }
 
   // ---------------------------------------------------------------------------
@@ -238,9 +325,58 @@ namespace Modbus {
   // ---------------------------------------------------------------------------
 
   // ---------------------------------------------------------------------------
-  Device::Private::Private (Device * q, Net net, const std::string & connection,
-                            const std::string & settings) :
-    q_ptr (q), isOpen (false), backend (0), recoveryLink (false), debug (false) {
+  Device::Private::Private (Device * q) :
+    q_ptr (q), isOpen (false), backend (0), recoveryLink (false),
+    debug (false) {}
+
+  // ---------------------------------------------------------------------------
+  Device::Private::~Private() {
+
+    delete backend;
+  }
+
+  // ---------------------------------------------------------------------------
+  void Device::Private::setConfigFromFile (const std::string & jsonfile,
+      const std::string & key) {
+
+    // read a JSON file
+    std::ifstream ifs (jsonfile);
+
+    if (ifs.is_open()) {
+      json j, config;
+
+      ifs >> j;
+      // std::cout << "file > " << j << std::endl; // debug
+      if (! key.empty() && j.contains (key)) {
+
+        config = j[key];
+      }
+      else {
+
+        config = j;
+      }
+      // std::cout << "config > " << config << std::endl; // debug
+      setConfig (config);
+    }
+    else {
+
+      throw std::system_error (errno, std::system_category(),
+                               "failed to open " + jsonfile);
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // virtual
+  void Device::Private::setConfig (const nlohmann::json & config) {
+    PIMP_Q (Device);
+
+    Json::setConfig (q, config);
+  }
+
+  // ---------------------------------------------------------------------------
+  // virtual
+  void Device::Private::setBackend (Net net, const std::string & connection,
+                                    const std::string & settings) {
 
     switch (net) {
 
@@ -260,15 +396,30 @@ namespace Modbus {
   }
 
   // ---------------------------------------------------------------------------
-  Device::Private::~Private() {
+  bool
+  Device::Private::open () {
 
-    delete backend;
+    if (modbus_connect (ctx()) == 0) {
+      // avoid that the slave takes the pulse of 40μs created by the
+      // driver when opening the port as a start bit.
+
+      std::this_thread::sleep_for (std::chrono::milliseconds (20));
+      return true;
+    }
+    return false;
+  }
+
+  // ---------------------------------------------------------------------------
+  void
+  Device::Private::close() {
+
+    modbus_close (ctx());
   }
 
   // ---------------------------------------------------------------------------
   int Device::Private::defaultSlave (int addr) const {
 
-    if (addr < 0) {
+    if (addr < 0 && backend != 0) {
 
       return backend->net() == Rtu ? Broadcast : TcpSlave;
     }
@@ -282,6 +433,62 @@ namespace Modbus {
     return (modbus_get_socket (ctx()) >= 0);
   }
 
+  // ---------------------------------------------------------------------------
+  //
+  //                        Modbus::Json Namespace
+  //
+  // ---------------------------------------------------------------------------
+  namespace Json {
+
+    // -------------------------------------------------------------------------
+    void setConfig (Device * dev, const nlohmann::json & config) {
+      auto connection =  config["connection"].get<std::string>();
+      auto settings =  config["settings"].get<std::string>();
+      auto net = config["mode"].get<Net>();
+
+      if (dev->setBackend (net, connection, settings)) {
+
+        if (config.contains ("recovery-link")) {
+
+          auto b = config["recovery-link"].get<bool>();
+          dev->setRecoveryLink (b);
+        }
+        if (config.contains ("debug")) {
+
+          auto b = config["debug"].get<bool>();
+          dev->setDebug (b);
+        }
+        if (config.contains ("response-timeout")) {
+
+          auto d = config["response-timeout"].get<double>();
+          d /= 1000;
+          dev->setResponseTimeout (d);
+        }
+        if (config.contains ("byte-timeout")) {
+
+          auto d = config["byte-timeout"].get<double>();
+          d /= 1000;
+          dev->setByteTimeout (d);
+        }
+        if (config.contains ("rtu") && net == Rtu) {
+          auto rtu = config["rtu"];
+
+          if (rtu.contains ("mode")) {
+            auto m = rtu["mode"].get<SerialMode>();
+            dev->rtu().setSerialMode (m);
+          }
+          if (rtu.contains ("rts")) {
+            auto r = rtu["rts"].get<SerialRts>();
+            dev->rtu().setRts (r);
+          }
+          if (rtu.contains ("rts-delay")) {
+            auto r = rtu["rts-delay"].get<int>();
+            dev->rtu().setRtsDelay (r);
+          }
+        }
+      }
+    }
+  }
 }
 
 /* ========================================================================== */

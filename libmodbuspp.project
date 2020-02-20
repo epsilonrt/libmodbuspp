@@ -24,6 +24,7 @@
       <File Name="include/modbuspp/popl.h"/>
       <File Name="include/modbuspp/request.h"/>
       <File Name="include/modbuspp/response.h"/>
+      <File Name="include/modbuspp/router.h"/>
     </VirtualDirectory>
     <File Name="include/modbuspp.h"/>
   </VirtualDirectory>
@@ -77,6 +78,9 @@
     <File Name="src/message_p.h"/>
     <File Name="src/request.cpp"/>
     <File Name="src/response.cpp"/>
+    <File Name="src/router.cpp"/>
+    <File Name="src/router_p.h"/>
+    <File Name="src/json_p.h"/>
   </VirtualDirectory>
   <VirtualDirectory Name="lib">
     <VirtualDirectory Name="resources">

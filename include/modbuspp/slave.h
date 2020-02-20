@@ -39,10 +39,19 @@ namespace Modbus {
   class Slave {
 
     public:
+
+      
       /**
        * @brief Constructor
        */
       Slave (int slaveAddr, Device * dev);
+
+      /**
+       * @brief Default Constructor
+       *
+       * object cannot be used without calling setDevice() and setNumber()
+       */
+      Slave ();
 
       /**
        * @brief Destructor
@@ -60,7 +69,32 @@ namespace Modbus {
        * @return the slave number
        */
       int number() const;
+      
+      /**
+       * @brief Sets the slave number
+       */
+      void setNumber(int n);
 
+      /**
+       * @brief returns the device used to access the network 
+       */
+      Device * device() const;
+      
+      /**
+       * @brief Sets the device used to access the network 
+       */
+      void setDevice (Device * dev);
+
+      /**
+       * @brief returns true if device() and number() are sets
+       */
+      bool isValid() const;
+
+      /**
+       * @brief returns true if isValid() and device() is opened.
+       */
+      bool isOpen() const;
+      
       /**
        * @brief Modbus addressing mode
        *
@@ -100,13 +134,13 @@ namespace Modbus {
        * the PDU address is equal to the MODBUS address minus 1, otherwise they are equal.
        */
       int pduAddress (int addr) const;
-
+      
       /**
        * @brief Read many discrete inputs (input bits)
        *
-       * This function shall read the content of the \b nb input bits to the
-       * address \b addr of the remote device.  The result of reading is stored
-       * in \b dest array as  boolean.
+       * This function shall read the content of the @b nb input bits to the
+       * address @b addr of the remote device.  The result of reading is stored
+       * in @b dest array as  boolean.
        *
        * The function uses the Modbus function code 0x02 (read input status).
        *
@@ -118,9 +152,9 @@ namespace Modbus {
       /**
        * @brief Read many coils (bits)
        *
-       * This function shall read the status of the \b nb bits (coils) to the
-       * address \b addr of the remote device. The result of reading is stored
-       * in \b dest array as boolean.
+       * This function shall read the status of the @b nb bits (coils) to the
+       * address @b addr of the remote device. The result of reading is stored
+       * in @b dest array as boolean.
        *
        * The function uses the Modbus function code 0x01 (read coil status).
        *
@@ -145,9 +179,9 @@ namespace Modbus {
       /**
        * @brief Write many coils (bits)
        *
-       * This function shall write the status of the \b nb bits (coils) from
-       * \b src at the address \b addr of the remote device.
-       * The \b src array must contains booelans.
+       * This function shall write the status of the @b nb bits (coils) from
+       * @b src at the address @b addr of the remote device.
+       * The @b src array must contains booelans.
        *
        * The function uses the Modbus function code 0x0F (force multiple coils).
        *
@@ -159,10 +193,10 @@ namespace Modbus {
       /**
        * @brief Read many input registers
        *
-       * This function shall read the content of the \b nb input registers to
-       * the address \b addr of the remote device.
+       * This function shall read the content of the @b nb input registers to
+       * the address @b addr of the remote device.
        *
-       * The result of reading is stored in \b dest array as word values (16 bits).
+       * The result of reading is stored in @b dest array as word values (16 bits).
        *
        * The function uses the Modbus function code 0x04 (read input registers).
        * The holding registers and input registers have different historical
@@ -177,9 +211,9 @@ namespace Modbus {
        * @brief Read many registers
        *
        * This function shall read the content of the nb holding registers to
-       * the address \b addr of the remote device.
+       * the address @b addr of the remote device.
        *
-       * The result of reading is stored in \b dest array as word values (16 bits).
+       * The result of reading is stored in @b dest array as word values (16 bits).
        *
        * The function uses the Modbus function code 0x03 (read holding registers).
        *
@@ -191,8 +225,8 @@ namespace Modbus {
       /**
        * @brief Write a single register
        *
-       * This function shall write the value of \b value holding registers at
-       * the address \b addr of the remote device.
+       * This function shall write the value of @b value holding registers at
+       * the address @b addr of the remote device.
        *
        * The function uses the Modbus function code 0x06 (preset single register).
        *
@@ -204,8 +238,8 @@ namespace Modbus {
       /**
        * @brief Write many registers
        *
-       * This function shall write the content of the \b nb holding registers
-       * from the array \b src at address \b addr of the remote device.
+       * This function shall write the content of the @b nb holding registers
+       * from the array @b src at address @b addr of the remote device.
        *
        * The function uses the Modbus function code 0x10 (preset multiple registers).
        *
@@ -217,14 +251,14 @@ namespace Modbus {
       /**
        * @brief Write and read many registers in a single transaction
        *
-       * This function shall write the content of the \b write_nb holding
-       * registers from the array 'src' to the address \b write_addr of the
-       * remote device then shall read the content of the \b read_nb holding
-       * registers to the address \b read_addr of the remote device.
-       * The result of reading is stored in \b dest array as word values (16 bits).
+       * This function shall write the content of the @b write_nb holding
+       * registers from the array 'src' to the address @b write_addr of the
+       * remote device then shall read the content of the @b read_nb holding
+       * registers to the address @b read_addr of the remote device.
+       * The result of reading is stored in @b dest array as word values (16 bits).
        *
        * You must take care to allocate enough memory to store the results in
-       * \b dest (at least \b nb * sizeof(uint16_t)).
+       * @b dest (at least @b nb * sizeof(uint16_t)).
        *
        * The function uses the Modbus function code 0x17 (write/read registers).
        *
@@ -237,8 +271,8 @@ namespace Modbus {
       /**
        * @brief Read a single discrete input (input bit)
        *
-       * This function shall read a single input bits to the address \b addr
-       * of the device.  The result of reading is stored in \b dest
+       * This function shall read a single input bits to the address @b addr
+       * of the device.  The result of reading is stored in @b dest
        * as boolean.
        *
        * The function uses the Modbus function code 0x02 (read input status).
@@ -254,8 +288,8 @@ namespace Modbus {
       /**
        * @brief Read a single coil (bit)
        *
-       * This function shall read a signle bit (coil) to the address \b addr of
-       * the device. The result of reading is stored in \b dest
+       * This function shall read a signle bit (coil) to the address @b addr of
+       * the device. The result of reading is stored in @b dest
        * as boolean.
        *
        * The function uses the Modbus function code 0x01 (read coil status).
@@ -271,10 +305,10 @@ namespace Modbus {
       /**
        * @brief Read a single input register
        *
-       * This function shall read a single input register to the address \b addr
+       * This function shall read a single input register to the address @b addr
        * of the device.
        *
-       * The result of reading is stored in \b dest as word values (16 bits).
+       * The result of reading is stored in @b dest as word values (16 bits).
        *
        * The function uses the Modbus function code 0x04 (read input registers).
        * The holding registers and input registers have different historical
@@ -292,9 +326,9 @@ namespace Modbus {
        * @brief Read a single register
        *
        * This function shall read a signle holding register to
-       * the address \b addr of the device.
+       * the address @b addr of the device.
        *
-       * The result of reading is stored in \b dest as word values (16 bits).
+       * The result of reading is stored in @b dest as word values (16 bits).
        *
        * The function uses the Modbus function code 0x03 (read holding registers).
        *
@@ -312,10 +346,10 @@ namespace Modbus {
        * Data is a template class for storing, transmitting, and receiving
        * arithmetic data in multiple 16-bit Modbus registers.
        *
-       * This function shall read the content of the \b nb input data to
-       * the address \b addr of the device.
+       * This function shall read the content of the @b nb input data to
+       * the address @b addr of the device.
        *
-       * The result of reading is stored in \b dest array as \b T values.
+       * The result of reading is stored in @b dest array as @b T values.
        *
        * The function uses the Modbus function code 0x04 (read input registers).
        *
@@ -348,10 +382,10 @@ namespace Modbus {
        * Data is a template class for storing, transmitting, and receiving
        * arithmetic data in multiple 16-bit Modbus registers.
        *
-       * This function shall read a single input data to the address \b addr
+       * This function shall read a single input data to the address @b addr
        * of the device.
        *
-       * The result of reading is stored in \b dest as T value.
+       * The result of reading is stored in @b dest as T value.
        *
        * The function uses the Modbus function code 0x04 (read input registers).
        *
@@ -375,10 +409,10 @@ namespace Modbus {
        * Data is a template class for storing, transmitting, and receiving
        * arithmetic data in multiple 16-bit Modbus registers.
        *
-       * This function shall read a single holding data to the address \b addr
+       * This function shall read a single holding data to the address @b addr
        * of the device.
        *
-       * The result of reading is stored in \b dest as T value.
+       * The result of reading is stored in @b dest as T value.
        *
        * The function uses the Modbus function code 0x03 (read holding registers).
        *
@@ -402,10 +436,10 @@ namespace Modbus {
        * Data is a template class for storing, transmitting, and receiving
        * arithmetic data in multiple 16-bit Modbus registers.
        *
-       * This function shall read the content of the \b nb data to
-       * the address \b addr of the device.
+       * This function shall read the content of the @b nb data to
+       * the address @b addr of the device.
        *
-       * The result of reading is stored in \b dest array as \b T values.
+       * The result of reading is stored in @b dest array as @b T values.
        *
        * The function uses the Modbus function code 0x03 (read holding registers).
        *
@@ -438,18 +472,20 @@ namespace Modbus {
        * Data is a template class for storing, transmitting, and receiving
        * arithmetic data in multiple 16-bit Modbus registers.
        *
-       * This function shall write the content of the \b nb holding data
-       * from the array \b src at address \b addr of the device.
+       * This function shall write the content of the @b nb holding data
+       * from the array @b src at address @b addr of the device.
        *
        * The function uses the Modbus function code 0x10 (preset multiple registers).
        *
        * @return number of written holding Modbus registers (16-bit) if successful.
        * Otherwise it shall return -1 and set errno.
        */
-      template <typename T, Endian e> int writeRegisters (int addr, const Data<T, e> * src, int nb = 1) {
+      template <typename T, Endian e> int writeRegisters (int addr, Data<T, e> * src, int nb = 1) {
         std::vector<uint16_t> buf;
 
         for (int i = 0; i < nb; i++) {
+          
+          src[i].updateRegisters();
           for (auto & r : src[i].registers()) {
             buf.push_back (r);
           }
@@ -464,15 +500,16 @@ namespace Modbus {
        * arithmetic data in multiple 16-bit Modbus registers.
        *
        * This function shall write a single holding data
-       * from \b value at address \b addr of the device.
+       * from @b value at address @b addr of the device.
        *
        * The function uses the Modbus function code 0x10 (preset multiple registers).
        *
        * @return number of written holding Modbus registers (16-bit) if successful.
        * Otherwise it shall return -1 and set errno.
        */
-      template <typename T, Endian e> int writeRegister (int addr, const Data<T, e> & value) {
-
+      template <typename T, Endian e> int writeRegister (int addr, Data<T, e> & value) {
+        
+        value.updateRegisters();
         return writeRegisters (addr, value.registers().data(), value.registers().size());
       }
       
@@ -491,7 +528,8 @@ namespace Modbus {
        * @brief returns a description of the controller
        *
        * This function shall send a request to the controller to obtain a
-       * description of the controller. \n
+       * description of the controller.
+       * 
        * The response stored in dest contains:
        * - the slave ID, this unique ID is in reality not unique at all so it’s
        * not possible to depend on it to know how the information are packed in
