@@ -1,9 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<CodeLite_Project Name="tcp-gw-to-clock-server" Version="10.0.0" InternalType="Console">
+<CodeLite_Project Name="clock-server-json" Version="10.0.0" InternalType="Console">
   <Description/>
   <Dependencies/>
   <VirtualDirectory Name="src">
     <File Name="main.cpp"/>
+  </VirtualDirectory>
+  <VirtualDirectory Name="json">
+    <File Name="clock-server-tcp.json"/>
+    <File Name="clock-server-virtual.json"/>
+  </VirtualDirectory>
+  <VirtualDirectory Name="doc">
+    <File Name="README.md"/>
   </VirtualDirectory>
   <Settings Type="Executable">
     <GlobalSettings>
@@ -21,7 +28,7 @@
       </Compiler>
       <Linker Options="" Required="yes"/>
       <ResourceCompiler Options="" Required="no"/>
-      <General OutputFile="$(IntermediateDirectory)/$(ProjectName)" IntermediateDirectory="./Debug" Command="./$(ProjectName)" CommandArguments="/dev/ttyUSB1" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="yes" IsGUIProgram="no" IsEnabled="yes"/>
+      <General OutputFile="$(IntermediateDirectory)/$(ProjectName)" IntermediateDirectory="./Debug" Command="./$(ProjectName)" CommandArguments="../clock-server-virtual.json" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="yes" IsGUIProgram="no" IsEnabled="yes"/>
       <BuildSystem Name="Default"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
         <![CDATA[]]>
@@ -97,7 +104,6 @@
       </Completion>
     </Configuration>
   </Settings>
-  <VirtualDirectory Name="doc">
-    <File Name="README.md"/>
-  </VirtualDirectory>
+  <Dependencies Name="Debug"/>
+  <Dependencies Name="Release"/>
 </CodeLite_Project>
