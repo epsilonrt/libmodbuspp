@@ -18,14 +18,7 @@
 #ifndef MODBUSPP_CONFIG_H_
 #define MODBUSPP_CONFIG_H_
 /* ========================================================================== */
-#cmakedefine01 MODBUSPP_WITH_ARDUINO
-#cmakedefine01 MODBUSPP_WITH_GPIO
-#cmakedefine01 MODBUSPP_WITH_I2C
-#cmakedefine01 MODBUSPP_WITH_SPI
-#cmakedefine01 MODBUSPP_WITH_SERIAL
 #cmakedefine01 MODBUSPP_WITH_STATIC
-#cmakedefine01 MODBUSPP_DRIVER_BCM2835
-#cmakedefine01 MODBUSPP_DRIVER_ALLWINNERH
 
 #define MODBUSPP_VERSION       "@MODBUSPP_VERSION_STRING@"
 #define MODBUSPP_VERSION_SHORT "@MODBUSPP_VERSION_SHORT@"
