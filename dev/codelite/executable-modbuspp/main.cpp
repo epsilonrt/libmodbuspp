@@ -1,10 +1,23 @@
 // libmodbuspp template
 // This example code is in the public domain.
+#include <csignal>
 #include <iostream>
 #include <modbuspp.h>
 
 using namespace std;
 using namespace Modbus;
+
+Master mb; // instantiate new MODBUS Master
+
+// -----------------------------------------------------------------------------
+// Signal trap, triggers during a CTRL+C or if kill is called
+void
+sighandler (int sig) {
+
+  mb.close();
+  cout << "everything was closed." << endl << "Have a nice day !" << endl;
+  exit (EXIT_SUCCESS);
+}
 
 // -----------------------------------------------------------------------------
 int main (int argc, char **argv) {
@@ -14,8 +27,12 @@ int main (int argc, char **argv) {
 
     port = argv[1]; // the serial port can be provided as a parameter on the command line.
   }
+  
+  // CTRL+C and kill call triggers the trap sighandler()
+  signal (SIGINT, sighandler);
+  signal (SIGTERM, sighandler);
 
-  Master mb (Rtu, port, "38400E1"); // new master on RTU
+  mb.setBackend (Rtu, port, "38400E1"); // set master on RTU
   // if you have to handle the DE signal of the line driver with RTS,
   // you should uncomment the lines below...
   // mb.rtu().setRts(RtsDown);
