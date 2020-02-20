@@ -118,17 +118,17 @@ namespace Modbus {
    *
    * Request To Send mode to communicate on a RS485 serial bus.
    *
-   * By default, the mode is set to \b RtsNone and no signal is issued before
+   * By default, the mode is set to @b RtsNone and no signal is issued before
    * writing data on the wire.
    *
-   * To enable the RTS mode, the values \b RtsUp or \b RtsDown must be used,
+   * To enable the RTS mode, the values @b RtsUp or @b RtsDown must be used,
    * these modes enable the RTS mode and set the polarity at the same time.
    *
-   * When \b RtsUp is used, an ioctl call is made with RTS flag enabled then
+   * When @b RtsUp is used, an ioctl call is made with RTS flag enabled then
    * data is written on the bus after a delay of 1 ms, then another ioctl call
    * is made with the RTS flag disabled and again a delay of 1 ms occurs.
    *
-   * The \b RtsDown mode applies the same procedure but with an inverted RTS flag.
+   * The @b RtsDown mode applies the same procedure but with an inverted RTS flag.
    */
   enum SerialRts {
     RtsNone = MODBUS_RTU_RTS_NONE, ///< no use of the RTS.

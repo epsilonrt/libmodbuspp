@@ -27,8 +27,8 @@ namespace Modbus {
    * This class can not and should not be instantiated by the user.
    * It provides access to properties and methods specific to the TCP layer.
    *
-   * An instance of this class is created by the constructor \b Device::Device()
-   * of the \b Device class (or its derived classes) if the TCP layer is selected.
+   * An instance of this class is created by the constructor @b Device::Device()
+   * of the @b Device class (or its derived classes) if the TCP layer is selected.
    *
    * Access to this instance is done using the Device::tcp() method.
    *

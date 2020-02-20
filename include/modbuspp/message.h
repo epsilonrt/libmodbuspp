@@ -61,17 +61,17 @@ namespace Modbus {
       Message (Device & dev, Function func);
 
       /**
-       * @brief Constructs a copy of @a other
+       * @brief Constructs a copy of @b other
        */
       Message (const Message & other);
 
       /**
-       * @brief Sets the Message object to be equal to @a other.
+       * @brief Sets the Message object to be equal to @b other.
        */
       Message& operator= (const Message &other);
 
       /**
-       * @brief Swaps Message @a other with this Message. This operation is
+       * @brief Swaps Message @b other with this Message. This operation is
        * very fast and never fails.
        */
       void swap (Message &other);
@@ -167,7 +167,7 @@ namespace Modbus {
        * @brief Sets the CRC for the message
        *
        * Can be used for all functions.
-       * This value is at the offset @a pduIndex of the PDU, if @a pduIndex is 0
+       * This value is at the offset @b pduIndex of the PDU, if @b pduIndex is 0
        * or is not supplied, the CRC is inserted taking into account previous
        * calls since the last clear.
        */
@@ -186,7 +186,7 @@ namespace Modbus {
       /**
        * @brief Returns the PDU byte corresponding to the offset provided
        *
-       * @a pduOffset has a maximum value of @a MaxPduLength-1, it can have a negative
+       * @b pduOffset has a maximum value of @b MaxPduLength-1, it can have a negative
        * value in order to access the bytes of the ADU that precedes the PDU.
        */
       uint8_t byte (int pduOffset) const;
@@ -194,7 +194,7 @@ namespace Modbus {
       /**
        * @brief Returns the PDU word corresponding to the offset provided
        *
-       * @a pduOffset has a maximum value of @a MaxPduLength-2, it can have a negative
+       * @b pduOffset has a maximum value of @b MaxPduLength-2, it can have a negative
        * value in order to access the words of the ADU that precedes the PDU.
        */
       uint16_t word (int pduOffset) const;
@@ -202,7 +202,7 @@ namespace Modbus {
       /**
        * @brief Write a byte in the PDU to the supplied offset
        *
-       * @a pduOffset has a maximum value of @a MaxPduLength-1, it can have a negative
+       * @b pduOffset has a maximum value of @b MaxPduLength-1, it can have a negative
        * value in order to access the bytes of the ADU that precedes the PDU.
        */
       void setByte (int pduOffset, uint8_t value);
@@ -210,7 +210,7 @@ namespace Modbus {
       /**
        * @brief Write a word in the PDU to the supplied offset
        *
-       * @a pduOffset has a maximum value of @a MaxPduLength-2, it can have a negative
+       * @b pduOffset has a maximum value of @b MaxPduLength-2, it can have a negative
        * value in order to access the wordss of the ADU that precedes the PDU.
        */
       void setWord (int pduOffset, uint16_t value);
@@ -228,7 +228,7 @@ namespace Modbus {
       /**
        * @brief Returns the ADU byte corresponding to the index provided
        *
-       * @a i must be between 0 and @a maxAduLength()-1
+       * @b i must be between 0 and @b maxAduLength()-1
        */
       uint8_t adu (uint16_t i);
 
@@ -247,7 +247,7 @@ namespace Modbus {
       /**
        * @brief Prints all bytes of the message on the output stream provided
        * 
-       * The bytes printed are preceded by the character @a prefix() and 
+       * The bytes printed are preceded by the character @b prefix() and 
        * followed by the suffix().
        * 
        * for debugging.
@@ -279,7 +279,7 @@ namespace Modbus {
       void setPrefix (char prefix);
 
       /**
-       * @brief Inserts the message @a m byte sequence into @a os.
+       * @brief Inserts the message @b m byte sequence into @b os.
        */
       friend std::ostream& operator<< (std::ostream& os, const Message & m);
 

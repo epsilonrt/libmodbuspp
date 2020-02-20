@@ -152,9 +152,9 @@ namespace Modbus {
       }
 
       /**
-       * @brief Swap bytes and words of a T value \b v
+       * @brief Swap bytes and words of a T value @b v
        * 
-       * The order used is \b endianness().
+       * The order used is @b endianness().
        */
       void swap (T & v) {
 

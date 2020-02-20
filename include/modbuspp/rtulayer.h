@@ -27,8 +27,8 @@ namespace Modbus {
    * This class can not and should not be instantiated by the user.
    * It provides access to properties and methods specific to the RTU layer.
    *
-   * An instance of this class is created by the constructor \b Device::Device()
-   * of the \b Device class (or its derived classes) if the RTU layer is selected.
+   * An instance of this class is created by the constructor @b Device::Device()
+   * of the @b Device class (or its derived classes) if the RTU layer is selected.
    *
    * Access to this instance is done using the Device::rtu() method.
    *
@@ -79,13 +79,13 @@ namespace Modbus {
        *
        * This function shall return the serial mode currently used.
        *
-       * - \b Rs232: the serial line is set for RS232 communication. RS-232
+       * - @b Rs232: the serial line is set for RS232 communication. RS-232
        *  (Recommended Standard 232) is the traditional name for a series of
        *  standards  for serial binary single-ended data and control signals
        *  connecting between a DTE (Data Terminal Equipment) and a DCE
        *  (Data Circuit-terminating  Equipment).
        *  It is commonly used in computer serial ports
-       * - \b Rs485: the serial line is set for RS485 communication. EIA-485,
+       * - @b Rs485: the serial line is set for RS485 communication. EIA-485,
        *  also known as TIA/EIA-485 or RS-485, is a standard defining the electrical
        *  characteristics of drivers and receivers for use in balanced digital
        *  multipoint systems. This standard is widely used for communications in
@@ -95,7 +95,7 @@ namespace Modbus {
        * This function is only available on Linux kernels 2.6.28 onwards.
        *
        * @return return the current mode if successful.
-       * Otherwise it shall return \b UnknownMode (-1) and set errno.
+       * Otherwise it shall return @b UnknownMode (-1) and set errno.
        * @sa setSerialMode()
        */
       SerialMode serialMode();
@@ -103,7 +103,7 @@ namespace Modbus {
       /**
        * @brief Set the serial mode
        *
-       * This function shall set the selected serial mode \b mode.
+       * This function shall set the selected serial mode @b mode.
        *
        * @return true if successful.
        * Otherwise it shall return false and set errno.
@@ -117,7 +117,7 @@ namespace Modbus {
        * This function shall get the current Request To Send mode
        *
        * @return the current RTS mode if successful.
-       * Otherwise it shall return \b UnknownRts (-1) and set errno.
+       * Otherwise it shall return @b UnknownRts (-1) and set errno.
        * @sa setRts()
        */
       SerialRts rts();

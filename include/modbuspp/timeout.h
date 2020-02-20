@@ -58,7 +58,7 @@ namespace Modbus {
        * @brief Set the value from the integer part and the decimal part
        * @param s seconds
        * @param us microseconds, if this value is greater than 999999, it is
-       * adjusted as well as \b s.
+       * adjusted as well as @b s.
        */
       void setValue (uint32_t s, uint32_t us);
 
