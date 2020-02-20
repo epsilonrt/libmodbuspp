@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CodeLite_Workspace Name="modbuspp" Database="" Version="10.0.0">
-  <Project Name="libmodbuspp" Path="libmodbuspp.project" Active="Yes"/>
+  <Project Name="libmodbuspp" Path="libmodbuspp.project" Active="No"/>
   <Project Name="libmodbuspp-doc" Path="doc/libmodbuspp-doc.project" Active="No"/>
   <VirtualDirectory Name="examples">
     <VirtualDirectory Name="master">
@@ -9,30 +9,34 @@
       <Project Name="read-input-registers" Path="examples/master/read-input-registers/read-input-registers.project" Active="No"/>
       <Project Name="report-slave-id" Path="examples/master/report-slave-id/report-slave-id.project" Active="No"/>
       <Project Name="write-holding-data" Path="examples/master/write-holding-data/write-holding-data.project" Active="No"/>
+      <Project Name="rw-holding-json" Path="examples/master/rw-holding-json/rw-holding-json.project" Active="No"/>
     </VirtualDirectory>
     <VirtualDirectory Name="server">
+      <Project Name="clock-server-json" Path="examples/server/clock-server-json/clock-server-json.project" Active="No"/>
       <Project Name="clock-server" Path="examples/server/clock-server/clock-server.project" Active="No"/>
-      <Project Name="tcp-gw-to-clock-server" Path="examples/server/tcp-gw-to-clock-server/tcp-gw-to-clock-server.project" Active="No"/>
-      <Project Name="tcp-gw-to-serial" Path="examples/server/tcp-gw-to-serial/tcp-gw-to-serial.project" Active="No"/>
-      <Project Name="tcp-gw-callback" Path="examples/server/tcp-gw-callback/tcp-gw-callback.project" Active="No"/>
+    </VirtualDirectory>
+    <VirtualDirectory Name="router">
+      <Project Name="router-json" Path="examples/router/router-json/router-json.project" Active="Yes"/>
     </VirtualDirectory>
   </VirtualDirectory>
   <BuildMatrix>
-    <WorkspaceConfiguration Name="Debug" Selected="no">
+    <WorkspaceConfiguration Name="Debug" Selected="yes">
       <Environment/>
       <Project Name="libmodbuspp" ConfigName="Debug"/>
       <Project Name="libmodbuspp-doc" ConfigName="Debug"/>
-      <Project Name="tcp-gw-to-clock-server" ConfigName="Debug"/>
-      <Project Name="tcp-gw-to-serial" ConfigName="Debug"/>
-      <Project Name="tcp-gw-callback" ConfigName="Debug"/>
+      <Project Name="rw-holding-json" ConfigName="Debug"/>
+      <Project Name="clock-server-json" ConfigName="Debug"/>
+      <Project Name="router-json" ConfigName="Debug"/>
+      <Project Name="clock-server" ConfigName="Debug"/>
     </WorkspaceConfiguration>
-    <WorkspaceConfiguration Name="Release" Selected="yes">
+    <WorkspaceConfiguration Name="Release" Selected="no">
       <Environment/>
       <Project Name="libmodbuspp" ConfigName="Release"/>
       <Project Name="libmodbuspp-doc" ConfigName="Release"/>
-      <Project Name="tcp-gw-to-clock-server" ConfigName="Release"/>
-      <Project Name="tcp-gw-to-serial" ConfigName="Release"/>
-      <Project Name="tcp-gw-callback" ConfigName="Release"/>
+      <Project Name="rw-holding-json" ConfigName="Release"/>
+      <Project Name="clock-server-json" ConfigName="Release"/>
+      <Project Name="router-json" ConfigName="Release"/>
+      <Project Name="clock-server" ConfigName="Release"/>
     </WorkspaceConfiguration>
   </BuildMatrix>
 </CodeLite_Workspace>
