@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CodeLite_Workspace Name="modbuspp" Database="" Version="10.0.0">
-  <Project Name="libmodbuspp" Path="libmodbuspp.project" Active="No"/>
+  <Project Name="libmodbuspp" Path="libmodbuspp.project" Active="Yes"/>
   <Project Name="libmodbuspp-doc" Path="doc/libmodbuspp-doc.project" Active="No"/>
   <VirtualDirectory Name="examples">
     <VirtualDirectory Name="master">
@@ -16,7 +16,8 @@
       <Project Name="clock-server" Path="examples/server/clock-server/clock-server.project" Active="No"/>
     </VirtualDirectory>
     <VirtualDirectory Name="router">
-      <Project Name="router-json" Path="examples/router/router-json/router-json.project" Active="Yes"/>
+      <Project Name="router-json" Path="examples/router/router-json/router-json.project" Active="No"/>
+      <Project Name="router-simple" Path="examples/router/router-simple/router-simple.project"/>
     </VirtualDirectory>
   </VirtualDirectory>
   <BuildMatrix>
@@ -28,6 +29,7 @@
       <Project Name="clock-server-json" ConfigName="Debug"/>
       <Project Name="router-json" ConfigName="Debug"/>
       <Project Name="clock-server" ConfigName="Debug"/>
+      <Project Name="router-simple" ConfigName="Debug"/>
     </WorkspaceConfiguration>
     <WorkspaceConfiguration Name="Release" Selected="no">
       <Environment/>
@@ -37,6 +39,7 @@
       <Project Name="clock-server-json" ConfigName="Release"/>
       <Project Name="router-json" ConfigName="Release"/>
       <Project Name="clock-server" ConfigName="Release"/>
+      <Project Name="router-simple" ConfigName="Release"/>
     </WorkspaceConfiguration>
   </BuildMatrix>
 </CodeLite_Workspace>
