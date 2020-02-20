@@ -23,10 +23,10 @@ int main (int argc, char **argv) {
   // mb.rtu().setRts(RtsDown);
   // mb.rtu().setSerialMode(Rs485);
 
-  Slave slv (mb.addSlave (8));
+  Slave & slv = mb.addSlave (8);
 
-  cout << "Reads coils of slave[" << slv.slave() << "] on " <<
-       mb.backend().connection() << " (" << mb.backend().settings() << ")" << endl;
+  cout << "Reads coils of slave[" << slv.number() << "] on " <<
+       mb.connection() << " (" << mb.settings() << ")" << endl;
 
   if (mb.open ()) { // open a connection
     bool coil[5];

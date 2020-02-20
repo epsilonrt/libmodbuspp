@@ -29,8 +29,8 @@ int main (int argc, char **argv) {
 
   Slave & slv = mb.addSlave (33); // SolarPi Pressure meter
 
-  cout << "Reads holding registers of slave[" << slv.slave() << "] on " <<
-       mb.backend().connection() << " (" << mb.backend().settings() << ")" << endl;
+  cout << "Reads holding registers of slave[" << slv.number() << "] on " <<
+       mb.connection() << " (" << mb.settings() << ")" << endl;
 
   if (mb.open ()) { // open a connection
     // success, do what you want here

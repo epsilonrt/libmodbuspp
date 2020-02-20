@@ -28,10 +28,10 @@ int main (int argc, char **argv) {
   // mb.rtu().setRts(RtsDown);
   // mb.rtu().setSerialMode(Rs485);
 
-  Slave slv (mb.addSlave (33)); // SolarPi Pressure meter
+  Slave & slv = mb.addSlave (33); // SolarPi Pressure meter
 
-  cout << "Reads identifier of slave[" << slv.slave() << "] on " <<
-       mb.backend().connection() << " (" << mb.backend().settings() << ")" << endl;
+  cout << "Reads identifier of slave[" << slv.number() << "] on " <<
+       mb.connection() << " (" << mb.settings() << ")" << endl;
 
   if (mb.open ()) { // open a connection
     // success, do what you want here
