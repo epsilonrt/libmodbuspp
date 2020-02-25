@@ -33,8 +33,6 @@ namespace Modbus {
    * @class Message
    * @brief Modbus Message
    *
-   * @example server/tcp-gateway/main.cpp
-   *
    * @author Pascal JEAN, aka epsilonrt
    * @copyright GNU Lesser General Public License
    */
@@ -48,7 +46,7 @@ namespace Modbus {
        * @return 1 if the message has been completely processed, 0 if the
        * message has not been processed, -1 if error.
        */
-      typedef int (*Callback) (const Request & req, Device * sender);
+      typedef int (*Callback) (Message * msg, Device * sender);
 
       /**
        * @brief Constructors
@@ -57,6 +55,8 @@ namespace Modbus {
       explicit Message (Device & dev);
       Message (NetLayer & backend, const std::vector<uint8_t> & adu);
       Message (Device & dev, const std::vector<uint8_t> & adu);
+      Message (NetLayer & backend, const uint8_t * adu, size_t adulength);
+      Message (Device & dev, const uint8_t * adu, size_t adulength);
       Message (NetLayer & backend, Function func);
       Message (Device & dev, Function func);
 
@@ -64,11 +64,23 @@ namespace Modbus {
        * @brief Constructs a copy of @b other
        */
       Message (const Message & other);
+      
+      /**
+       * @brief Move Constructor
+       * The object acquires the content managed by @b other. 
+       * @b other becomes an empty object (as if default-constructed).
+       */
+      Message (Message && other);
 
       /**
        * @brief Sets the Message object to be equal to @b other.
        */
       Message& operator= (const Message &other);
+      
+      /**
+       * @brief Move assignment
+       */
+      Message& operator= (Message && other);
 
       /**
        * @brief Swaps Message @b other with this Message. This operation is
@@ -164,24 +176,25 @@ namespace Modbus {
       void setQuantity (uint16_t n);
 
       /**
-       * @brief Sets the CRC for the message
-       *
-       * Can be used for all functions.
-       * This value is at the offset @b pduIndex of the PDU, if @b pduIndex is 0
-       * or is not supplied, the CRC is inserted taking into account previous
-       * calls since the last clear.
-       */
-      void setCrc (uint16_t pduIndex = 0);
-
-      /**
        * @brief Empties the message and returns it to the initial state
        */
       void clear();
 
       /**
-       * @brief returns the number of bytes of the message
+       * @brief returns the number of bytes of the PDU
+       * 
+       * @note Use @b aduSize() to get the number of bytes of the ADU.
        */
       size_t size() const;
+      
+      /**
+       * @brief Change the size of the PDU
+       * 
+       * Enables the size of the PDU to be forced if the ADU buffer contains 
+       * information that must be kept.
+       * 
+       */
+      void setSize(size_t size);
 
       /**
        * @brief Returns the PDU byte corresponding to the offset provided
@@ -216,14 +229,14 @@ namespace Modbus {
       void setWord (int pduOffset, uint16_t value);
 
       /**
-       * @brief Returns the underlying ADU as a byte vector.
+       * @brief Returns the underlying ADU bytes pointer
        */
-      std::vector<uint8_t> & adu ();
+      uint8_t * adu ();
 
       /**
        * @overload
        */
-      const std::vector<uint8_t> & adu () const;
+      const uint8_t * adu () const;
 
       /**
        * @brief Returns the ADU byte corresponding to the index provided
@@ -231,6 +244,26 @@ namespace Modbus {
        * @b i must be between 0 and @b maxAduLength()-1
        */
       uint8_t adu (uint16_t i);
+
+      /**
+       * @brief returns the number of bytes of the ADU
+       * 
+       */
+      size_t aduSize() const;
+      
+      /**
+       * @brief Change the size of the ADU
+       * 
+       * Enables the size of the PDU to be forced if the ADU buffer contains 
+       * information that must be kept.
+       * 
+       */
+      void setAduSize(size_t size);
+
+      /**
+       * @brief Return the ADU header length
+       */
+      uint16_t aduHeaderLength() const;
 
       /**
        * @brief Underlying layer used (backend)
@@ -243,41 +276,34 @@ namespace Modbus {
        * @brief Return the maximum ADU length
        */
       uint16_t maxAduLength() const;
+
       
       /**
        * @brief Prints all bytes of the message on the output stream provided
        * 
-       * The bytes printed are preceded by the character @b prefix() and 
-       * followed by the suffix().
+       * The bytes printed are preceded by the character '<'  and 
+       * followed '>' if the message is a request, and preceded by the character 
+       * '['  and followed '[' if the message is a response.
        * 
        * for debugging.
        */
       void print (std::ostream& os) const;
+
+      /**
+       * @brief Prints all bytes of the message on the output stream provided
+       * 
+       * The bytes printed are preceded by the character @b prefix and 
+       * followed by the suffix.
+       * 
+       * for debugging.
+       */
+      void print (std::ostream& os, char prefix, char suffix) const;
       
       /**
-       * @brief Returns the character following each byte printed 
-       * 
-       * It is a space, by default.
+       * @brief Returns true if the message is a response
        */
-      char suffix() const;
+      bool isResponse() const;
       
-      /**
-       * @brief Returns the character preceding each byte printed. 
-       * 
-       * It is a space, by default.
-       */
-      char prefix() const;
-
-      /**
-       * @brief Sets the character following each byte printed 
-       */ 
-      void setSuffix (char suffix);
-
-      /**
-       * @brief Sets the character preceding each byte printed. 
-       */
-      void setPrefix (char prefix);
-
       /**
        * @brief Inserts the message @b m byte sequence into @b os.
        */

@@ -16,24 +16,18 @@
  */
 #pragma once
 
-#include <modbuspp/message.h>
+#include <modbuspp/response.h>
+#include "message_p.h"
 
 namespace Modbus {
 
-  class Message::Private {
+  class Response::Private : public Message::Private {
     public:
-      Private (Message * q, NetLayer * b);
-      Private (Message * q, NetLayer * b, const std::vector<uint8_t> & m);
-      Private (Message * q, NetLayer * b, Function f);
+      Private (Response * q, NetLayer * b);
+      Private (Response * q, NetLayer * b, const std::vector<uint8_t> & m);
+      Private (Response * q, NetLayer * b, Function f);
       virtual ~Private();
-
-      Message * const q_ptr;
-      Net net;
-      std::vector<uint8_t> adu;
-      int pduBegin;
-      size_t aduSize;
-      uint16_t maxAduLength;
-      bool isResponse;
+      PIMP_DECLARE_PUBLIC (Response)
   };
 }
 

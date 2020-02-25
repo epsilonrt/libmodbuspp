@@ -37,8 +37,22 @@ namespace Modbus {
       explicit Request (Device & dev);
       Request (NetLayer & backend, const std::vector<uint8_t> & adu);
       Request (Device & dev, const std::vector<uint8_t> & adu);
+      Request (NetLayer & backend, const uint8_t * adu, size_t adulength);
+      Request (Device & dev, const uint8_t * adu, size_t adulength);
       Request (NetLayer & backend, Function func);
       Request (Device & dev, Function func);
+
+      /**
+       * @brief Constructs a copy of @b other
+       */
+      Request (const Request & other);
+      
+      /**
+       * @brief Move Constructor
+       * The object acquires the content managed by @b other. 
+       * @b other becomes an empty object (as if default-constructed).
+       */
+      Request (Request && other);
 
       /**
        * @brief Returns the byte count of the request
@@ -153,6 +167,13 @@ namespace Modbus {
        * This values are at the pdu[6+index/8].
        */
       void setCoilValues (uint16_t index, uint16_t quantity, const bool * values);
+
+    protected:
+      class Private;
+      Request (Private &dd);
+
+    private:
+      PIMP_DECLARE_PRIVATE (Request)
   };
 }
 

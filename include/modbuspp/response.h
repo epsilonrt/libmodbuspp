@@ -34,9 +34,28 @@ namespace Modbus {
       /**
        * @brief Constructors
        */
+      explicit Response (NetLayer & backend);
+      explicit Response (Device & dev);
+      Response (NetLayer & backend, const std::vector<uint8_t> & adu);
+      Response (Device & dev, const std::vector<uint8_t> & adu);
+      Response (NetLayer & backend, const uint8_t * adu, size_t adulength);
+      Response (Device & dev, const uint8_t * adu, size_t adulength);
+      Response (NetLayer & backend, Function func);
+      Response (Device & dev, Function func);
+
+      /**
+       * @brief Copy Constructors
+       */
       Response (const Request & req);
       Response (const Message & msg);
       Response (const Response & other);
+      
+      /**
+       * @brief Move Constructors
+       */
+      Response (Request && req);
+      Response (Message && msg);
+      Response (Response && other);
 
       /**
        * @brief Sets the byte count for the response
@@ -89,8 +108,6 @@ namespace Modbus {
        */
       void setExceptionCode (ExceptionCode code);
 
-      //++++++++++++++++++
-
       /**
        * @brief Returns a register value of the response
        * 
@@ -126,12 +143,19 @@ namespace Modbus {
       void bitValues (uint16_t index, uint16_t quantity, bool * values) const;
       
       /**
-       * @brief Retruns the exception code of the response
+       * @brief Returns the exception code of the response
        *
        * Can be used for all functions.
        * This value is at the pdu[1].
        */
       ExceptionCode exceptionCode() const;
+
+    protected:
+      class Private;
+      Response (Private &dd);
+
+    private:
+      PIMP_DECLARE_PRIVATE (Response)
   };
 
 }

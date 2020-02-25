@@ -18,6 +18,7 @@
 #include <modbuspp/netlayer.h>
 #include <modbuspp/response.h>
 #include <modbuspp/request.h>
+#include "response_p.h"
 #include "config.h"
 
 namespace Modbus {
@@ -29,27 +30,79 @@ namespace Modbus {
   // ---------------------------------------------------------------------------
 
   // ---------------------------------------------------------------------------
+  Response::Response (Response::Private &dd) : Message (dd) {}
+
+  // ---------------------------------------------------------------------------
+  Response::Response (NetLayer & backend) :
+    Message (*new Private (this, &backend)) {}
+
+  // ---------------------------------------------------------------------------
+  Response::Response (NetLayer & backend, const std::vector<uint8_t> & adu) :
+    Message (*new Private (this, &backend, adu)) {}
+
+  // ---------------------------------------------------------------------------
+  Response::Response (NetLayer & backend, Function f) :
+    Message (*new Private (this, &backend, f)) {}
+
+  // ---------------------------------------------------------------------------
+  Response::Response (Device & dev) :
+    Response (dev.backend()) {}
+
+  // ---------------------------------------------------------------------------
+  Response::Response (Device & dev, const std::vector<uint8_t> & adu) :
+    Response (dev.backend(), adu) {}
+
+  // ---------------------------------------------------------------------------
+  Response::Response (NetLayer & backend, const uint8_t * adu, size_t len) :
+    Response (backend, std::vector<uint8_t> (adu, adu + len)) {}
+
+  // ---------------------------------------------------------------------------
+  Response::Response (Device & dev, const uint8_t * adu, size_t len) :
+    Response (dev, std::vector<uint8_t> (adu, adu + len)) {}
+
+  // ---------------------------------------------------------------------------
+  Response::Response (Device & dev, Function f) :
+    Response (dev.backend(), f) {}
+
+  // ---------------------------------------------------------------------------
   Response::Response (const Request & req) :
     Message (req) {
-      
-    setPrefix ('<');
-    setSuffix ('>');
+    PIMP_D(Response);
+    
+    d->isResponse = true;
   }
+  
   // ---------------------------------------------------------------------------
   Response::Response (const Message & msg) :
     Message (msg) {
-      
-    setPrefix ('<');
-    setSuffix ('>');
+    PIMP_D(Response);
+    
+    d->isResponse = true;
   }
 
   // ---------------------------------------------------------------------------
   Response::Response (const Response & other) :
-    Message (other) {
-      
-    setPrefix ('<');
-    setSuffix ('>');
+    Message (other) {}
+
+  // ---------------------------------------------------------------------------
+  Response::Response (Request && req) :
+    Message (req) {
+    PIMP_D(Response);
+    
+    d->isResponse = true;
   }
+  
+  // ---------------------------------------------------------------------------
+  Response::Response (Message && msg) :
+    Message (msg) {
+    PIMP_D(Response);
+    
+    d->isResponse = true;
+  }
+
+  // ---------------------------------------------------------------------------
+  Response::Response (Response && other) :
+    Message (other) {}
 
   // ---------------------------------------------------------------------------
   void Response::setByteCount (uint8_t n) {
@@ -136,6 +189,28 @@ namespace Modbus {
       values[i] = bitValue (index + i);
     }
   }
+
+
+  // ---------------------------------------------------------------------------
+  //
+  //                         Response::Private Class
+  //
+  // ---------------------------------------------------------------------------
+  
+  // ---------------------------------------------------------------------------
+  Response::Private::Private (Response * q, NetLayer * b) :
+    Message::Private (q, b) {}
+
+  // ---------------------------------------------------------------------------
+  Response::Private::Private (Response * q, NetLayer * b, const std::vector<uint8_t> & m) :
+    Message::Private (q, b, m) {}
+
+  // ---------------------------------------------------------------------------
+  Response::Private::Private (Response * q, NetLayer * b, Function f) :
+    Message::Private (q, b, f) {}
+    
+  // ---------------------------------------------------------------------------
+  Response::Private::~Private() = default;
 
 }
 

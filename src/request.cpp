@@ -17,6 +17,7 @@
 #include <modbuspp/device.h>
 #include <modbuspp/netlayer.h>
 #include <modbuspp/request.h>
+#include "request_p.h"
 #include "config.h"
 
 namespace Modbus {
@@ -28,46 +29,47 @@ namespace Modbus {
   // ---------------------------------------------------------------------------
 
   // ---------------------------------------------------------------------------
-  Request::Request (NetLayer & backend) :
-    Message (backend) {
-    setPrefix ('[');
-    setSuffix (']');
-  }
+  Request::Request (Request::Private &dd) : Message (dd) {}
 
   // ---------------------------------------------------------------------------
-  Request::Request (Device & dev) :
-    Message (dev) {
-    setPrefix ('[');
-    setSuffix (']');
-  }
+  Request::Request (NetLayer & backend) :
+    Message (*new Private (this, &backend)) {}
 
   // ---------------------------------------------------------------------------
   Request::Request (NetLayer & backend, const std::vector<uint8_t> & adu) :
-    Message (backend, adu) {
-    setPrefix ('[');
-    setSuffix (']');
-  }
-
-  // ---------------------------------------------------------------------------
-  Request::Request (Device & dev, const std::vector<uint8_t> & adu) :
-    Message (dev, adu) {
-    setPrefix ('[');
-    setSuffix (']');
-  }
+    Message (*new Private (this, &backend, adu)) {}
 
   // ---------------------------------------------------------------------------
   Request::Request (NetLayer & backend, Function f) :
-    Message (backend, f) {
-    setPrefix ('[');
-    setSuffix (']');
-  }
+    Message (*new Private (this, &backend, f)) {}
+
+  // ---------------------------------------------------------------------------
+  Request::Request (Device & dev) :
+    Request (dev.backend()) {}
+
+  // ---------------------------------------------------------------------------
+  Request::Request (Device & dev, const std::vector<uint8_t> & adu) :
+    Request (dev.backend(), adu) {}
+
+  // ---------------------------------------------------------------------------
+  Request::Request (NetLayer & backend, const uint8_t * adu, size_t len) :
+    Request (backend, std::vector<uint8_t> (adu, adu + len)) {}
+
+  // ---------------------------------------------------------------------------
+  Request::Request (Device & dev, const uint8_t * adu, size_t len) :
+    Request (dev, std::vector<uint8_t> (adu, adu + len)) {}
 
   // ---------------------------------------------------------------------------
   Request::Request (Device & dev, Function f) :
-    Message (dev, f) {
-    setPrefix ('[');
-    setSuffix (']');
-  }
+    Request (dev.backend(), f) {}
+
+  // ---------------------------------------------------------------------------
+  Request::Request (const Request & other) :
+    Message (other) {}
+
+  // ---------------------------------------------------------------------------
+  Request::Request (Request && other) :
+    Message (other) {}
 
   // ---------------------------------------------------------------------------
   uint16_t Request::registerValue () const {
@@ -171,6 +173,28 @@ namespace Modbus {
       setCoilValue (index + i, values[i]);
     }
   }
+
+  // ---------------------------------------------------------------------------
+  //
+  //                         Request::Private Class
+  //
+  // ---------------------------------------------------------------------------
+  
+  // ---------------------------------------------------------------------------
+  Request::Private::Private (Request * q, NetLayer * b) :
+    Message::Private (q, b) {}
+
+  // ---------------------------------------------------------------------------
+  Request::Private::Private (Request * q, NetLayer * b, const std::vector<uint8_t> & m) :
+    Message::Private (q, b, m) {}
+
+  // ---------------------------------------------------------------------------
+  Request::Private::Private (Request * q, NetLayer * b, Function f) :
+    Message::Private (q, b, f) {}
+    
+  // ---------------------------------------------------------------------------
+  Request::Private::~Private() = default;
+
 }
 
 /* ========================================================================== */
