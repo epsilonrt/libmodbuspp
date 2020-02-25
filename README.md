@@ -247,7 +247,7 @@ if (router.open ()) {
   router.run();
   while (router.isOpen()) {
 
-    std::this_thread::yield();
+    std::this_thread::sleep_for (std::chrono::milliseconds (200));
   }
 }
 ```
@@ -257,9 +257,25 @@ How beautiful is that ? :-)
 The source code of this program is searchable in the examples folder
 [router-json](https://github.com/epsilonrt/libmodbuspp/blob/master/examples/router/router-json/main.cpp).
 
-libmodbuspp comes with full documentation in manual and [html](http://www.epsilonrt.fr/modbuspp/) format.
+**Note on routing libmodbus in RTU**  
+---
+
+libmodbus does not support routing in RTU, in fact, only messages intended for a 
+single slave (that of the context) or broadcast are processed.  
+The author of libmodbus, Stéphane justifies this choice in his terms:  
+_Filter on the Modbus unit identifier (slave) in RTU mode to avoid useless CRC computing._  
+To benefit from the routing capacity of the Router and Server classes in RTU, 
+you must therefore use the modified version of libmodbus.  
+In this version (3.1.4-2~epsi+2) released from the [piduino](http://apt.piduino.org) 
+repository, the filtering has been removed.  
+Thus, it is the Server class which performs this filtering (after checking the 
+CRC therefore). Effectively, this has the effect of loading the microprocessor, 
+but, at present, the computing power of our machines is such that it does not 
+pose a problem.
 
 ## Quickstart guide
+
+libmodbuspp comes with full documentation in manual and [html](http://www.epsilonrt.fr/modbuspp/) format.
 
 ### Installation
 

@@ -1,11 +1,11 @@
 /**
- * @brief libmodbuspp clock-server-json example
+ * @brief libmodbuspp virtual-server-json example
  *
- * Shows how to use libmodbuspp to build a MODBUS time server.
+ * Shows how to use libmodbuspp to build a virtual MODBUS server.
  * the MODBUS server is configured from the JSON ./server.json file
  *
  * @code
- * clock-server-json json_filename
+ * virtual-server ../virtual-server-tcp.json
  * @endcode
  *
  * Once the server has started you can test it with mbpoll :
@@ -37,21 +37,6 @@
  *
  * These data correspond to 15:40:37 on Thursday 28/11/2019, 332nd day of the
  * year. To read the time difference from GMT (in seconds) :
- *
- * @code
-    $ mbpoll -mtcp -p1502 -a10 -t4:int -B -1 localhost
-      ....
-      -- Polling slave 10...
-      [1]:  3600
- * @endcode
- *
- * To set the offset to GMT-2 hours :
- *
- * @code
-    $ mbpoll -mtcp -p1502 -a10 -t4:int -B localhost -- -7200
-      ....
-      Written 1 references.
- * @endcode
  */
 #include <csignal>
 #include <thread>
@@ -63,17 +48,16 @@ using namespace Modbus;
 
 Server srv; // instantiates new MODBUS Server
 
-// -----------------------------------------------------------------------------
-// Signal trap, triggers during a CTRL+C or if kill is called
-void
-sighandler (int sig) {
-
-  srv.close();
-  cout << "everything was closed." << endl << "Have a nice day !" << endl;
-  exit (EXIT_SUCCESS);
-}
-
-// -----------------------------------------------------------------------------
+/* -----------------------------------------------------------------------------
+ * Incoming message handler
+ * This function is called each time a MODBUS message is received by the Server 
+ * class on the backend network (TCP-IP or OSL).
+ * Here the function analyzes the message, if it is a message for reading input 
+ * registers (FC 4), a response is constructed which sends dummy values which 
+ * are incremented with each reading. The response is sent using the 
+ * sendRawMessage() function, which automatically completes the message with a 
+ * header or CRC.
+ */
 int messageHandler (Message * req, Device * dev) {
 
   cout << "Receive message, size : " << req->aduSize() << endl;
@@ -100,18 +84,28 @@ int messageHandler (Message * req, Device * dev) {
 }
 
 // -----------------------------------------------------------------------------
+// Signal trap, triggers during a CTRL+C or if kill is called
+void
+sighandler (int sig) {
+
+  srv.close();
+  cout << "everything was closed." << endl << "Have a nice day !" << endl;
+  exit (EXIT_SUCCESS);
+}
+
+// -----------------------------------------------------------------------------
 int main (int argc, char **argv) {
 
   if (argc < 2) {
 
     cerr << "Error: the JSON filename must be provided as a parameter on the command line !" << endl;
-    cerr << "e.g. : " << argv[0] << " null-server-tcp.json" << endl;
+    cerr << "e.g. : " << argv[0] << " virtual-server-tcp.json" << endl;
     exit (EXIT_FAILURE);
   }
 
   string  jsonfile = argv[1];
 
-  cout << "Null Server" << endl;
+  cout << "Virtual Server" << endl;
   // CTRL+C and kill call triggers the trap sighandler()
   signal (SIGINT, sighandler);
   signal (SIGTERM, sighandler);
@@ -129,7 +123,7 @@ int main (int argc, char **argv) {
       srv.run();
       while (srv.isOpen()) {
 
-        //std::this_thread::yield();
+        // std::this_thread::yield();
         std::this_thread::sleep_for (std::chrono::milliseconds (200));
       }
     }

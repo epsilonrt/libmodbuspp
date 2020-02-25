@@ -141,6 +141,6 @@ int main (int argc, char **argv) {
     cerr << "Unattended exception !" << endl;
   }
   
-  return 0;
+  return EXIT_FAILURE;
 }
 /* ========================================================================== */

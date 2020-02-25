@@ -101,4 +101,7 @@
     <File Name="virtual-server-tcp.json"/>
     <File Name="virtual-server-serial.json"/>
   </VirtualDirectory>
+  <VirtualDirectory Name="doc">
+    <File Name="README.md"/>
+  </VirtualDirectory>
 </CodeLite_Project>

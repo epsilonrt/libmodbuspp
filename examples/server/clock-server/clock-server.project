@@ -5,10 +5,6 @@
   <VirtualDirectory Name="src">
     <File Name="main.cpp"/>
   </VirtualDirectory>
-  <VirtualDirectory Name="json">
-    <File Name="clock-server-tcp.json"/>
-    <File Name="clock-server-virtual.json"/>
-  </VirtualDirectory>
   <VirtualDirectory Name="doc">
     <File Name="README.md"/>
   </VirtualDirectory>

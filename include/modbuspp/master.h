@@ -42,10 +42,12 @@ namespace Modbus {
       slave.readInputRegisters (1, values, 2);
    * @endcode
    *
-   * @example master/read-holding-data/main.cpp
-   * @example master/read-input-registers/main.cpp
-   * @example master/write-holding-data/main.cpp
    * @example master/read-coils/main.cpp
+   * @example master/read-holding-data/main.cpp
+   * @example master/report-slave-id/main.cpp
+   * @example master/read-input-registers/main.cpp
+   * @example master/rw-holding-json/main.cpp
+   * @example master/write-holding-data/main.cpp
    *
    * @author Pascal JEAN, aka epsilonrt
    * @copyright GNU Lesser General Public License

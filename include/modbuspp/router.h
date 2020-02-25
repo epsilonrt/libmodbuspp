@@ -22,35 +22,22 @@ namespace Modbus {
 
   /**
     * @class Router
-    * @brief Router connected to Modbus (Router)
-    *
-    * The Modbus slave is waiting for request from Modbus Masters (clients) and
-    * must answer when it is concerned by the request.
+    * @brief Router connected to Modbus
     *
     * To use, simply perform the following actions:
     *
     * @code
-       // instantiate a variable by choosing the network and the parameters to connect to it
-       Router srv (net, connection, settings);
+      string  jsonfile = argv[1];
+      Router router (jsonfile, "modbuspp-router");
 
-       // Adding a new slave to the server
-       BufferedSlave & slv = srv.addSlave (10);
+      if (router.open ()) {
 
-       // Adding Input registers block to this slave
-       slv.setBlock (InputRegister, 8);
+        router.run();
+        while (router.isOpen()) {
 
-       // open the communication
-       srv.open ();
-       for (;;) {
-         now = time (nullptr);
-         if (now > before) {
-           before = now;
-           // .....
-           // update the input registers
-           slv.writeInputRegisters (1, mb_time, 8);
-         }
-         srv.poll (100);
-       }
+          std::this_thread::sleep_for (std::chrono::milliseconds (200));
+        }
+      }
     * @endcode
     *
      * @example router/router-simple/main.cpp

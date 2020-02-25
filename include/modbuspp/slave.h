@@ -28,11 +28,6 @@ namespace Modbus {
    * @class Slave
    * @brief Slave connected to Modbus
    *
-   * @example master/read-holding-data/main.cpp
-   * @example master/read-input-registers/main.cpp
-   * @example master/write-holding-data/main.cpp
-   * @example master/read-coils/main.cpp
-   * 
    * @author Pascal JEAN, aka epsilonrt
    * @copyright GNU Lesser General Public License
    */
