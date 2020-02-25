@@ -25,6 +25,7 @@ namespace Modbus {
 
     public:
       Private (const std::string & host, const std::string & service);
+      uint16_t transactionId;
   };
 }
 

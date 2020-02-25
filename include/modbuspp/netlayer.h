@@ -21,7 +21,8 @@
 #include <modbuspp/global.h>
 
 namespace Modbus {
-
+  class Message;
+  
   /**
    * @class NetLayer
    * @brief Network layer base class (backend)
@@ -81,6 +82,25 @@ namespace Modbus {
        * @overload
        */
       const modbus_t * context() const;
+      
+      /**
+       * @brief Send a request/response @b msg  via the socket of the @b context()
+       * 
+       * This function can be used to send message not handled by the library.
+       * The message is transmitted "raw", without any modification.
+       * 
+       * @return The function shall return the full message length, if successful. 
+       * Otherwise it shall return -1 and set errno.
+       */
+      virtual int sendRawMessage (const Message * msg);
+
+      /**
+       * @brief Prepare the message @b msg before sending
+       * 
+       * This function updates the ADU header or adds the CRC at the end 
+       * depending on the network used..
+       */
+      virtual bool prepareToSend (Message & msg);
 
       /**
        * @brief last error message

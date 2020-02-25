@@ -61,6 +61,16 @@ namespace Modbus {
        */
       const std::string & service() const;
 
+      /**
+       * @overload
+       */
+      virtual int sendRawMessage (const Message * msg);
+      
+      /**
+       * @overload
+       */
+      virtual bool prepareToSend (Message & msg);
+
     protected:
       class Private;
       TcpLayer (Private &dd);

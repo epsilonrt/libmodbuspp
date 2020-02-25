@@ -24,7 +24,8 @@ namespace Modbus {
   class RtuLayer::Private  : public NetLayer::Private {
 
     public:
-      Private (const std::string & port, const std::string & settings); 
+      Private (const std::string & port, const std::string & settings);
+      int oneByteTime;
   };
 }
 

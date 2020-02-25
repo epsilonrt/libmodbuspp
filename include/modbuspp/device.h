@@ -25,6 +25,7 @@ namespace Modbus {
   class NetLayer;
   class RtuLayer;
   class TcpLayer;
+  class Message;
 
   /**
    * @class Device
@@ -395,6 +396,26 @@ namespace Modbus {
        * @brief underlying backend
        */
       NetLayer & backend() const;
+
+      /**
+       * @brief Send a request/response @b msg  via the socket of the @b context()
+       * 
+       * This function can be used to send message not handled by the library.
+       * The message is transmitted "raw", without any modification if 
+       * @b prepareBefore is false, otherwise the message is modified to add a 
+       * header (for TCP-IP) or a CRC (for RTU).
+       * 
+       * @return The function shall return the full message length, if successful. 
+       * Otherwise it shall return -1 and set errno
+       * 
+       * @warning This function is not supported in RTU mode on Windows™.
+       */
+      int sendRawMessage (Message * msg, bool prepareBefore = false);
+      
+      /**
+       * @overload
+       */
+      int sendRawMessage (Message & msg, bool prepareBefore = false);
 
       /**
        * @brief Set debug flag

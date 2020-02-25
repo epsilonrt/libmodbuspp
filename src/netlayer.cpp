@@ -55,7 +55,7 @@ namespace Modbus {
 
     return d->ctx;
   }
-  
+
   // ---------------------------------------------------------------------------
   const modbus_t * NetLayer::context() const {
     PIMP_D (const NetLayer);
@@ -69,14 +69,27 @@ namespace Modbus {
 
     return d->connection;
   }
-  
+
   // ---------------------------------------------------------------------------
   const std::string & NetLayer::settings() const {
     PIMP_D (const NetLayer);
 
     return d->settings;
   }
-  
+
+  // ---------------------------------------------------------------------------
+  int NetLayer::sendRawMessage (const Message * msg) {
+    
+    errno = EINVAL;
+    return -1;
+  }
+
+  // ---------------------------------------------------------------------------
+  bool NetLayer::prepareToSend (Message & msg) {
+
+    return false;
+  }
+
   // ---------------------------------------------------------------------------
   // static
   std::string NetLayer::lastError() {

@@ -46,6 +46,7 @@ namespace Modbus {
       }
       int defaultSlave (int addr) const;
       bool isConnected () const;
+      void printError (const char * what = nullptr) const;
 
       Device * const q_ptr;
       bool isOpen;

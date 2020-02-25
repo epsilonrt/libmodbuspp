@@ -35,11 +35,6 @@ namespace Modbus {
    * @sa Device::Device()
    * @sa Device::rtu()
    * 
-   * @example master/read-holding-data/main.cpp
-   * @example master/read-input-registers/main.cpp
-   * @example master/write-holding-data/main.cpp
-   * @example master/read-coils/main.cpp
-   * 
    * @author Pascal JEAN, aka epsilonrt
    * @copyright GNU Lesser General Public License
    */
@@ -154,7 +149,19 @@ namespace Modbus {
        * @sa rtsDelay()
        */
       bool setRtsDelay (int us);
+
+      /**
+       * @overload
+       *
+       * @warning This function is not supported in Windows !
+       */
+      virtual int sendRawMessage (const Message * msg);
       
+      /**
+       * @overload
+       */
+      virtual bool prepareToSend (Message & msg);
+
       /**
        * @brief Extracts the baudrate from a settings string.
        * @return the baudrate found. if no value is found, returns the default
@@ -176,6 +183,8 @@ namespace Modbus {
        * If the parity is None, this function returns 2, otherwise returns 1.
        */
       static int stop (const std::string & settings);
+
+      static uint16_t crc16 (uint8_t * buf, uint16_t count);
 
     protected:
       class Private;

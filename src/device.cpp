@@ -16,6 +16,7 @@
  */
 #include <modbuspp/rtulayer.h>
 #include <modbuspp/tcplayer.h>
+#include <modbuspp/message.h>
 #include "device_p.h"
 #include "config.h"
 #include <chrono>
@@ -311,6 +312,78 @@ namespace Modbus {
     return NoNet;
   }
 
+  /* ---------------------------------------------------------------------------
+   * Inspired by msg_send from modbus.c :
+   * Copyright © 2001-2011 Stéphane Raimbault <stephane.raimbault@gmail.com>
+   *
+   * SPDX-License-Identifier: LGPL-2.1-or-later
+   */
+  int Device::sendRawMessage (Message * msg, bool prepareBefore) {
+
+    if (isValid()) {
+      PIMP_D (Device);
+      int rc;
+
+      if (prepareBefore) {
+
+        if (!backend().prepareToSend (*msg)) {
+
+          errno = EINVAL;
+          return -1;
+        }
+      }
+
+      if (d->debug) {
+
+        msg->print (std::cout, '[', ']');
+        std::cout << std::endl;
+      }
+
+      do {
+        rc = backend().sendRawMessage (msg);
+
+        if (rc == -1) {
+
+          d->printError();
+          if (d->recoveryLink && !msg->isResponse()) {
+            int saved_errno = errno;
+            long timeout = responseTimeout() * 1000;
+
+            if ( (errno == EBADF || errno == ECONNRESET || errno == EPIPE)) {
+
+              d->close ();
+              std::this_thread::sleep_for (std::chrono::milliseconds (timeout));
+              d->open ();
+            }
+            else {
+
+              std::this_thread::sleep_for (std::chrono::milliseconds (timeout));
+              flush();
+            }
+            errno = saved_errno;
+          }
+        }
+      }
+      while (d->recoveryLink && rc == -1 && !msg->isResponse());
+
+      if (rc > 0 && rc != msg->size()) {
+
+        errno = EMBBADDATA;
+        return -1;
+      }
+
+      return rc;
+    }
+    errno = EINVAL;
+    return -1;
+  }
+
+  // ---------------------------------------------------------------------------
+  int Device::sendRawMessage (Message & msg, bool prepareBefore) {
+
+    return sendRawMessage (&msg, prepareBefore);
+  }
+
   // ---------------------------------------------------------------------------
   // static
   std::string Device::lastError() {
@@ -431,6 +504,20 @@ namespace Modbus {
   Device::Private::isConnected() const {
 
     return (modbus_get_socket (ctx()) >= 0);
+  }
+
+  // ---------------------------------------------------------------------------
+  void Device::Private::printError (const char * what) const {
+
+    if (debug) {
+
+      std::cerr << "ERROR " << modbus_strerror (errno);
+      if (what) {
+
+        std::cerr << ": " << what;
+      }
+      std::cerr << std::endl;
+    }
   }
 
   // ---------------------------------------------------------------------------
