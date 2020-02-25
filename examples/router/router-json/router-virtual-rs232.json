@@ -17,6 +17,19 @@
         "byte-timeout": 500,
         "slaves": [
           {
+            "id": 32,
+            "blocks": [
+              {
+                "table": "input-register",
+                "quantity": 2
+              },
+              {
+                "table": "holding-register",
+                "quantity": 8
+              }
+            ]
+          },
+          {
             "id": 33,
             "blocks": [
               {
@@ -26,6 +39,32 @@
               {
                 "table": "holding-register",
                 "quantity": 8
+              }
+            ]
+          },
+          {
+            "id": 34,
+            "blocks": [
+              {
+                "table": "input-register",
+                "quantity": 2
+              },
+              {
+                "table": "holding-register",
+                "quantity": 8
+              }
+            ]
+          },
+          {
+            "id": 35,
+            "blocks": [
+              {
+                "table": "input-register",
+                "quantity": 4
+              },
+              {
+                "table": "holding-register",
+                "quantity": 10
               }
             ]
           }

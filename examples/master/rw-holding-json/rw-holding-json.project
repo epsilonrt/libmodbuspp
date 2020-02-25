@@ -97,7 +97,7 @@
   <VirtualDirectory Name="src">
     <File Name="main.cpp"/>
   </VirtualDirectory>
-  <VirtualDirectory Name="resources">
+  <VirtualDirectory Name="json">
     <File Name="master.json"/>
   </VirtualDirectory>
   <VirtualDirectory Name="doc">

@@ -1,0 +1,10 @@
+{
+  "modbuspp-server": {
+    "mode": "rtu",
+    "connection": "/dev/tnt1",
+    "settings": "38400E1",
+    "debug": true,
+    "response-timeout": 500,
+    "byte-timeout": 500
+  }
+}

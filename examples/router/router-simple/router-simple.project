@@ -100,4 +100,6 @@
   <VirtualDirectory Name="doc">
     <File Name="README.md"/>
   </VirtualDirectory>
+  <Dependencies Name="Debug"/>
+  <Dependencies Name="Release"/>
 </CodeLite_Project>

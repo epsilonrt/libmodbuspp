@@ -1,7 +1,7 @@
 {
   "modbuspp-master": {
     "mode": "rtu",
-    "connection": "/dev/ttyUSB0",
+    "connection": "/dev/tnt0",
     "settings": "38400E1",
     "debug": true,
     "response-timeout": 500,
@@ -13,11 +13,16 @@
     },
     "slaves": [
       {
-        "id": 33,
-        "pdu-adressing": false
+        "id": 32
+      },
+      {
+        "id": 33
       },
       {
         "id": 34
+      },
+      {
+        "id": 35
       }
     ]
   }

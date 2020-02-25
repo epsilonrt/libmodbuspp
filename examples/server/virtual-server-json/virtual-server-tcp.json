@@ -1,0 +1,11 @@
+{
+  "modbuspp-server": {
+    "mode": "tcp",
+    "connection": "localhost",
+    "settings": "1502",
+    "debug": true,
+    "recovery-link": true,
+    "response-timeout": 500,
+    "byte-timeout": 500
+  }
+}

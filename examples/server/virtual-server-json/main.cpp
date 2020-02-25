@@ -1,14 +1,14 @@
 /**
- * @brief libmodbuspp router-json example
+ * @brief libmodbuspp clock-server-json example
  *
  * Shows how to use libmodbuspp to build a MODBUS time server.
- * the MODBUS router is configured from a JSON file
+ * the MODBUS server is configured from the JSON ./server.json file
  *
  * @code
- * router-json json_filename
+ * clock-server-json json_filename
  * @endcode
  *
- * Once the router has started you can test it with mbpoll :
+ * Once the server has started you can test it with mbpoll :
  *
  * @code
     $ mbpoll -mtcp -p1502 -a10 -t3 -c8 localhost
@@ -61,15 +61,42 @@
 using namespace std;
 using namespace Modbus;
 
-Router router; // instantiates new MODBUS Router
+Server srv; // instantiates new MODBUS Server
 
 // -----------------------------------------------------------------------------
 // Signal trap, triggers during a CTRL+C or if kill is called
 void
 sighandler (int sig) {
 
-  router.close();
+  srv.close();
   cout << "everything was closed." << endl << "Have a nice day !" << endl;
+  exit (EXIT_SUCCESS);
+}
+
+// -----------------------------------------------------------------------------
+int messageHandler (Message * req, Device * dev) {
+
+  cout << "Receive message, size : " << req->aduSize() << endl;
+  if (req->function() == ReadInputRegisters) {
+    // the dummy word will be the returned value, incremented after each reading
+    static uint16_t dummy = 1; 
+    
+    // get request parameters
+    uint16_t N = req->quantity();
+    uint16_t index = req->startingAddress();
+    
+    // build response, see page 16 of MODBUS Application Protocol Specification
+    Response rsp (*req); // uses copy constructor to keep transaction id
+    rsp.setSize(1); // keep until function code
+    rsp.setByteCount (N * 2);
+    for (uint16_t i = 0; i < N; i++) {
+
+      rsp.setRegisterValue (index + i, dummy++);
+    }
+
+    return dev->sendRawMessage (rsp, true);
+  }
+  return 0;
 }
 
 // -----------------------------------------------------------------------------
@@ -78,52 +105,31 @@ int main (int argc, char **argv) {
   if (argc < 2) {
 
     cerr << "Error: the JSON filename must be provided as a parameter on the command line !" << endl;
-    cerr << "e.g. : " << argv[0] << " router-tcp-rs232.json" << endl;
+    cerr << "e.g. : " << argv[0] << " null-server-tcp.json" << endl;
     exit (EXIT_FAILURE);
   }
 
   string  jsonfile = argv[1];
 
-  cout << "--- Json Modbus Router ---" << endl;
-
+  cout << "Null Server" << endl;
   // CTRL+C and kill call triggers the trap sighandler()
   signal (SIGINT, sighandler);
   signal (SIGTERM, sighandler);
-  cout << "Press CTRL+C to stop... " << endl;
+  cout << "Press CTRL+C to stop... " << endl << endl;
 
   try {
     cout << "opening " << jsonfile << "..." << endl;
-    router.setConfig (jsonfile, "modbuspp-router");
+    srv.setConfig (jsonfile, "modbuspp-server");
+    srv.setMessageCallback (messageHandler);
 
-    if (router.debug()) {
-      // if debug, list masters and slaves
-      cout << endl;
-      for (const auto & m : router.masters()) {
-
-        auto master = m.second;
-        cout << "Master " << m.first << " connected through " << flush;
-        cout << master->connection() << ":" ;
-        cout << master->settings() << " with the slaves below:" << endl;
-        for (const auto & s : router.slaves()) {
-
-          auto slave = s.second;
-          if (slave->device() == master.get()) {
-            cout << "> id: " << slave->number() << endl;
-          }
-        }
-        cout << endl;
-      }
-    }
-
-    if (router.open ()) { // open a connection
+    if (srv.open ()) { // open a connection
       cout << "Listening server on " <<
-           router.connection() << ":" << router.settings() << "..."
-           << endl << endl;
+           srv.connection() << ":" << srv.settings() << "..." << endl << endl;
 
-      router.run();
-      while (router.isOpen()) {
+      srv.run();
+      while (srv.isOpen()) {
 
-        // std::this_thread::yield();
+        //std::this_thread::yield();
         std::this_thread::sleep_for (std::chrono::milliseconds (200));
       }
     }
@@ -140,7 +146,7 @@ int main (int argc, char **argv) {
 
     cerr << "Unattended exception !" << endl;
   }
-  
-  return 0;
+
+  return EXIT_FAILURE;
 }
 /* ========================================================================== */

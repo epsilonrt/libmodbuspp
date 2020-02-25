@@ -18,6 +18,7 @@
 
 #include <modbuspp/slave.h>
 #include <modbuspp/request.h>
+#include <modbuspp/response.h>
 
 namespace Modbus {
 
@@ -26,9 +27,6 @@ namespace Modbus {
   /**
     * @class BufferedSlave
     * @brief Buffered Slave
-    *
-    * @example server/clock-server/main.cpp
-    * @example server/tcp-gateway/main.cpp
     *
     * @author Pascal JEAN, aka epsilonrt
     * @copyright GNU Lesser General Public License
@@ -70,14 +68,14 @@ namespace Modbus {
       bool isValid() const;
 
       /**
-       * @brief Setting a block of data in the memory buffer.
+       * @brief Setting a block of data in the memory map.
        *
        * A single block of type @b t can be defined for a given slave.
        * The block has nmeb elements and starts at startAddr.
        * @param t
        * @param nmemb
        * @param startAddr
-       * @return
+       * @return number of elements actually allocated, -1 if error
        */
       int setBlock (Table t, int nmemb, int startAddr = -1);
 
