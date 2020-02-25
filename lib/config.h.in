@@ -19,6 +19,8 @@
 #define MODBUSPP_CONFIG_H_
 /* ========================================================================== */
 #cmakedefine01 MODBUSPP_WITH_STATIC
+#cmakedefine01 MODBUSPP_HAVE_TIOCRS485
+#cmakedefine01 MODBUSPP_HAVE_TIOCM_RTS
 
 #define MODBUSPP_VERSION       "@MODBUSPP_VERSION_STRING@"
 #define MODBUSPP_VERSION_SHORT "@MODBUSPP_VERSION_SHORT@"

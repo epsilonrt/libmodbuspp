@@ -102,6 +102,10 @@ if (NOT ${SIZEOF_BOOL} EQUAL 1)
   message(FATAL_ERROR "bool must have a size of 1 byte !")
 endif()
 
+include(CheckSymbolExists)
+check_symbol_exists(TIOCSRS485 sys/ioctl.h MODBUSPP_HAVE_TIOCRS485)
+check_symbol_exists(TIOCM_RTS sys/ioctl.h MODBUSPP_HAVE_TIOCM_RTS)
+
 # Make relative paths absolute (needed later on)
 foreach(p LIB BIN INCLUDE CMAKE DATA DOC CODELITE)
   set(var INSTALL_${p}_DIR)
