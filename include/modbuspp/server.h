@@ -54,8 +54,9 @@ namespace Modbus {
        }
     * @endcode
     *
-     * @example server/clock-server/main.cpp
-     * @example server/tcp-gateway/main.cpp
+    * @example server/clock-server/main.cpp
+    * @example server/clock-server-json/main.cpp
+    * @example server/virtual-server-json/main.cpp
     *
     * @author Pascal JEAN, aka epsilonrt
     * @copyright GNU Lesser General Public License
@@ -285,6 +286,19 @@ namespace Modbus {
        * @brief Returns the list of slaves as a map indexed by identifier number 
        */
       const std::map <int, std::shared_ptr<BufferedSlave>> & slaves() const;
+      
+            /**
+       * @brief
+       * @param cb
+       */
+      void setMessageCallback (Message::Callback cb);
+
+      /**
+       * @brief
+       * @return
+       */
+      Message::Callback messageCallback() const;
+
 
     protected:
       class Private;

@@ -24,9 +24,9 @@
 # endif
 #else
 # include <sys/socket.h>
-#include <fcntl.h>
+# include <fcntl.h>
+# include <unistd.h>
 #endif
-#include <unistd.h>
 #include "server_p.h"
 #include "config.h"
 
@@ -212,6 +212,20 @@ namespace Modbus {
   }
 
   // ---------------------------------------------------------------------------
+  Message::Callback Server::messageCallback() const {
+    PIMP_D (const Server);
+
+    return d->messageCB;
+  }
+
+  // ---------------------------------------------------------------------------
+  void Server::setMessageCallback (Message::Callback cb) {
+    PIMP_D (Server);
+
+    d->messageCB = cb;
+  }
+
+  // ---------------------------------------------------------------------------
   //
   //                         Server::Private Class
   //
@@ -291,7 +305,11 @@ namespace Modbus {
 
       if (sock != -1) {
 
+#ifdef _WIN32
+        ::closesocket (sock);
+#else
         ::close (sock);
+#endif
         sock = -1;
       }
     }
@@ -327,24 +345,22 @@ namespace Modbus {
           int ret;
           BufferedSlave * slv = slave[id].get();
 
-          req->adu().resize (rc);
-
           // route the message to a possible device to copy its registers to the map.
           ret = slv->readFromDevice (req.get());
           if (ret >= 0) {
 
             if (slv->beforeReplyCallback()) {
-              ret = slv->beforeReplyCallback() (*req, q);
+              ret = slv->beforeReplyCallback() (req.get(), q);
               if (ret != 0) { // -1 error, 1 exit, 0 continue
                 return ret;
               }
             }
 
-            rc = modbus_reply (ctx(), req->adu().data(), rc, slv->map());
+            rc = modbus_reply (ctx(), req->adu(), rc, slv->map());
             if (rc >= 0) {
 
               if (slv->afterReplyCallback()) {
-                ret = slv->afterReplyCallback() (*req, q);
+                ret = slv->afterReplyCallback() (req.get(), q);
                 if (ret != 0) { // -1 error, 1 exit, 0 continue
                   return ret;
                 }
@@ -357,6 +373,14 @@ namespace Modbus {
               }
             }
           }
+        }
+        rc = 0;
+      }
+      else {
+
+        if (messageCB) {
+
+          rc = messageCB (req.get(), q);
         }
       }
     }
@@ -375,7 +399,12 @@ namespace Modbus {
         return -1;
       }
     }
-    rc = modbus_receive (d->ctx(), d->req->adu().data());
+    d->req->clear();
+    rc = modbus_receive (d->ctx(), d->req->adu());
+    if (rc > 0) {
+
+      d->req->setAduSize (rc);
+    }
     return rc;
   }
 

@@ -46,6 +46,7 @@ namespace Modbus {
       std::future<int> receiveTask;
       std::thread daemon;
       std::promise<void> stopDaemon;
+      Message::Callback messageCB;
 
       PIMP_DECLARE_PUBLIC (Server)
   };
