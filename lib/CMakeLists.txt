@@ -35,6 +35,7 @@ set (hdr_modbuspp
   ${MODBUSPP_INC_DIR}/modbuspp/message.h
   ${MODBUSPP_INC_DIR}/modbuspp/netlayer.h
   ${MODBUSPP_INC_DIR}/modbuspp/popl.h
+  ${MODBUSPP_INC_DIR}/modbuspp/pimp.h
   ${MODBUSPP_INC_DIR}/modbuspp/request.h
   ${MODBUSPP_INC_DIR}/modbuspp/response.h
   ${MODBUSPP_INC_DIR}/modbuspp/router.h

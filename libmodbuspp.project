@@ -25,6 +25,7 @@
       <File Name="include/modbuspp/request.h"/>
       <File Name="include/modbuspp/response.h"/>
       <File Name="include/modbuspp/router.h"/>
+      <File Name="include/modbuspp/pimp.h"/>
     </VirtualDirectory>
     <File Name="include/modbuspp.h"/>
   </VirtualDirectory>
