@@ -247,6 +247,19 @@ namespace Modbus {
   }
 
   // ---------------------------------------------------------------------------
+  // virtual
+  void Server::Private::setBackend (Net net, const std::string & connection,
+                                    const std::string & settings) {
+
+    Device::Private::setBackend (net, connection, settings);
+#if HAVE_RTU_SET_RECV_FILTER
+    if (net == Rtu) {
+      modbus_rtu_set_recv_filter (ctx(), FALSE);
+    }
+#endif
+  }
+
+  // ---------------------------------------------------------------------------
   BufferedSlave * Server::Private::addSlave (int slaveAddr, Device * master) {
 
     if (modbus_set_slave (ctx(), slaveAddr) != 0) {

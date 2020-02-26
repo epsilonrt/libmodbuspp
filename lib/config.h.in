@@ -19,8 +19,10 @@
 #define MODBUSPP_CONFIG_H_
 /* ========================================================================== */
 #cmakedefine01 MODBUSPP_WITH_STATIC
-#cmakedefine01 MODBUSPP_HAVE_TIOCRS485
-#cmakedefine01 MODBUSPP_HAVE_TIOCM_RTS
+#cmakedefine01 HAVE_TIOCRS485
+#cmakedefine01 HAVE_TIOCM_RTS
+#cmakedefine01 HAVE_RTU_SET_RECV_FILTER
+#cmakedefine01 HAVE_RTU_GET_RECV_FILTER
 
 #define MODBUSPP_VERSION       "@MODBUSPP_VERSION_STRING@"
 #define MODBUSPP_VERSION_SHORT "@MODBUSPP_VERSION_SHORT@"

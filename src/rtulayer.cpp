@@ -185,7 +185,7 @@ namespace Modbus {
     errno = ENOTSUP;
     return -1;
 #else
-#if MODBUSPP_HAVE_TIOCM_RTS
+#if HAVE_TIOCM_RTS
     if (rts() != RtsNone) {
       ssize_t size;
       SerialRts r = (rts() == RtsDown) ? RtsUp : RtsDown; // complement the Rts state
@@ -203,7 +203,7 @@ namespace Modbus {
     else {
 #endif
       return write (modbus_get_socket (d->ctx), msg->adu(), msg->aduSize());
-#if MODBUSPP_HAVE_TIOCM_RTS
+#if HAVE_TIOCM_RTS
     }
 #endif
 #endif

@@ -266,8 +266,8 @@ The author of libmodbus, Stéphane justifies this choice in his terms:
 _Filter on the Modbus unit identifier (slave) in RTU mode to avoid useless CRC computing._  
 To benefit from the routing capacity of the Router and Server classes in RTU, 
 you must therefore use the modified version of libmodbus.  
-In this version (3.1.4-2~epsi+2) released from the [piduino](http://apt.piduino.org) 
-repository, the filtering has been removed.  
+In this version (3.1.4-3) released from the [piduino](http://apt.piduino.org) 
+repository, filtering can be disabled (with _modbus_rtu_set_recv_filter()_).    
 Thus, it is the Server class which performs this filtering (after checking the 
 CRC therefore). Effectively, this has the effect of loading the microprocessor, 
 but, at present, the computing power of our machines is such that it does not 

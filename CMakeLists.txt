@@ -103,8 +103,12 @@ if (NOT ${SIZEOF_BOOL} EQUAL 1)
 endif()
 
 include(CheckSymbolExists)
-check_symbol_exists(TIOCSRS485 sys/ioctl.h MODBUSPP_HAVE_TIOCRS485)
-check_symbol_exists(TIOCM_RTS sys/ioctl.h MODBUSPP_HAVE_TIOCM_RTS)
+check_symbol_exists(TIOCSRS485 sys/ioctl.h HAVE_TIOCRS485)
+check_symbol_exists(TIOCM_RTS sys/ioctl.h HAVE_TIOCM_RTS)
+
+list(APPEND CMAKE_REQUIRED_LIBRARIES modbus)
+check_symbol_exists(modbus_rtu_set_recv_filter modbus/modbus-rtu.h HAVE_RTU_SET_RECV_FILTER)
+check_symbol_exists(modbus_rtu_get_recv_filter modbus/modbus-rtu.h HAVE_RTU_GET_RECV_FILTER)
 
 # Make relative paths absolute (needed later on)
 foreach(p LIB BIN INCLUDE CMAKE DATA DOC CODELITE)
