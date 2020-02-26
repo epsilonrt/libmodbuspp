@@ -126,6 +126,39 @@ and [Modbus::Response](http://www.epsilonrt.fr/modbuspp/classModbus_1_1Response.
 classes (derived from the 
 [Modbus::Message](http://www.epsilonrt.fr/modbuspp/classModbus_1_1Message.html) class).
 
+The Server class is used to intercept received messages.  
+The installation of the callback function is performed by Server::setMessageCallback().  
+The function thus installed will be called if the slave address (unit identifier) 
+does not correspond to any slave registered by Server::addSlave().  
+This will make it possible to process MODBUS messages not supported by libmodbus 
+or, to route the messages to links not supported by libmodbus.  
+Here is an example of a callback function:
+
+```cpp
+int messageHandler (Message * req, Device * dev) {
+  cout << "Receive message, size : " << req->aduSize() << endl;
+  if (req->function() == ReadInputRegisters) {
+    // the dummy word will be the returned value, incremented after each reading
+    static uint16_t dummy = 1; 
+    // get request parameters
+    uint16_t N = req->quantity();
+    uint16_t index = req->startingAddress();
+    // build response, see page 16 of MODBUS Application Protocol Specification
+    Response rsp (*req); // uses copy constructor to keep transaction id
+    rsp.setSize(1); // keep until function code
+    rsp.setByteCount (N * 2);
+    for (uint16_t i = 0; i < N; i++) {
+      rsp.setRegisterValue (index + i, dummy++);
+    }
+    return dev->sendRawMessage (rsp, true);
+  }
+  return 0;
+}
+```
+
+The [virtual-server](https://github.com/epsilonrt/libmodbuspp/blob/slave/examples/server/virtual-server/main.cpp) 
+example illustrates this functionality.
+
 The [Modbus::Router](http://www.epsilonrt.fr/modbuspp/classModbus_1_1Router.html) 
 class performs a MODBUS message routing using the additional 
 address which is a byte which precedes the byte of the function code. 
@@ -257,16 +290,15 @@ How beautiful is that ? :-)
 The source code of this program is searchable in the examples folder
 [router-json](https://github.com/epsilonrt/libmodbuspp/blob/master/examples/router/router-json/main.cpp).
 
-**Note on routing libmodbus in RTU**  
----
+### Note on routing libmodbus in RTU
 
 libmodbus does not support routing in RTU, in fact, only messages intended for a 
 single slave (that of the context) or broadcast are processed.  
-The author of libmodbus, Stéphane justifies this choice in his terms:  
-_Filter on the Modbus unit identifier (slave) in RTU mode to avoid useless CRC computing._  
+The author of libmodbus, Stéphane, justifies this choice in his terms:  
+_"Filter on the Modbus unit identifier (slave) in RTU mode to avoid useless CRC computing."_  
 To benefit from the routing capacity of the Router and Server classes in RTU, 
-you must therefore use the modified version of libmodbus.  
-In this version (3.1.4-3) released from the [piduino](http://apt.piduino.org) 
+you must therefore use the fork of libmodbus named **libmodbusepsi**.  
+In this fork released from the [piduino](http://apt.piduino.org) 
 repository, filtering can be disabled (with _modbus_rtu_set_recv_filter()_).    
 Thus, it is the Server class which performs this filtering (after checking the 
 CRC therefore). Effectively, this has the effect of loading the microprocessor, 
