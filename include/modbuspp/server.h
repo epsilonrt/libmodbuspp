@@ -287,15 +287,19 @@ namespace Modbus {
        */
       const std::map <int, std::shared_ptr<BufferedSlave>> & slaves() const;
       
-            /**
-       * @brief
-       * @param cb
+      /**
+       * @brief Set the message callback function @b cb
+       * 
+       * Used to intercept received messages. The function thus installed will 
+       * be called if the slave address (unit identifier) does not correspond to 
+       * any slave registered by Server::addSlave().This will make it possible 
+       * to process MODBUS messages not supported by libmodbus or, to route the 
+       * messages to links not supported by libmodbus.  
        */
       void setMessageCallback (Message::Callback cb);
 
       /**
-       * @brief
-       * @return
+       * @brief Return the message callback function
        */
       Message::Callback messageCallback() const;
 

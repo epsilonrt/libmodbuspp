@@ -153,7 +153,7 @@ namespace Modbus {
       /**
        * @overload
        *
-       * @warning This function is not supported in Windows !
+       * @warning This function is not supported by Windows !
        */
       virtual int sendRawMessage (const Message * msg);
       
@@ -183,7 +183,10 @@ namespace Modbus {
        * If the parity is None, this function returns 2, otherwise returns 1.
        */
       static int stop (const std::string & settings);
-
+      
+      /**
+       * @brief Performing Modbus CRC16 generation of the buffer @b buf
+       */
       static uint16_t crc16 (uint8_t * buf, uint16_t count);
 
     protected:

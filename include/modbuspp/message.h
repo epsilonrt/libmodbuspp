@@ -176,27 +176,6 @@ namespace Modbus {
       void setQuantity (uint16_t n);
 
       /**
-       * @brief Empties the message and returns it to the initial state
-       */
-      void clear();
-
-      /**
-       * @brief returns the number of bytes of the PDU
-       * 
-       * @note Use @b aduSize() to get the number of bytes of the ADU.
-       */
-      size_t size() const;
-      
-      /**
-       * @brief Change the size of the PDU
-       * 
-       * Enables the size of the PDU to be forced if the ADU buffer contains 
-       * information that must be kept.
-       * 
-       */
-      void setSize(size_t size);
-
-      /**
        * @brief Returns the PDU byte corresponding to the offset provided
        *
        * @b pduOffset has a maximum value of @b MaxPduLength-1, it can have a negative
@@ -227,6 +206,27 @@ namespace Modbus {
        * value in order to access the wordss of the ADU that precedes the PDU.
        */
       void setWord (int pduOffset, uint16_t value);
+
+      /**
+       * @brief Empties the message and returns it to the initial state
+       */
+      void clear();
+
+      /**
+       * @brief returns the number of bytes of the PDU
+       * 
+       * @note Use @b aduSize() to get the number of bytes of the ADU.
+       */
+      size_t size() const;
+      
+      /**
+       * @brief Change the size of the PDU
+       * 
+       * Enables the size of the PDU to be forced if the ADU buffer contains 
+       * information that must be kept.
+       * 
+       */
+      void setSize(size_t size);
 
       /**
        * @brief Returns the underlying ADU bytes pointer

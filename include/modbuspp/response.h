@@ -109,6 +109,14 @@ namespace Modbus {
       void setExceptionCode (ExceptionCode code);
 
       /**
+       * @brief Returns the exception code of the response
+       *
+       * Can be used for all functions.
+       * This value is at the pdu[1].
+       */
+      ExceptionCode exceptionCode() const;
+
+      /**
        * @brief Returns a register value of the response
        * 
        * Can be used for the functions Read Holding Registers(03) and 
@@ -142,14 +150,6 @@ namespace Modbus {
        */
       void bitValues (uint16_t index, uint16_t quantity, bool * values) const;
       
-      /**
-       * @brief Returns the exception code of the response
-       *
-       * Can be used for all functions.
-       * This value is at the pdu[1].
-       */
-      ExceptionCode exceptionCode() const;
-
     protected:
       class Private;
       Response (Private &dd);

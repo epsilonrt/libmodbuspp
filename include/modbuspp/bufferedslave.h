@@ -71,35 +71,34 @@ namespace Modbus {
        * @brief Setting a block of data in the memory map.
        *
        * A single block of type @b t can be defined for a given slave.
-       * The block has nmeb elements and starts at startAddr.
-       * @param t
-       * @param nmemb
-       * @param startAddr
+       * The block has @b nmeb elements and starts at @b startAddr.
        * @return number of elements actually allocated, -1 if error
        */
       int setBlock (Table t, int nmemb, int startAddr = -1);
 
       /**
-       * @brief
-       * @param cb
+       * @brief Set the before reply callback function @b cb of this slave
+       * 
+       * This function is called before the main message manager responds to the 
+       * master by sending it a response from the contents of the memory map.
        */
       void setBeforeReplyCallback (Message::Callback cb);
 
       /**
-       * @brief
-       * @param cb
+       * @brief Set the after reply callback function @b cb of this slave
+       * 
+       * This function is called after the main message manager responds to the 
+       * master by sending it a response from the contents of the memory map.
        */
       void setAfterReplyCallback (Message::Callback cb);
 
       /**
-       * @brief
-       * @return
+       * @brief Return the before reply callback function @b cb of this slave
        */
       Message::Callback beforeReplyCallback() const;
 
       /**
-       * @brief
-       * @return
+       * @brief Return the after reply callback function @b cb of this slave
        */
       Message::Callback afterReplyCallback() const;
 
@@ -155,39 +154,50 @@ namespace Modbus {
       virtual int reportSlaveId (uint16_t max_dest, uint8_t * dest);
 
       /**
-       * @brief
-       * @param addr
-       * @param src
-       * @param nb
-       * @return
-       */
-      int writeInputRegisters (int addr, const uint16_t * src, int nb);
-
-      /**
-       * @brief
-       * @param addr
-       * @param src
-       * @param nb
-       * @return
-       */
-      int writeDiscreteInputs (int addr, const bool * src, int nb);
-
-      /**
-       * @brief
-       * @param addr
-       * @param src
-       * @return
+       * @brief Write a single discrete input (bit)
+       *
+       * This function shall write the status of @b src at the address @b addr of
+       * the memory map.
+       *
+       * @return 1 if successful.
+       * Otherwise it shall return -1 and set errno.
        */
       int writeDiscreteInput (int addr, bool src);
 
       /**
-       * @brief
-       * @param addr
-       * @param value
-       * @return
+       * @brief Read many discrete inputs (bits)
+       *
+       * This function shall read the status of the @b nb bits (input) to the
+       * address @b addr of the memory map. The result of reading is stored
+       * in @b dest array as boolean.
+       *
+       * @return the number of read bits if successful.
+       * Otherwise it shall return -1 and set errno.
+       */
+      int writeDiscreteInputs (int addr, const bool * src, int nb);
+
+
+      /**
+       * @brief Write a single register
+       *
+       * This function shall write the value of @b value input register at
+       * the address @b addr of the memory map.
+       *
+       * @return 1 if successful.
+       * Otherwise it shall return -1 and set errno.
        */
       int writeInputRegister (int addr, uint16_t value);
 
+      /**
+       * @brief Write many input registers
+       *
+       * This function shall write the content of the @b nb input registers
+       * from the array @b src at address @b addr of the memory map.
+       *
+       * @return number of written registers if successful.
+       * Otherwise it shall return -1 and set errno.
+       */
+      int writeInputRegisters (int addr, const uint16_t * src, int nb);
 
       /**
        * @brief Write many input data
@@ -196,7 +206,7 @@ namespace Modbus {
        * arithmetic data in multiple 16-bit Modbus registers.
        *
        * This function shall write the content of the @b nb input data
-       * from the array @b src at address @b addr of the device.
+       * from the array @b src at address @b addr of the memory map.
        *
        * @return number of written input Modbus registers (16-bit) if successful.
        * Otherwise it shall return -1.
