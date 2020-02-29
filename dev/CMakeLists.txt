@@ -32,3 +32,8 @@ install (DIRECTORY codelite/executable-modbuspp
   COMPONENT dev
   )
 
+install (DIRECTORY codelite/unit-test-modbuspp 
+  DESTINATION "${INSTALL_CODELITE_DIR}/templates/projects" 
+  DIRECTORY_PERMISSIONS OWNER_EXECUTE OWNER_WRITE OWNER_READ GROUP_EXECUTE GROUP_READ WORLD_EXECUTE WORLD_READ
+  COMPONENT dev
+  )

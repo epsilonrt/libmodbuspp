@@ -44,6 +44,9 @@
       <VirtualDirectory Name="executable-modbuspp">
         <File Name="dev/codelite/executable-modbuspp/main.cpp"/>
       </VirtualDirectory>
+      <VirtualDirectory Name="unit-test-modbuspp">
+        <File Name="dev/codelite/unit-test-modbuspp/main.cpp"/>
+      </VirtualDirectory>
     </VirtualDirectory>
     <VirtualDirectory Name="bin">
       <File Name="dev/bin/git-version"/>
