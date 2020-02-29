@@ -16,4 +16,4 @@ should follow my advice and use CodeLite...
 This library provides a file for pkg-config that should also allow you to 
 compile with gcc:
 
-		g++ -o rw-holding-json $(pkg-config --cflags --libs libmodbuspp) main.cpp
+		g++ -o rw-holding-json $(pkg-config --cflags --libs modbuspp) main.cpp

@@ -80,7 +80,6 @@ set_target_properties(modbuspp-shared PROPERTIES
   CLEAN_DIRECT_OUTPUT 1 
   VERSION ${MODBUSPP_VERSION} 
   SOVERSION ${MODBUSPP_VERSION_MAJOR}
-  PUBLIC_HEADER "${hdr_public}"
   )
 
 if(MODBUSPP_WITH_STATIC)
@@ -120,23 +119,23 @@ file(RELATIVE_PATH REL_INCLUDE_DIR "${MODBUSPP_INSTALL_CMAKE_DIR}"
 # ... for the build tree
 set(CONF_INCLUDE_DIRS "${MODBUSPP_INC_DIR}" "${MODBUSPP_SRC_DIR}" "${PROJECT_BINARY_DIR}")
 set(CONF_LIB_DIRS "${PROJECT_BINARY_DIR}/lib/libmodbuspp")
-configure_file(libmodbuspp-config.cmake.in
-  "${PROJECT_BINARY_DIR}/libmodbuspp-config.cmake" @ONLY)
+configure_file(modbuspp-config.cmake.in
+  "${PROJECT_BINARY_DIR}/modbuspp-config.cmake" @ONLY)
 
 # ... for the install tree
 set(CONF_INCLUDE_DIRS "\${MODBUSPP_CMAKE_DIR}/${REL_INCLUDE_DIR}")
 set(CONF_LIB_DIRS "\${MODBUSPP_CMAKE_DIR}/${REL_LIB_DIR}")
-configure_file(libmodbuspp-config.cmake.in
-  "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/libmodbuspp-config.cmake" @ONLY)
+configure_file(modbuspp-config.cmake.in
+  "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/modbuspp-config.cmake" @ONLY)
 
 # ... for both
-configure_file(libmodbuspp-config-version.cmake.in
-  "${PROJECT_BINARY_DIR}/libmodbuspp-config-version.cmake" @ONLY)
+configure_file(modbuspp-config-version.cmake.in
+  "${PROJECT_BINARY_DIR}/modbuspp-config-version.cmake" @ONLY)
 
-# Install the libmodbuspp-config.cmake and libmodbuspp-config-version.cmake
+# Install the modbuspp-config.cmake and modbuspp-config-version.cmake
 install(FILES
-  "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/libmodbuspp-config.cmake"
-  "${PROJECT_BINARY_DIR}/libmodbuspp-config-version.cmake"
+  "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/modbuspp-config.cmake"
+  "${PROJECT_BINARY_DIR}/modbuspp-config-version.cmake"
   DESTINATION "${MODBUSPP_INSTALL_CMAKE_DIR}" COMPONENT dev)
 
 # Install the export set for use with the install-tree
@@ -156,8 +155,12 @@ install (TARGETS modbuspp-shared
   # IMPORTANT: Add the modbuspp library to the "export-set"
   EXPORT modbuspp
   LIBRARY DESTINATION "${INSTALL_LIB_DIR}" COMPONENT lib
-  PUBLIC_HEADER DESTINATION "${INSTALL_INCLUDE_DIR}" COMPONENT dev
   )
+
+install ( DIRECTORY "${MODBUSPP_INC_DIR}/" 
+          DESTINATION "${INSTALL_INCLUDE_DIR}" COMPONENT dev)
+install ( FILES ${CMAKE_CURRENT_BINARY_DIR}/config.h 
+          DESTINATION "${INSTALL_INCLUDE_DIR}/${PROJECT_NAME}" COMPONENT dev)
 
 if(MODBUSPP_WITH_STATIC)
   install (TARGETS modbuspp-static 
@@ -176,9 +179,9 @@ foreach(item ${MODBUSPP_LDFLAGS_OTHER})
   string(APPEND MODBUSPP_LDFLAGS_PKGCONFIG "${item} ")
 endforeach(item MODBUSPP_LDFLAGS_OTHER)
 
-configure_file (${CMAKE_CURRENT_SOURCE_DIR}/libmodbuspp.pc.in
-  ${CMAKE_CURRENT_BINARY_DIR}/libmodbuspp.pc @ONLY)
+configure_file (${CMAKE_CURRENT_SOURCE_DIR}/modbuspp.pc.in
+  ${CMAKE_CURRENT_BINARY_DIR}/modbuspp.pc @ONLY)
 
-install (FILES ${CMAKE_CURRENT_BINARY_DIR}/libmodbuspp.pc 
+install (FILES ${CMAKE_CURRENT_BINARY_DIR}/modbuspp.pc 
   DESTINATION "${INSTALL_LIB_DIR}/pkgconfig"
   COMPONENT dev)

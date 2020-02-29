@@ -6,10 +6,10 @@ Note that this project is set to work with the GNU toolchain (gdb, g++) and libm
 	</Description>
   <Settings Type="Executable">
     <GlobalSettings>
-      <Compiler Options="-std=c++14;$(shell pkg-config --cflags libmodbuspp)" C_Options="-std=c99;$(shell pkg-config --cflags libmodbuspp)" Assembler="">
+      <Compiler Options="-std=c++14;$(shell pkg-config --cflags modbuspp)" C_Options="-std=c99" Assembler="">
         <IncludePath Value="."/>
       </Compiler>
-      <Linker Options="$(shell pkg-config --libs libmodbuspp)">
+      <Linker Options="$(shell pkg-config --libs modbuspp)">
         <LibraryPath Value="."/>
       </Linker>
       <ResourceCompiler Options=""/>

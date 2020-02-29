@@ -386,7 +386,7 @@ in `main.cpp`
 
 To build, you must type the command:
 
-    g++ -o read-input-registers main.cpp $(pkg-config --cflags --libs libmodbuspp)
+    g++ -o read-input-registers main.cpp $(pkg-config --cflags --libs modbuspp)
     
 You can then run it :
 

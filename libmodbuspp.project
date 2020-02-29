@@ -88,9 +88,9 @@
       <File Name="lib/CMakeLists.txt"/>
     </VirtualDirectory>
     <File Name="lib/config.h.in"/>
-    <File Name="lib/libmodbuspp.pc.in"/>
-    <File Name="lib/libmodbuspp-config.cmake.in"/>
-    <File Name="lib/libmodbuspp-config-version.cmake.in"/>
+    <File Name="lib/modbuspp.pc.in"/>
+    <File Name="lib/modbuspp-config.cmake.in"/>
+    <File Name="lib/modbuspp-config-version.cmake.in"/>
   </VirtualDirectory>
   <VirtualDirectory Name="resources">
     <File Name="CMakeLists.txt"/>
