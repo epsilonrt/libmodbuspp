@@ -45,6 +45,7 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
 endif()
 
 set (MODBUSPP_WITH_STATIC 0 CACHE BOOL "Enable building static libraries.")
+set (MODBUSPP_UNIT_TESTS 1 CACHE BOOL "Enable building unit tests.")
 
 # Offer the user the choice of overriding the installation directories
 set(INSTALL_LIB_DIR lib CACHE PATH "Installation directory for libraries")
@@ -86,6 +87,8 @@ set(LIBMODBUS_PACKAGE lib${LIBMODBUS_NAME}5)
 set(LIBMODBUSDEV_PACKAGE lib${LIBMODBUS_NAME}-dev)
 
 find_package(Gzip)
+
+pkg_check_modules (UNITTESTPP UnitTest++>=2.0.0)
 
 if(MODBUSPP_USE_EXTERNAL_JSON)
   find_package(nlohmann_json 3.2.0 REQUIRED)
@@ -234,6 +237,12 @@ configure_file (${CMAKE_CURRENT_SOURCE_DIR}/modbuspp.pc.in
 install (FILES ${CMAKE_CURRENT_BINARY_DIR}/modbuspp.pc 
   DESTINATION "${INSTALL_LIB_DIR}/pkgconfig"
   COMPONENT dev)
+
+if (UNITTESTPP_FOUND AND MODBUSPP_UNIT_TESTS)
+  include(CTest)
+  enable_testing()
+  add_subdirectory (tests)
+endif()
 
 if (MODBUSPP_WITH_DOXYGEN_DOC)
   add_dependencies(modbuspp-shared doc)

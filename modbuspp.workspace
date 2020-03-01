@@ -21,6 +21,10 @@
       <Project Name="router-simple" Path="examples/router/router-simple/router-simple.project" Active="No"/>
     </VirtualDirectory>
   </VirtualDirectory>
+  <VirtualDirectory Name="tests">
+    <Project Name="unit-test-server" Path="tests/unit-test-server/unit-test-server.project" Active="No"/>
+    <Project Name="unit-test-device" Path="tests/unit-test-device/unit-test-device.project" Active="No"/>
+  </VirtualDirectory>
   <BuildMatrix>
     <WorkspaceConfiguration Name="Debug" Selected="no">
       <Environment/>
@@ -32,6 +36,8 @@
       <Project Name="clock-server" ConfigName="Debug"/>
       <Project Name="router-simple" ConfigName="Debug"/>
       <Project Name="virtual-server" ConfigName="Debug"/>
+      <Project Name="unit-test-server" ConfigName="Debug"/>
+      <Project Name="unit-test-device" ConfigName="Debug"/>
     </WorkspaceConfiguration>
     <WorkspaceConfiguration Name="Release" Selected="yes">
       <Environment/>
@@ -43,6 +49,8 @@
       <Project Name="clock-server" ConfigName="Release"/>
       <Project Name="router-simple" ConfigName="Release"/>
       <Project Name="virtual-server" ConfigName="Release"/>
+      <Project Name="unit-test-server" ConfigName="Release"/>
+      <Project Name="unit-test-device" ConfigName="Release"/>
     </WorkspaceConfiguration>
   </BuildMatrix>
 </CodeLite_Workspace>

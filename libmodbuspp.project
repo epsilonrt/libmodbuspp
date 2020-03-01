@@ -35,9 +35,7 @@
     <File Name="doc/Doxyfile.in"/>
     <File Name="doc/main_page_footer.dox"/>
     <File Name="doc/main_page_header.dox"/>
-    <VirtualDirectory Name="resources">
-      <File Name="doc/CMakeLists.txt"/>
-    </VirtualDirectory>
+    <File Name="doc/CMakeLists.txt"/>
   </VirtualDirectory>
   <VirtualDirectory Name="dev">
     <VirtualDirectory Name="codelite">
@@ -55,6 +53,7 @@
       <File Name="dev/cmake/GitVersion.cmake"/>
       <File Name="dev/cmake/FindGzip.cmake"/>
       <File Name="dev/cmake/GetDate.cmake"/>
+      <File Name="dev/cmake/SubDirList.cmake"/>
     </VirtualDirectory>
     <File Name="dev/CMakeLists.txt"/>
   </VirtualDirectory>
@@ -87,22 +86,26 @@
     <File Name="src/json_p.h"/>
   </VirtualDirectory>
   <VirtualDirectory Name="lib">
-    <VirtualDirectory Name="resources">
-      <File Name="lib/CMakeLists.txt"/>
-    </VirtualDirectory>
-    <File Name="lib/config.h.in"/>
-    <File Name="lib/modbuspp.pc.in"/>
-    <File Name="lib/modbuspp-config.cmake.in"/>
-    <File Name="lib/modbuspp-config-version.cmake.in"/>
+    <File Name="lib/CMakeLists.txt"/>
   </VirtualDirectory>
   <VirtualDirectory Name="resources">
     <File Name="CMakeLists.txt"/>
+    <File Name="modbuspp-config.cmake.in"/>
+    <File Name="modbuspp-config-version.cmake.in"/>
+    <File Name="modbuspp.pc.in"/>
+    <File Name="config.h.in"/>
+    <File Name="version.h.in"/>
   </VirtualDirectory>
   <VirtualDirectory Name="libmodbuspp">
     <File Name="AUTHORS"/>
     <File Name="cmake_uninstall.cmake.in"/>
     <File Name="COPYING.LESSER"/>
     <File Name="README.md"/>
+  </VirtualDirectory>
+  <Dependencies Name="Debug"/>
+  <Dependencies Name="Release"/>
+  <VirtualDirectory Name="tests">
+    <File Name="tests/CMakeLists.txt"/>
   </VirtualDirectory>
   <Settings Type="Executable">
     <GlobalSettings>
@@ -146,7 +149,7 @@
         <CustomPostBuild/>
         <CustomPreBuild/>
       </AdditionalRules>
-      <Completion EnableCpp11="no" EnableCpp14="no">
+      <Completion EnableCpp11="yes" EnableCpp14="no">
         <ClangCmpFlagsC/>
         <ClangCmpFlags/>
         <ClangPP/>
@@ -186,7 +189,7 @@
         <CustomPostBuild/>
         <CustomPreBuild/>
       </AdditionalRules>
-      <Completion EnableCpp11="yes" EnableCpp14="yes">
+      <Completion EnableCpp11="yes" EnableCpp14="no">
         <ClangCmpFlagsC/>
         <ClangCmpFlags/>
         <ClangPP/>
@@ -194,6 +197,4 @@
       </Completion>
     </Configuration>
   </Settings>
-  <Dependencies Name="Debug"/>
-  <Dependencies Name="Release"/>
 </CodeLite_Project>
