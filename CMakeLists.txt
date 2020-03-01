@@ -17,8 +17,8 @@
 # modbuspp top-level CMakeLists.txt
 cmake_minimum_required (VERSION 3.5 FATAL_ERROR)
 
-project (MODBUSPP)
-set (PROJECT_DESCRIPTION "C++ wrapper for the libmodbus library")
+project (MODBUSPP LANGUAGES CXX)
+set (PROJECT_DESCRIPTION "Much more than a C++ wrapper for the libmodbus library")
 set (PROJECT_DESCRIPTION_TEXT "\
   A C++ wrapper for the libmodbus library, to send/receive data with a device which\n\
   respects the Modbus protocol. This library can use a serial port or an\n\
@@ -145,9 +145,6 @@ configure_file(
     IMMEDIATE @ONLY)
 add_custom_target(uninstall
     COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake)
-
-add_definitions ( -DMODBUSPP_INSTALL_DATA_DIR="${MODBUSPP_INSTALL_DATA_DIR}" 
-                  -DMODBUSPP_INSTALL_ETC_DIR="${MODBUSPP_INSTALL_ETC_DIR}")
                   
 # Suppress GCC warnings
 # See https://gcc.gnu.org/gcc-7/changes.html
@@ -162,7 +159,6 @@ add_compile_options(-Wno-psabi)
 
 add_subdirectory (dev)
 add_subdirectory (lib)
-#add_subdirectory (utils)
 add_subdirectory (doc)
 
 if (MODBUSPP_WITH_DOXYGEN_DOC)
