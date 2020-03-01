@@ -105,6 +105,8 @@ include (GitVersion)
 GetGitVersion(MODBUSPP_VERSION)
 set(MODBUSPP_VERSION
   ${MODBUSPP_VERSION_MAJOR}.${MODBUSPP_VERSION_MINOR}.${MODBUSPP_VERSION_PATCH})
+configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/config.h.in
+                ${CMAKE_CURRENT_BINARY_DIR}/config.h @ONLY)
 
 include(CheckTypeSize)
 check_type_size(bool SIZEOF_BOOL BUILTIN_TYPES_ONLY LANGUAGE CXX)
@@ -157,15 +159,99 @@ add_custom_target(uninstall
 # <<< TODO >>> Fix this problem before compile with GCC 7 !
 add_compile_options(-Wno-psabi)
 
+include_directories(
+  ${LIBMODBUS_INCLUDE_DIRS} 
+  ${MODBUSPP_INC_DIR} 
+  ${CMAKE_CURRENT_BINARY_DIR}
+)
+
 add_subdirectory (dev)
 add_subdirectory (lib)
 add_subdirectory (doc)
+
+# CMake Package ----------------------------------------------------------------
+
+# Add all targets to the build-tree export set
+if (MODBUSPP_WITH_STATIC)
+  set (exported_targets modbuspp-shared modbuspp-static)
+else(MODBUSPP_WITH_STATIC)
+  set (exported_targets modbuspp-shared)
+endif(MODBUSPP_WITH_STATIC)
+
+export(TARGETS ${exported_targets}
+  FILE "${PROJECT_BINARY_DIR}/modbuspp.cmake")
+
+# Export the package for use from the build-tree
+# (this registers the build-tree with a global CMake-registry)
+export(PACKAGE modbuspp)
+
+# Create the modbuspp-config.cmake and modbuspp-config-version files
+file(RELATIVE_PATH REL_LIB_DIR "${MODBUSPP_INSTALL_CMAKE_DIR}" 
+  "${INSTALL_LIB_DIR}")
+file(RELATIVE_PATH REL_INCLUDE_DIR "${MODBUSPP_INSTALL_CMAKE_DIR}"
+  "${INSTALL_INCLUDE_DIR}")
+
+# ... for the build tree
+set(CONF_INCLUDE_DIRS "${MODBUSPP_INC_DIR}" "${PROJECT_BINARY_DIR}")
+set(CONF_LIB_DIRS "${PROJECT_BINARY_DIR}/lib")
+configure_file(modbuspp-config.cmake.in
+  "${PROJECT_BINARY_DIR}/modbuspp-config.cmake" @ONLY)
+
+# ... for the install tree
+set(CONF_INCLUDE_DIRS "\${MODBUSPP_CMAKE_DIR}/${REL_INCLUDE_DIR}")
+set(CONF_LIB_DIRS "\${MODBUSPP_CMAKE_DIR}/${REL_LIB_DIR}")
+configure_file(modbuspp-config.cmake.in
+  "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/modbuspp-config.cmake" @ONLY)
+
+# ... for both
+configure_file(modbuspp-config-version.cmake.in
+  "${PROJECT_BINARY_DIR}/modbuspp-config-version.cmake" @ONLY)
+
+# Install the modbuspp-config.cmake and modbuspp-config-version.cmake
+install(FILES
+  "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/modbuspp-config.cmake"
+  "${PROJECT_BINARY_DIR}/modbuspp-config-version.cmake"
+  DESTINATION "${MODBUSPP_INSTALL_CMAKE_DIR}" COMPONENT dev)
+
+# Install the export set for use with the install-tree
+install(EXPORT modbuspp DESTINATION
+  "${MODBUSPP_INSTALL_CMAKE_DIR}" COMPONENT dev)
+
+## pkg-config ------------------------------------------------------------------
+foreach(item ${MODBUSPP_CFLAGS_OTHER})
+  string(APPEND MODBUSPP_CFLAGS_PKGCONFIG "${item} ")
+endforeach(item MODBUSPP_CFLAGS_OTHER)
+
+foreach(item ${MODBUSPP_LDFLAGS_OTHER})
+  string(APPEND MODBUSPP_LDFLAGS_PKGCONFIG "${item} ")
+endforeach(item MODBUSPP_LDFLAGS_OTHER)
+
+configure_file (${CMAKE_CURRENT_SOURCE_DIR}/modbuspp.pc.in
+  ${CMAKE_CURRENT_BINARY_DIR}/modbuspp.pc @ONLY)
+
+install (FILES ${CMAKE_CURRENT_BINARY_DIR}/modbuspp.pc 
+  DESTINATION "${INSTALL_LIB_DIR}/pkgconfig"
+  COMPONENT dev)
 
 if (MODBUSPP_WITH_DOXYGEN_DOC)
   add_dependencies(modbuspp-shared doc)
 endif()
 
-### Packages generation --------------------------------------------------------
+# Install the modbuspp licence files
+install(FILES
+  "${PROJECT_SOURCE_DIR}/COPYING.LESSER"
+  DESTINATION "${MODBUSPP_INSTALL_DATA_DIR}" COMPONENT lib)
+
+install(FILES
+  "${PROJECT_SOURCE_DIR}/README.md"
+  DESTINATION "${MODBUSPP_INSTALL_DOC_DIR}" COMPONENT lib)
+
+install ( DIRECTORY "${MODBUSPP_INC_DIR}/" 
+          DESTINATION "${INSTALL_INCLUDE_DIR}" COMPONENT dev)
+install ( FILES ${CMAKE_CURRENT_BINARY_DIR}/config.h 
+          DESTINATION "${INSTALL_INCLUDE_DIR}/${PROJECT_NAME}" COMPONENT dev)
+
+### Debian Packages generation -------------------------------------------------
 set(CPACK_PACKAGE_NAME ${PROJECT_NAME})
 set(CPACK_PACKAGE_VERSION "${MODBUSPP_VERSION_MAJOR}.${MODBUSPP_VERSION_MINOR}.${MODBUSPP_VERSION_PATCH}")
 set(CPACK_PACKAGE_VERSION_MAJOR "${MODBUSPP_VERSION_MAJOR}")

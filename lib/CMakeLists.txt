@@ -21,45 +21,13 @@ if(NOT CPACK_PACKAGE_DIRECTORY)
   set(CPACK_PACKAGE_DIRECTORY ${CMAKE_BINARY_DIR}/packages)
 endif()
 
-WriteGitVersionFile(${CMAKE_CURRENT_BINARY_DIR}/version.h)
   
 file(GLOB_RECURSE src_modbuspp  ${MODBUSPP_SRC_DIR}/*.cpp)
-
-set (hdr_modbuspp 
-  ${MODBUSPP_INC_DIR}/modbuspp.h
-  ${MODBUSPP_INC_DIR}/modbuspp/bufferedslave.h
-  ${MODBUSPP_INC_DIR}/modbuspp/data.h
-  ${MODBUSPP_INC_DIR}/modbuspp/device.h
-  ${MODBUSPP_INC_DIR}/modbuspp/global.h
-  ${MODBUSPP_INC_DIR}/modbuspp/master.h
-  ${MODBUSPP_INC_DIR}/modbuspp/message.h
-  ${MODBUSPP_INC_DIR}/modbuspp/netlayer.h
-  ${MODBUSPP_INC_DIR}/modbuspp/popl.h
-  ${MODBUSPP_INC_DIR}/modbuspp/pimp.h
-  ${MODBUSPP_INC_DIR}/modbuspp/request.h
-  ${MODBUSPP_INC_DIR}/modbuspp/response.h
-  ${MODBUSPP_INC_DIR}/modbuspp/router.h
-  ${MODBUSPP_INC_DIR}/modbuspp/rtulayer.h
-  ${MODBUSPP_INC_DIR}/modbuspp/server.h
-  ${MODBUSPP_INC_DIR}/modbuspp/slave.h
-  ${MODBUSPP_INC_DIR}/modbuspp/slavereport.h
-  ${MODBUSPP_INC_DIR}/modbuspp/swap.h
-  ${MODBUSPP_INC_DIR}/modbuspp/tcplayer.h
-  ${MODBUSPP_INC_DIR}/modbuspp/timeout.h
-)
-
-configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/config.h.in
-                ${CMAKE_CURRENT_BINARY_DIR}/config.h @ONLY)
-
-set(hdr_public ${hdr_modbuspp} ${CMAKE_CURRENT_BINARY_DIR}/config.h)
-
 set (libsrc ${src_modbuspp})
 
 # this is the "object library" target: compiles the sources only once
 add_library(objlib OBJECT ${libsrc})
-
 get_target_property(JSON_INCLUDE_DIRS nlohmann_json::nlohmann_json INTERFACE_INCLUDE_DIRECTORIES)
-
 target_include_directories(objlib BEFORE PRIVATE
   ${LIBMODBUS_INCLUDE_DIRS} 
   ${MODBUSPP_INC_DIR} 
@@ -67,7 +35,6 @@ target_include_directories(objlib BEFORE PRIVATE
   ${CMAKE_CURRENT_BINARY_DIR}
   ${JSON_INCLUDE_DIRS}
 )
-target_compile_definitions(objlib PUBLIC MODBUSPP_WITH_CONFIG_H)
 
 # shared libraries need PIC
 set_property(TARGET objlib PROPERTY POSITION_INDEPENDENT_CODE 1)
@@ -92,75 +59,11 @@ if(MODBUSPP_WITH_STATIC)
   )
 endif(MODBUSPP_WITH_STATIC)
 
-# CMake Package ----------------------------------------------------------------
-# The interesting stuff goes here
-# ===============================
-
-# Add all targets to the build-tree export set
-if (MODBUSPP_WITH_STATIC)
-  set (exported_targets modbuspp-shared modbuspp-static)
-else(MODBUSPP_WITH_STATIC)
-  set (exported_targets modbuspp-shared)
-endif(MODBUSPP_WITH_STATIC)
-
-export(TARGETS ${exported_targets}
-  FILE "${PROJECT_BINARY_DIR}/libmodbuspp.cmake")
-
-# Export the package for use from the build-tree
-# (this registers the build-tree with a global CMake-registry)
-export(PACKAGE libmodbuspp)
-
-# Create the modbuspp-config.cmake and modbuspp-config-version files
-file(RELATIVE_PATH REL_LIB_DIR "${MODBUSPP_INSTALL_CMAKE_DIR}" 
-  "${INSTALL_LIB_DIR}")
-file(RELATIVE_PATH REL_INCLUDE_DIR "${MODBUSPP_INSTALL_CMAKE_DIR}"
-  "${INSTALL_INCLUDE_DIR}")
-
-# ... for the build tree
-set(CONF_INCLUDE_DIRS "${MODBUSPP_INC_DIR}" "${MODBUSPP_SRC_DIR}" "${PROJECT_BINARY_DIR}")
-set(CONF_LIB_DIRS "${PROJECT_BINARY_DIR}/lib/libmodbuspp")
-configure_file(modbuspp-config.cmake.in
-  "${PROJECT_BINARY_DIR}/modbuspp-config.cmake" @ONLY)
-
-# ... for the install tree
-set(CONF_INCLUDE_DIRS "\${MODBUSPP_CMAKE_DIR}/${REL_INCLUDE_DIR}")
-set(CONF_LIB_DIRS "\${MODBUSPP_CMAKE_DIR}/${REL_LIB_DIR}")
-configure_file(modbuspp-config.cmake.in
-  "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/modbuspp-config.cmake" @ONLY)
-
-# ... for both
-configure_file(modbuspp-config-version.cmake.in
-  "${PROJECT_BINARY_DIR}/modbuspp-config-version.cmake" @ONLY)
-
-# Install the modbuspp-config.cmake and modbuspp-config-version.cmake
-install(FILES
-  "${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/modbuspp-config.cmake"
-  "${PROJECT_BINARY_DIR}/modbuspp-config-version.cmake"
-  DESTINATION "${MODBUSPP_INSTALL_CMAKE_DIR}" COMPONENT dev)
-
-# Install the export set for use with the install-tree
-install(EXPORT modbuspp DESTINATION
-  "${MODBUSPP_INSTALL_CMAKE_DIR}" COMPONENT dev)
-
-# Install the modbuspp licence files
-install(FILES
-  "${PROJECT_SOURCE_DIR}/COPYING.LESSER"
-  DESTINATION "${MODBUSPP_INSTALL_DATA_DIR}" COMPONENT lib)
-
-install(FILES
-  "${PROJECT_SOURCE_DIR}/README.md"
-  DESTINATION "${MODBUSPP_INSTALL_DOC_DIR}" COMPONENT lib)
-
 install (TARGETS modbuspp-shared
   # IMPORTANT: Add the modbuspp library to the "export-set"
   EXPORT modbuspp
   LIBRARY DESTINATION "${INSTALL_LIB_DIR}" COMPONENT lib
   )
-
-install ( DIRECTORY "${MODBUSPP_INC_DIR}/" 
-          DESTINATION "${INSTALL_INCLUDE_DIR}" COMPONENT dev)
-install ( FILES ${CMAKE_CURRENT_BINARY_DIR}/config.h 
-          DESTINATION "${INSTALL_INCLUDE_DIR}/${PROJECT_NAME}" COMPONENT dev)
 
 if(MODBUSPP_WITH_STATIC)
   install (TARGETS modbuspp-static 
@@ -168,20 +71,3 @@ if(MODBUSPP_WITH_STATIC)
     ARCHIVE DESTINATION "${INSTALL_LIB_DIR}" COMPONENT dev
   )
 endif(MODBUSPP_WITH_STATIC)
-
-
-## pkg-config ------------------------------------------------------------------
-foreach(item ${MODBUSPP_CFLAGS_OTHER})
-  string(APPEND MODBUSPP_CFLAGS_PKGCONFIG "${item} ")
-endforeach(item MODBUSPP_CFLAGS_OTHER)
-
-foreach(item ${MODBUSPP_LDFLAGS_OTHER})
-  string(APPEND MODBUSPP_LDFLAGS_PKGCONFIG "${item} ")
-endforeach(item MODBUSPP_LDFLAGS_OTHER)
-
-configure_file (${CMAKE_CURRENT_SOURCE_DIR}/modbuspp.pc.in
-  ${CMAKE_CURRENT_BINARY_DIR}/modbuspp.pc @ONLY)
-
-install (FILES ${CMAKE_CURRENT_BINARY_DIR}/modbuspp.pc 
-  DESTINATION "${INSTALL_LIB_DIR}/pkgconfig"
-  COMPONENT dev)
