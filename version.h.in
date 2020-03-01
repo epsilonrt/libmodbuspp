@@ -1,0 +1,51 @@
+/* Copyright © 2018-2019 Pascal JEAN, All rights reserved.
+ * This file is part of the libmodbuspp Library.
+ *
+ * The libmodbuspp Library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 3 of the License, or (at your option) any later version.
+ *
+ * The libmodbuspp Library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with the libmodbuspp Library; if not, see <http://www.gnu.org/licenses/>.
+ */
+#pragma once
+
+/** @brief The full version as string, like 1.0-3-g166e25d */
+#define MODBUSPP_VERSION       "@MODBUSPP_VERSION_STRING@"
+/** @brief The short version as string, like 1.0-3 */
+#define MODBUSPP_VERSION_SHORT "@MODBUSPP_VERSION_SHORT@"
+/** @brief The tiny version as string, like 1.0 */
+#define MODBUSPP_VERSION_TINY  "@MODBUSPP_VERSION_TINY@"
+/** @brief The major version, (1, if %MODBUSPP_VERSION_SHORT is 1.0-3) */
+#define MODBUSPP_VERSION_MAJOR @MODBUSPP_VERSION_MAJOR@
+/** @brief The minor version (0, if %MODBUSPP_VERSION_SHORT is 1.0-3) */
+#define MODBUSPP_VERSION_MINOR @MODBUSPP_VERSION_MINOR@
+/** @brief The patch version (3, if %MODBUSPP_VERSION_SHORT is 1.0-3) */
+#define MODBUSPP_VERSION_PATCH @MODBUSPP_VERSION_PATCH@
+/** @brief SHA1 HASH of the git version */
+#define MODBUSPP_VERSION_SHA1  @MODBUSPP_VERSION_SHA1@
+
+/** @brief Numerically encoded version, like 0x010003 */
+#define MODBUSPP_VERSION_HEX ((MODBUSPP_VERSION_MAJOR << 24) |  \
+                               (MODBUSPP_VERSION_MINOR << 16) |  \
+                               (MODBUSPP_VERSION_PATCH << 8))
+
+/**
+ * @brief Check modbuspp version
+ * Evaluates to True if the version is greater than @major, @minor and @patch
+ */
+#define MODBUSPP_VERSION_CHECK(major,minor,patch)      \
+    (MODBUSPP_VERSION_MAJOR > (major) ||               \
+     (MODBUSPP_VERSION_MAJOR == (major) &&             \
+      MODBUSPP_VERSION_MINOR > (minor)) ||             \
+     (MODBUSPP_VERSION_MAJOR == (major) &&             \
+      MODBUSPP_VERSION_MINOR == (minor) &&             \
+      MODBUSPP_VERSION_PATCH >= (patch)))
+
+/* ========================================================================== */

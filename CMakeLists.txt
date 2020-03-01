@@ -107,6 +107,8 @@ set(MODBUSPP_VERSION
   ${MODBUSPP_VERSION_MAJOR}.${MODBUSPP_VERSION_MINOR}.${MODBUSPP_VERSION_PATCH})
 configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/config.h.in
                 ${CMAKE_CURRENT_BINARY_DIR}/config.h @ONLY)
+configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/version.h.in
+                ${CMAKE_CURRENT_BINARY_DIR}/version.h @ONLY)
 
 include(CheckTypeSize)
 check_type_size(bool SIZEOF_BOOL BUILTIN_TYPES_ONLY LANGUAGE CXX)
@@ -116,11 +118,11 @@ if (NOT ${SIZEOF_BOOL} EQUAL 1)
 endif()
 
 include(CheckSymbolExists)
-check_symbol_exists(TIOCSRS485 sys/ioctl.h HAVE_TIOCRS485)
-check_symbol_exists(TIOCM_RTS sys/ioctl.h HAVE_TIOCM_RTS)
+check_symbol_exists(TIOCSRS485 sys/ioctl.h MODBUSPP_HAVE_TIOCRS485)
+check_symbol_exists(TIOCM_RTS sys/ioctl.h MODBUSPP_HAVE_TIOCM_RTS)
 
 list(APPEND CMAKE_REQUIRED_LIBRARIES ${LIBMODBUS_NAME})
-check_symbol_exists(modbus_rtu_set_recv_filter ${LIBMODBUS_NAME}/modbus-rtu.h HAVE_RTU_SET_RECV_FILTER)
+check_symbol_exists(modbus_rtu_set_recv_filter ${LIBMODBUS_NAME}/modbus-rtu.h MODBUSPP_HAVE_RTU_MULTI_SLAVES)
 
 # Make relative paths absolute (needed later on)
 foreach(p LIB BIN INCLUDE CMAKE DATA DOC CODELITE)
@@ -249,6 +251,7 @@ install(FILES
 install ( DIRECTORY "${MODBUSPP_INC_DIR}/" 
           DESTINATION "${INSTALL_INCLUDE_DIR}" COMPONENT dev)
 install ( FILES ${CMAKE_CURRENT_BINARY_DIR}/config.h 
+          ${CMAKE_CURRENT_BINARY_DIR}/version.h 
           DESTINATION "${INSTALL_INCLUDE_DIR}/${PROJECT_NAME}" COMPONENT dev)
 
 ### Debian Packages generation -------------------------------------------------

@@ -16,6 +16,7 @@
  */
 #pragma once
 
+#include <modbuspp/version.h>
 #include <modbuspp/rtulayer.h>
 #include <modbuspp/tcplayer.h>
 #include <modbuspp/master.h>

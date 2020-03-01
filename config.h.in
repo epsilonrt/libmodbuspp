@@ -14,22 +14,11 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with the libmodbuspp Library; if not, see <http://www.gnu.org/licenses/>.
  */
+#pragma once
 
-#ifndef MODBUSPP_CONFIG_H_
-#define MODBUSPP_CONFIG_H_
-/* ========================================================================== */
-#cmakedefine01 MODBUSPP_WITH_STATIC
-#cmakedefine01 HAVE_TIOCRS485
-#cmakedefine01 HAVE_TIOCM_RTS
-#cmakedefine01 HAVE_RTU_SET_RECV_FILTER
-
-#define MODBUSPP_VERSION       "@MODBUSPP_VERSION_STRING@"
-#define MODBUSPP_VERSION_SHORT "@MODBUSPP_VERSION_SHORT@"
-#define MODBUSPP_VERSION_TINY  "@MODBUSPP_VERSION_TINY@"
-#define MODBUSPP_VERSION_MAJOR @MODBUSPP_VERSION_MAJOR@
-#define MODBUSPP_VERSION_MINOR @MODBUSPP_VERSION_MINOR@
-#define MODBUSPP_VERSION_PATCH @MODBUSPP_VERSION_PATCH@
-#define MODBUSPP_VERSION_SHA1  @MODBUSPP_VERSION_SHA1@
+#include "version.h"
+#cmakedefine01 MODBUSPP_HAVE_TIOCRS485
+#cmakedefine01 MODBUSPP_HAVE_TIOCM_RTS
+#cmakedefine01 MODBUSPP_HAVE_RTU_MULTI_SLAVES
 
 /* ========================================================================== */
-#endif /*MODBUSPP_CONFIG_H_ defined */

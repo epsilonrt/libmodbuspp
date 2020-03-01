@@ -252,7 +252,7 @@ namespace Modbus {
                                     const std::string & settings) {
 
     Device::Private::setBackend (net, connection, settings);
-#if HAVE_RTU_SET_RECV_FILTER
+#if MODBUSPP_HAVE_RTU_MULTI_SLAVES
     if (net == Rtu) {
       modbus_rtu_set_recv_filter (ctx(), FALSE);
     }

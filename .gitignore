@@ -9,6 +9,7 @@ compile_commands.json
 *.so
 obj/
 .*
-version.*
+version.h
+config.h
 *build-*/
 work/
