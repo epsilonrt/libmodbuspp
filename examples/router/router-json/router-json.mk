@@ -13,7 +13,7 @@ CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
 User                   :=epsilonrt
-Date                   :=02/25/20
+Date                   :=03/03/20
 CodeLitePath           :=/home/pascal/.codelite
 LinkerName             :=/usr/bin/g++
 SharedObjectLinkerName :=/usr/bin/g++ -shared -fPIC
@@ -35,7 +35,7 @@ PreprocessOnlySwitch   :=-E
 ObjectsFileList        :="router-json.txt"
 PCHCompileFlags        :=
 MakeDirCommand         :=mkdir -p
-LinkOptions            := $(shell pkg-config --libs libmodbuspp) 
+LinkOptions            := $(shell pkg-config --libs modbuspp) 
 IncludePath            :=  $(IncludeSwitch). $(IncludeSwitch). 
 IncludePCH             := 
 RcIncludePath          := 
@@ -50,8 +50,8 @@ LibPath                := $(LibraryPathSwitch).
 AR       := /usr/bin/ar rcu
 CXX      := /usr/bin/g++
 CC       := /usr/bin/gcc
-CXXFLAGS := -std=c++14 $(shell pkg-config --cflags libmodbuspp) -g -O0 -Wall $(Preprocessors)
-CFLAGS   := -std=c99 $(shell pkg-config --cflags libmodbuspp) -g -O0 -Wall $(Preprocessors)
+CXXFLAGS := -std=c++11 $(shell pkg-config --cflags modbuspp) -g -O0 -Wall $(Preprocessors)
+CFLAGS   := -std=c99 -g -O0 -Wall $(Preprocessors)
 ASFLAGS  := 
 AS       := /usr/bin/as
 
