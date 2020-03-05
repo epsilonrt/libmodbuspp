@@ -206,6 +206,12 @@ namespace Modbus {
        * value in order to access the wordss of the ADU that precedes the PDU.
        */
       void setWord (int pduOffset, uint16_t value);
+      
+      /**
+       * @brief Return the CRC read in the message
+       * @return true if successfull, false if net()!=Rtu or aduSize()<4 
+       */
+      bool crc (uint16_t & c) const;
 
       /**
        * @brief Empties the message and returns it to the initial state

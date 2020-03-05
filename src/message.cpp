@@ -206,6 +206,17 @@ namespace Modbus {
   }
 
   // ---------------------------------------------------------------------------
+  bool Message::crc (uint16_t & c) const {
+
+    if (net() == Rtu && aduSize() >= 4) {
+      
+      c = word (size() - 2);
+      return true;
+    }
+    return false;
+  }
+
+  // ---------------------------------------------------------------------------
   void Message::setAduSize (size_t size) {
     PIMP_D (Message);
 
