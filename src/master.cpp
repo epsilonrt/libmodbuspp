@@ -64,7 +64,7 @@ namespace Modbus {
       d->recoveryLink = recovery;
       return true;
     }
-    return false;
+    throw std::runtime_error ("Error: backend not set !");
   }
 
   // ---------------------------------------------------------------------------
@@ -78,10 +78,6 @@ namespace Modbus {
   Slave & Master::addSlave (int slaveAddr) {
     PIMP_D (Master);
 
-    if (isOpen()) {
-
-      throw std::logic_error ("Unable to add slave when open !");
-    }
     return *d->addSlave (slaveAddr);
   }
 
@@ -141,8 +137,8 @@ namespace Modbus {
 
     if (isValid()) {
       PIMP_D (Device);
-      const uint8_t * adu = req.adu();
-      return modbus_send_raw_request (d->ctx(), adu, req.aduSize());;
+
+      return modbus_send_raw_request (d->ctx(), req.adu(), req.aduSize());;
     }
     throw std::runtime_error ("Error: backend not set !");
   }
@@ -206,25 +202,29 @@ namespace Modbus {
   Slave * Master::Private::addSlave (int slaveAddr) {
     PIMP_Q (Master);
 
-    if (modbus_set_slave (ctx(), slaveAddr) != 0) {
-      std::ostringstream oss;
+    if (q->isValid()) {
 
-      oss << "Error: Unable to add slave[" << slaveAddr << "]\n" << lastError();
-      throw std::invalid_argument (oss.str());
+      if (modbus_set_slave (ctx(), slaveAddr) != 0) {
+        std::ostringstream oss;
+
+        oss << "Error: Unable to add slave[" << slaveAddr << "]\n" << lastError();
+        throw std::invalid_argument (oss.str());
+      }
+
+      std::shared_ptr<Slave> s;
+
+      if (slave.count (slaveAddr)) {
+
+        s = slave[slaveAddr];
+      }
+      else {
+
+        s = std::make_shared<Slave> (slaveAddr, q);
+        slave[slaveAddr] = s;
+      }
+      return s.get();
     }
-
-    std::shared_ptr<Slave> s;
-
-    if (slave.count (slaveAddr)) {
-
-      s = slave[slaveAddr];
-    }
-    else {
-
-      s = std::make_shared<Slave> (slaveAddr, q);
-      slave[slaveAddr] = s;
-    }
-    return s.get();
+    throw std::runtime_error ("Error: backend not set !");
   }
 
   // ---------------------------------------------------------------------------

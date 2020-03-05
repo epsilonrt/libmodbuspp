@@ -69,45 +69,52 @@ namespace Modbus {
   // ---------------------------------------------------------------------------
   bool Slave::isValid() const {
 
-    return (device() != 0) && (number() >= 0);
+    return (device() != 0 ? device()->isValid() : false) && (number() >= 0);
   }
 
   // ---------------------------------------------------------------------------
   bool Slave::isOpen() const {
-    PIMP_D (const Slave);
 
-    return d->dev ? d->dev->isOpen() : false;
+    return isValid() ? device()->isOpen() : false;
   }
 
   // ---------------------------------------------------------------------------
   int Slave::readCoils (int addr, bool * dest, int nb) {
 
-    if (isOpen()) {
+    if (isValid()) {
       PIMP_D (Slave);
 
-      return modbus_read_bits (d->ctx(),
-                               pduAddress (addr), nb, (uint8_t *) dest);
-    }
-    return -1;
+      if (modbus_set_slave (d->ctx(), d->id) == 0) {
 
+        return modbus_read_bits (d->ctx(),
+                                 pduAddress (addr), nb, (uint8_t *) dest);
+      }
+      return -1; // errno set by modbus_set_slave
+    }
+    throw std::runtime_error ("Error: slave id or backend not set !");
   }
 
   // ---------------------------------------------------------------------------
   int Slave::readDiscreteInputs (int addr, bool * dest, int nb) {
 
-    if (isOpen()) {
+    if (isValid()) {
       PIMP_D (Slave);
 
-      return modbus_read_input_bits (d->ctx(),
-                                     pduAddress (addr), nb, (uint8_t *) dest);
+      if (modbus_set_slave (d->ctx(), d->id) == 0) {
+
+        return modbus_read_input_bits (d->ctx(),
+                                       pduAddress (addr), nb, (uint8_t *) dest);
+      }
+      return -1; // errno set by modbus_set_slave
     }
-    return -1;
+    throw std::runtime_error ("Error: slave id or backend not set !");
   }
 
   // ---------------------------------------------------------------------------
   int Slave::readRegisters (int addr, uint16_t * dest, int nb) {
 
-    if (isOpen()) {
+    if (isValid()) {
+
       PIMP_D (Slave);
 
       if (modbus_set_slave (d->ctx(), d->id) == 0) {
@@ -115,15 +122,15 @@ namespace Modbus {
         return modbus_read_registers (d->ctx(),
                                       pduAddress (addr), nb, dest);
       }
+      return -1; // errno set by modbus_set_slave
     }
-
-    return -1;
+    throw std::runtime_error ("Error: slave id or backend not set !");
   }
 
   // ---------------------------------------------------------------------------
   int Slave::readInputRegisters (int addr, uint16_t * dest, int nb) {
 
-    if (isOpen()) {
+    if (isValid()) {
       PIMP_D (Slave);
 
       if (modbus_set_slave (d->ctx(), d->id) == 0) {
@@ -131,15 +138,15 @@ namespace Modbus {
         return modbus_read_input_registers (d->ctx(),
                                             pduAddress (addr), nb, dest);
       }
+      return -1; // errno set by modbus_set_slave
     }
-
-    return -1;
+    throw std::runtime_error ("Error: slave id or backend not set !");
   }
 
   // ---------------------------------------------------------------------------
   int Slave::writeCoils (int addr, const bool * src, int nb) {
 
-    if (isOpen()) {
+    if (isValid()) {
       PIMP_D (Slave);
 
       if (modbus_set_slave (d->ctx(), d->id) == 0) {
@@ -147,14 +154,15 @@ namespace Modbus {
         return modbus_write_bits (d->ctx(),
                                   pduAddress (addr), nb, (const uint8_t *) src);
       }
+      return -1; // errno set by modbus_set_slave
     }
-    return -1;
+    throw std::runtime_error ("Error: slave id or backend not set !");
   }
 
   // ---------------------------------------------------------------------------
   int Slave::writeCoil (int addr, bool value) {
 
-    if (isOpen()) {
+    if (isValid()) {
       PIMP_D (Slave);
 
       if (modbus_set_slave (d->ctx(), d->id) == 0) {
@@ -162,28 +170,30 @@ namespace Modbus {
         return modbus_write_bit (d->ctx(),
                                  pduAddress (addr), (uint8_t) value);
       }
+      return -1; // errno set by modbus_set_slave
     }
-    return -1;
+    throw std::runtime_error ("Error: slave id or backend not set !");
   }
 
   // ---------------------------------------------------------------------------
   int Slave::writeRegisters (int addr, const uint16_t * src, int nb) {
 
-    if (isOpen()) {
+    if (isValid()) {
       PIMP_D (Slave);
 
       if (modbus_set_slave (d->ctx(), d->id) == 0) {
 
         return modbus_write_registers (d->ctx(), pduAddress (addr), nb, src);
       }
+      return -1; // errno set by modbus_set_slave
     }
-    return -1;
+    throw std::runtime_error ("Error: slave id or backend not set !");
   }
 
   // ---------------------------------------------------------------------------
   int Slave::writeRegister (int addr, uint16_t value) {
 
-    if (isOpen()) {
+    if (isValid()) {
       PIMP_D (Slave);
 
       if (modbus_set_slave (d->ctx(), d->id) == 0) {
@@ -191,16 +201,16 @@ namespace Modbus {
         return modbus_write_register (d->ctx(),
                                       pduAddress (addr), value);
       }
+      return -1; // errno set by modbus_set_slave
     }
-    return -1;
+    throw std::runtime_error ("Error: slave id or backend not set !");
   }
 
 
   // ---------------------------------------------------------------------------
   int Slave::writeReadRegisters (int waddr, const uint16_t * src, int wnb,
                                  int raddr, uint16_t * dest, int rnb) {
-
-    if (isOpen()) {
+    if (isValid()) {
       PIMP_D (Slave);
 
       if (modbus_set_slave (d->ctx(), d->id) == 0) {
@@ -209,24 +219,25 @@ namespace Modbus {
                                                 pduAddress (waddr), wnb, src,
                                                 pduAddress (raddr), rnb, dest);
       }
+      return -1; // errno set by modbus_set_slave
     }
-    return -1;
+    throw std::runtime_error ("Error: slave id or backend not set !");
   }
 
   // ---------------------------------------------------------------------------
   int Slave::reportSlaveId (uint16_t max_dest, uint8_t *dest) {
 
-    if (isOpen()) {
+    if (isValid()) {
+
       PIMP_D (Slave);
 
-      if (d->dev->net() == Rtu) {
-        if (modbus_set_slave (d->ctx(), d->id) == 0) {
+      if (modbus_set_slave (d->ctx(), d->id) == 0) {
 
-          return modbus_report_slave_id (d->ctx(), max_dest, dest);
-        }
+        return modbus_report_slave_id (d->ctx(), max_dest, dest);
       }
+      return -1; // errno set by modbus_set_slave
     }
-    return -1;
+    throw std::runtime_error ("Error: slave id or backend not set !");
   }
 
   // ---------------------------------------------------------------------------

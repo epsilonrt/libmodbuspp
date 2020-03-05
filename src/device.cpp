@@ -101,13 +101,13 @@ namespace Modbus {
 
   // ---------------------------------------------------------------------------
   int Device::flush() {
-
-    if (isOpen()) {
+    
+    if (isValid()) {
       PIMP_D (Device);
 
       return modbus_flush (d->ctx());
     }
-    return -1;
+    throw std::runtime_error ("Error: backend not set !");
   }
 
   // ---------------------------------------------------------------------------
@@ -178,6 +178,7 @@ namespace Modbus {
 
   // ---------------------------------------------------------------------------
   NetLayer & Device::backend() const {
+
     if (isValid()) {
       PIMP_D (const Device);
 
@@ -214,9 +215,9 @@ namespace Modbus {
     if (isValid()) {
       PIMP_D (Device);
 
-      (void) modbus_set_response_timeout (d->ctx(), t.sec(), t.usec());
+      return modbus_set_response_timeout (d->ctx(), t.sec(), t.usec()) == 0;
     }
-    return isValid();
+    throw std::runtime_error ("Error: backend not set !");
   }
 
   // ---------------------------------------------------------------------------
@@ -231,9 +232,9 @@ namespace Modbus {
     if (isValid()) {
       PIMP_D (Device);
 
-      (void) modbus_get_response_timeout (d->ctx(), &t.m_sec, &t.m_usec);
+      return modbus_get_response_timeout (d->ctx(), &t.m_sec, &t.m_usec) == 0;
     }
-    return isValid();
+    throw std::runtime_error ("Error: backend not set !");
   }
 
   // ---------------------------------------------------------------------------
@@ -250,9 +251,9 @@ namespace Modbus {
     if (isValid()) {
       PIMP_D (Device);
 
-      (void) modbus_set_byte_timeout (d->ctx(), t.sec(), t.usec());
+      return modbus_set_byte_timeout (d->ctx(), t.sec(), t.usec()) == 0;
     }
-    return isValid();
+    throw std::runtime_error ("Error: backend not set !");
   }
 
   // ---------------------------------------------------------------------------
@@ -267,9 +268,9 @@ namespace Modbus {
     if (isValid()) {
       PIMP_D (Device);
 
-      (void) modbus_get_byte_timeout (d->ctx(), &t.m_sec, &t.m_usec);
+      return modbus_get_byte_timeout (d->ctx(), &t.m_sec, &t.m_usec) == 0;
     }
-    return isValid();
+    throw std::runtime_error ("Error: backend not set !");
   }
 
   // ---------------------------------------------------------------------------
@@ -282,17 +283,17 @@ namespace Modbus {
 
   // ---------------------------------------------------------------------------
   bool Device::setDebug (bool debug) {
-    int rc = -1;
 
     if (isValid()) {
       PIMP_D (Device);
 
-      int rc = modbus_set_debug (d->ctx(), debug ? TRUE : FALSE);
-      if (rc == 0) {
+      if (modbus_set_debug (d->ctx(), debug ? TRUE : FALSE) == 0) {
+
         d->debug = debug;
       }
+      return d->debug == debug;
     }
-    return (rc == 0);
+    throw std::runtime_error ("Error: backend not set !");
   }
 
   // ---------------------------------------------------------------------------
@@ -374,8 +375,7 @@ namespace Modbus {
 
       return rc;
     }
-    errno = EINVAL;
-    return -1;
+    throw std::runtime_error ("Error: backend not set !");
   }
 
   // ---------------------------------------------------------------------------
