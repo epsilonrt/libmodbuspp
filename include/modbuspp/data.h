@@ -82,7 +82,7 @@ namespace Modbus {
       /**
        * @overload
        */
-      operator T&() const {
+      operator const T&() const {
         return m_value;
       }
 
