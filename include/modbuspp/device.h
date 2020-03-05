@@ -47,7 +47,7 @@ namespace Modbus {
        * For the Tcp backend :
        * - @b connection specifies the host name or IP
        * address of the host to connect to, eg. "192.168.0.5" , "::1" or
-       * "server.com". A NULL value can be used to listen any addresses in server mode,
+       * "server.com". "*" value can be used to listen any addresses in server mode,
        * - @b settings is the service name/port number to connect to.
        * To use the default Modbus port use the string "502". On many Unix
        * systems, it’s convenient to use a port number greater than or equal
@@ -59,7 +59,8 @@ namespace Modbus {
        *  OS, eg. "/dev/ttyS0" or "/dev/ttyUSB0",
        * - @b settings specifies communication settings as a string in the
        *  format BBBBPS. BBBB specifies the baud rate of the communication, PS
-       *  specifies the parity and the bits of stop.
+       *  specifies the parity and the bits of stop, e.g. 38400E1 for 38400
+       *  baud with even parity and 1 stop.
        *
        *  According to Modbus RTU specifications :
        *    - the possible combinations for PS are E1, O1 and N2.
@@ -126,7 +127,7 @@ namespace Modbus {
        * For the Tcp backend :
        * - @b connection specifies the host name or IP
        * address of the host to connect to, eg. "192.168.0.5" , "::1" or
-       * "server.com". A NULL value can be used to listen any addresses in server mode,
+       * "server.com". "*" value can be used to listen any addresses in server mode,
        * - @b settings is the service name/port number to connect to.
        * To use the default Modbus port use the string "502". On many Unix
        * systems, it’s convenient to use a port number greater than or equal
@@ -138,7 +139,8 @@ namespace Modbus {
        *  OS, eg. "/dev/ttyS0" or "/dev/ttyUSB0",
        * - @b settings specifies communication settings as a string in the
        *  format BBBBPS. BBBB specifies the baud rate of the communication, PS
-       *  specifies the parity and the bits of stop.
+       *  specifies the parity and the bits of stop, e.g. 38400E1 for 38400
+       *  baud with even parity and 1 stop.
        *
        *  According to Modbus RTU specifications :
        *    - the possible combinations for PS are E1, O1 and N2.
@@ -190,6 +192,17 @@ namespace Modbus {
        * @brief Returns the connection used
        * 
        * Serial port or host depending on the backend.
+       *
+       * For the Tcp backend :
+       * - @b connection specifies the host name or IP
+       * address of the host to connect to, eg. "192.168.0.5" , "::1" or
+       * "server.com".
+       * .
+       *
+       * For the Rtu backend :
+       * - @b connection specifies the name of the serial port handled by the
+       *  OS, eg. "/dev/ttyS0" or "/dev/ttyUSB0",
+       * .
        */
       std::string connection() const;
       
@@ -197,6 +210,26 @@ namespace Modbus {
        * @brief Returns the connection settings
        * 
        * IP port or speed, parity and stop bit depending on the backend
+       * 
+       * For the Tcp backend :
+       * - @b settings is the service name/port number to connect to.
+       * To use the default Modbus port use the string "502". On many Unix
+       * systems, it’s convenient to use a port number greater than or equal
+       * to 1024 because it’s not necessary to have administrator privileges.
+       * .
+       *
+       * For the Rtu backend :
+       * - @b settings specifies communication settings as a string in the
+       *  format BBBBPS. BBBB specifies the baud rate of the communication, PS
+       *  specifies the parity and the bits of stop, e.g. 38400E1 for 38400
+       *  baud with even parity and 1 stop.
+       *
+       *  According to Modbus RTU specifications :
+       *    - the possible combinations for PS are E1, O1 and N2.
+       *    - the number of bits of data must be 8, also there is no possibility
+       *      to change this setting
+       *    .
+       * .
        */
       std::string settings() const;
 
