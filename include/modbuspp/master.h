@@ -19,6 +19,8 @@
 #include <map>
 #include <modbuspp/device.h>
 #include <modbuspp/slave.h>
+#include <modbuspp/request.h>
+#include <modbuspp/response.h>
 
 namespace Modbus {
 
@@ -213,6 +215,36 @@ namespace Modbus {
        * @brief Returns the list of slaves as a map indexed by identifier number 
        */
       const std::map <int, std::shared_ptr<Slave>> & slaves() const;
+      
+      /**
+       * @brief Send a raw request
+       * 
+       * This function shall send a request. This function must be used for 
+       * debugging purposes because you have to take care to make a valid 
+       * request by hand. The function only adds to the message, the header or 
+       * CRC of the selected backend, so _req_ must start and contain at 
+       * least a slave/unit identifier and a function code. This function can 
+       * be used to send request not handled by the library.
+       * 
+       * @return The function shall return the full message length, counting the 
+       * extra data relating to the backend, if successful. Otherwise it shall 
+       * return -1 and set errno.
+       */
+      int sendRawRequest (const Request & req);
+      
+      /**
+       * @brief Receive a confirmation request
+       * 
+       * This function shall receive a request confirmation. This function must 
+       * be used for debugging purposes because the received response isn't 
+       * checked against the initial request. This function can be used to 
+       * receive request not handled by the library.
+       * 
+       * @return The function shall store the confirmation request in _rsp_ and 
+       * return the response length if sucessful. Otherwise it shall return -1 
+       * and set errno.
+       */
+      int receiveResponse (Response & rsp);
 
     protected:
       class Private;

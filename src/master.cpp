@@ -135,7 +135,34 @@ namespace Modbus {
 
     return d->slave;
   }
-  
+
+  // ---------------------------------------------------------------------------
+  int Master::sendRawRequest (const Request & req) {
+
+    if (isValid()) {
+      PIMP_D (Device);
+      const uint8_t * adu = req.adu();
+      return modbus_send_raw_request (d->ctx(), adu, req.aduSize());;
+    }
+    throw std::runtime_error ("Error: backend not set !");
+  }
+
+  // ---------------------------------------------------------------------------
+  int Master::receiveResponse (Response & resp) {
+
+    if (isValid()) {
+      PIMP_D (Device);
+
+      int rc = modbus_receive_confirmation (d->ctx(), resp.adu());;
+      if (rc > 0) {
+
+        resp.setAduSize (rc);
+      }
+      return rc;
+    }
+    throw std::runtime_error ("Error: backend not set !");
+  }
+
   // ---------------------------------------------------------------------------
   //
   //                         Master::Private Class
