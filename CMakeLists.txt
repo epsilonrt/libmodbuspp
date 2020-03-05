@@ -72,7 +72,7 @@ set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
 set(THREADS_PREFER_PTHREAD_FLAG TRUE)
 find_package(Threads REQUIRED)
 
-set(LIBMODBUS_MIN_VERSION "3.1.4")
+set(LIBMODBUS_MIN_VERSION "3.1.6")
 find_package(PkgConfig REQUIRED)
 
 pkg_check_modules (LIBMODBUS libmodbusepsi>=${LIBMODBUS_MIN_VERSION})
