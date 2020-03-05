@@ -71,6 +71,11 @@ namespace Modbus {
        */
       virtual bool prepareToSend (Message & msg);
 
+      /**
+       * @overload
+       */
+      virtual bool checkMessage (const Message & msg);
+
     protected:
       class Private;
       TcpLayer (Private &dd);

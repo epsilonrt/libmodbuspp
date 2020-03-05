@@ -163,6 +163,11 @@ namespace Modbus {
       virtual bool prepareToSend (Message & msg);
 
       /**
+       * @overload
+       */
+      virtual bool checkMessage (const Message & msg);
+
+      /**
        * @brief Extracts the baudrate from a settings string.
        * @return the baudrate found. if no value is found, returns the default
        * value, ie 19200.
@@ -187,7 +192,7 @@ namespace Modbus {
       /**
        * @brief Performing Modbus CRC16 generation of the buffer @b buf
        */
-      static uint16_t crc16 (uint8_t * buf, uint16_t count);
+      static uint16_t crc16 (const uint8_t * buf, uint16_t count);
 
     protected:
       class Private;

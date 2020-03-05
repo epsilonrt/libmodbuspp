@@ -86,6 +86,12 @@ namespace Modbus {
   }
 
   // ---------------------------------------------------------------------------
+  bool TcpLayer::checkMessage (const Message & msg) {
+    
+    return (msg.net() == Tcp) && (msg.size() >= 1);
+  }
+
+  // ---------------------------------------------------------------------------
   //
   //                         TcpLayer::Private Class
   //

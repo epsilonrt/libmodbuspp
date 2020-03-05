@@ -101,6 +101,11 @@ namespace Modbus {
        * depending on the network used..
        */
       virtual bool prepareToSend (Message & msg);
+      
+      /**
+       * @brief Return true if the message is valid for this backend
+       */
+      virtual bool checkMessage (const Message & msg);
 
       /**
        * @brief last error message

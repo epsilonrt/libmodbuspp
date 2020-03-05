@@ -226,6 +226,17 @@ namespace Modbus {
   }
 
   // ---------------------------------------------------------------------------
+  bool RtuLayer::checkMessage (const Message & msg) {
+    uint16_t crc;
+    
+    if  (msg.crc (crc)) {
+      
+      return crc16(msg.adu(),msg.aduSize()-2) == crc;
+    }
+    return false;
+  }
+
+  // ---------------------------------------------------------------------------
   // static
   int RtuLayer::baud (const std::string & settings) {
     int b;
@@ -266,14 +277,15 @@ namespace Modbus {
 
   // ---------------------------------------------------------------------------
   // static
-  uint16_t RtuLayer::crc16 (uint8_t *buffer, uint16_t buffer_length) {
+  uint16_t RtuLayer::crc16 (const uint8_t * buf, uint16_t count) {
     uint8_t crcHi = 0xFF; /* high CRC byte initialized */
     uint8_t crcLo = 0xFF; /* low CRC byte initialized */
     unsigned int i; /* will index into CRC lookup */
 
     /* pass through message buffer */
-    while (buffer_length--) {
-      i = crcHi ^ *buffer++; /* calculate the CRC  */
+    while (count--) {
+      
+      i = crcHi ^ *buf++; /* calculate the CRC  */
       crcHi = crcLo ^ rtu::CrcHiTable[i];
       crcLo = rtu::CrcLoTable[i];
     }

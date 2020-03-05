@@ -79,7 +79,7 @@ namespace Modbus {
 
   // ---------------------------------------------------------------------------
   int NetLayer::sendRawMessage (const Message * msg) {
-    
+
     errno = EINVAL;
     return -1;
   }
@@ -90,6 +90,12 @@ namespace Modbus {
     return false;
   }
 
+  // ---------------------------------------------------------------------------
+  bool NetLayer::checkMessage (const Message & msg) {
+
+    return false;
+  }
+  
   // ---------------------------------------------------------------------------
   // static
   std::string NetLayer::lastError() {
