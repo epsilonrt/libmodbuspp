@@ -403,6 +403,66 @@ namespace Modbus {
       bool byteTimeout (Timeout & timeout);
 
       /**
+       * @brief Set timeout for indication
+       *
+       * This function shall set the @b timeout interval used by a server to wait 
+       * for a request from a client.
+       * If @b timeout is zero, this timeout will not be used at all. In this 
+       * case, the server will wait forever.
+       *
+       * @param timeout reference on the variable that will contain the new
+       * timeout in seconds.
+       * @return true if successful.
+       * @sa indicationTimeout()
+       */
+      bool setIndicationTimeout (const double & timeout);
+
+      /**
+       * @brief Get timeout used to wait for an indication (request received by a server)
+       *
+       * This function shall return the timeout interval used to wait for an 
+       * indication in @b timeout.
+       * Indication is the term used by the Modbus protocol to designate a request 
+       * received by the server.
+       * 
+       * The default value is zero, it means the server will wait forever.
+       *
+       * @return timeout for indication in seconds.
+       * @sa setIndicationTimeout()
+       */
+      double indicationTimeout();
+
+      /**
+       * @brief Set timeout for indication
+       *
+       * This function shall set the @b timeout interval used by a server to wait 
+       * for a request from a client.
+       * If @b timeout is zero, this timeout will not be used at all. In this 
+       * case, the server will wait forever.
+       *
+       * @param timeout reference on the variable that will contain the new timeout value
+       * @return true if successful.
+       * @sa indicationTimeout()
+       */
+      bool setIndicationTimeout (const Timeout & timeout);
+
+      /**
+       * @brief Get timeout used to wait for an indication (request received by a server)
+       *
+       * This function shall return the timeout interval used to wait for an 
+       * indication in @b timeout.
+       * Indication is the term used by the Modbus protocol to designate a request 
+       * received by the server.
+       * 
+       * The default value is zero, it means the server will wait forever.
+       * 
+       * @param timeout reference on the variable that will contain the timeout value
+       * @return true if successful.
+       * @sa setIndicationTimeout()
+       */
+      bool indicationTimeout (Timeout & timeout);
+
+      /**
        * @brief Underlying layer used (backend)
        *
        * This function allows to know the underlying layer used.

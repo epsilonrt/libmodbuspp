@@ -282,6 +282,42 @@ namespace Modbus {
   }
 
   // ---------------------------------------------------------------------------
+  bool Device::setIndicationTimeout (const Timeout & t) {
+
+    if (isValid()) {
+      PIMP_D (Device);
+
+      return modbus_set_indication_timeout (d->ctx(), t.sec(), t.usec()) == 0;
+    }
+    throw std::runtime_error ("Error: backend not set !");
+  }
+
+  // ---------------------------------------------------------------------------
+  bool Device::setIndicationTimeout (const double & t) {
+
+    return setIndicationTimeout (Timeout (t));
+  }
+
+  // ---------------------------------------------------------------------------
+  bool Device::indicationTimeout (Timeout & t) {
+
+    if (isValid()) {
+      PIMP_D (Device);
+
+      return modbus_get_indication_timeout (d->ctx(), &t.m_sec, &t.m_usec) == 0;
+    }
+    throw std::runtime_error ("Error: backend not set !");
+  }
+
+  // ---------------------------------------------------------------------------
+  double Device::indicationTimeout () {
+    Timeout t;
+
+    indicationTimeout (t);
+    return t.value();
+  }
+
+  // ---------------------------------------------------------------------------
   bool Device::setDebug (bool debug) {
 
     if (isValid()) {
