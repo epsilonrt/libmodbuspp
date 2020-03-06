@@ -78,16 +78,16 @@ namespace Modbus {
 
       /**
        * @brief Set the before reply callback function @b cb of this slave
-       * 
-       * This function is called before the main message manager responds to the 
+       *
+       * This function is called before the main message manager responds to the
        * master by sending it a response from the contents of the memory map.
        */
       void setBeforeReplyCallback (Message::Callback cb);
 
       /**
        * @brief Set the after reply callback function @b cb of this slave
-       * 
-       * This function is called after the main message manager responds to the 
+       *
+       * This function is called after the main message manager responds to the
        * master by sending it a response from the contents of the memory map.
        */
       void setAfterReplyCallback (Message::Callback cb);
@@ -241,6 +241,40 @@ namespace Modbus {
         value.updateRegisters();
         return writeInputRegisters (addr, value.registers().data(), value.registers().size());
       }
+      
+      /**
+       * @brief Update the real slave from data block  @b t
+       * 
+       * @warning Only coils and holding registers may be update from data blocks.
+       * 
+       * @return number of written Modbus items if successful.
+       * Otherwise it shall return -1 and set errno.
+       */
+      int updateSlaveFromBlock (Table t);
+
+      /**
+       * @brief Update the real slave from coils and holding registers data blocks
+       * 
+       * @return true successful.
+       * Otherwise it shall return false and set errno.
+       */
+      bool updateSlaveFromBlock ();
+      
+      /**
+       * @brief Update data block  @b t from the real slave
+       * 
+       * @return the number of read items if successful.
+       * Otherwise it shall return -1 and set errno.
+       */
+      int updateBlockFromSlave (Table t);
+
+      /**
+       * @brief Update all data blocks from the real slave 
+       * 
+       * @return true successful.
+       * Otherwise it shall return false and set errno.
+       */
+      bool updateBlockFromSlave ();
 
       using Slave::readInputRegisters;
       using Slave::readInputRegister;

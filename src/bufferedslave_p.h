@@ -33,6 +33,12 @@ namespace Modbus {
       int setCoilBlock (int addr, int nmemb);
       int setHoldingRegisterBlock (int addr, int nmemb);
       int setInputRegisterBlock (int addr, int nmemb);
+      int updateDiscreteInputBlockFromSlave();
+      int updateCoilBlockFromSlave();
+      int updateHoldingRegisterBlockFromSlave();
+      int updateInputRegisterBlockFromSlave();
+      int updateSlaveCoilFromBlock();
+      int updateSlaveHoldingRegisterFromBlock();
 
       modbus_mapping_t * map;
       std::vector<uint8_t> idReport;

@@ -63,6 +63,7 @@ namespace Modbus {
       case HoldingRegister:
         return d->setHoldingRegisterBlock (startAddr, nmemb);
     }
+    errno = EINVAL;
     return -1;
   }
 
@@ -169,6 +170,7 @@ namespace Modbus {
       }
       return 0;
     }
+    errno = EINVAL;
     return -1;
   }
 
@@ -241,6 +243,7 @@ namespace Modbus {
       }
       return 0;
     }
+    errno = EINVAL;
     return -1;
   }
 
@@ -269,6 +272,7 @@ namespace Modbus {
       memcpy (dest, src, nb * sizeof (dest[0]));
       return nb;
     }
+    errno = EINVAL;
     return -1;
   }
 
@@ -297,6 +301,7 @@ namespace Modbus {
       return nb;
 
     }
+    errno = EINVAL;
     return -1;
   }
 
@@ -324,6 +329,7 @@ namespace Modbus {
       memcpy (dest, src, nb * sizeof (dest[0]));
       return nb;
     }
+    errno = EINVAL;
     return -1;
   }
 
@@ -352,6 +358,7 @@ namespace Modbus {
       memcpy (dest, src, nb * sizeof (dest[0]));
       return nb;
     }
+    errno = EINVAL;
     return -1;
   }
 
@@ -384,6 +391,7 @@ namespace Modbus {
 
       return nb;
     }
+    errno = EINVAL;
     return -1;
   }
 
@@ -421,6 +429,7 @@ namespace Modbus {
       }
       return nb;
     }
+    errno = EINVAL;
     return -1;
   }
 
@@ -466,6 +475,7 @@ namespace Modbus {
       return read_nb;
 
     }
+    errno = EINVAL;
     return -1;
   }
 
@@ -505,6 +515,7 @@ namespace Modbus {
       memcpy (dest, src, nb * sizeof (dest[0]));
       return nb;
     }
+    errno = EINVAL;
     return -1;
   }
 
@@ -529,6 +540,7 @@ namespace Modbus {
       memcpy (dest, src, nb * sizeof (dest[0]));
       return nb;
     }
+    errno = EINVAL;
     return -1;
   }
 
@@ -536,6 +548,54 @@ namespace Modbus {
   int BufferedSlave::writeInputRegister (int addr, uint16_t value) {
 
     return writeInputRegisters (addr, &value, 1);
+  }
+
+  // ---------------------------------------------------------------------------
+  int BufferedSlave::updateSlaveFromBlock (Table t) {
+    PIMP_D (BufferedSlave);
+
+    switch (t) {
+      case Coil:
+        return d->updateSlaveCoilFromBlock();
+      case HoldingRegister:
+        return d->updateSlaveHoldingRegisterFromBlock();
+    }
+    errno = EINVAL;
+    return -1;
+  }
+
+  // ---------------------------------------------------------------------------
+  bool BufferedSlave::updateSlaveFromBlock () {
+
+    return updateSlaveFromBlock (Coil) >= 0 &&
+           updateSlaveFromBlock (HoldingRegister) >= 0;
+  }
+
+  // ---------------------------------------------------------------------------
+  int BufferedSlave::updateBlockFromSlave (Table t) {
+    PIMP_D (BufferedSlave);
+
+    switch (t) {
+      case DiscreteInput:
+        return d->updateDiscreteInputBlockFromSlave();
+      case Coil:
+        return d->updateCoilBlockFromSlave();
+      case InputRegister:
+        return d->updateInputRegisterBlockFromSlave();
+      case HoldingRegister:
+        return d->updateHoldingRegisterBlockFromSlave();
+    }
+    errno = EINVAL;
+    return -1;
+  }
+
+  // ---------------------------------------------------------------------------
+  bool BufferedSlave::updateBlockFromSlave () {
+
+    return updateBlockFromSlave (Coil) >= 0 &&
+           updateBlockFromSlave (HoldingRegister) >= 0 &&
+           updateBlockFromSlave (DiscreteInput) >= 0 &&
+           updateBlockFromSlave (InputRegister) >= 0;
   }
 
   // ---------------------------------------------------------------------------
@@ -559,7 +619,7 @@ namespace Modbus {
   //                         BufferedSlave::Private Class
   //
   // ---------------------------------------------------------------------------
-  
+
   // ---------------------------------------------------------------------------
   BufferedSlave::Private::Private (BufferedSlave * q) :
     Slave::Private (q), map (modbus_mapping_new (0, 0, 0, 0)),
@@ -579,6 +639,104 @@ namespace Modbus {
   BufferedSlave::Private::~Private() {
 
     modbus_mapping_free (map);
+  }
+
+  // ---------------------------------------------------------------------------
+  int BufferedSlave::Private::updateDiscreteInputBlockFromSlave() {
+    PIMP_Q (Slave);
+
+    int nb = map->nb_input_bits;
+    if (q->isOpen() && nb > 0) {
+      int addr = q->dataAddress (map->start_input_bits);
+      uint8_t * dest = map->tab_input_bits;
+
+      return  q->readDiscreteInputs (addr, (bool *) dest, nb);
+    }
+    return 0;
+  }
+
+  // ---------------------------------------------------------------------------
+  int BufferedSlave::Private::updateCoilBlockFromSlave() {
+    PIMP_Q (Slave);
+
+    int nb = map->nb_bits;
+    if (q->isOpen() && nb > 0) {
+      int addr = q->dataAddress (map->start_bits);
+      uint8_t * dest = map->tab_bits;
+
+      return  q->readCoils (addr, (bool *) dest, nb);
+    }
+    return 0;
+  }
+
+  // ---------------------------------------------------------------------------
+  int BufferedSlave::Private::updateHoldingRegisterBlockFromSlave() {
+    PIMP_Q (Slave);
+
+    int nb = map->nb_registers;
+    if (q->isOpen() && nb > 0) {
+      int addr = q->dataAddress (map->start_registers);
+      uint16_t * dest = map->tab_registers;
+
+      return  q->readRegisters (addr, dest, nb);
+    }
+    return 0;
+  }
+
+  // ---------------------------------------------------------------------------
+  int BufferedSlave::Private::updateInputRegisterBlockFromSlave() {
+    PIMP_Q (Slave);
+
+    int nb = map->nb_input_registers;
+    if (q->isOpen() && nb > 0) {
+      int addr = q->dataAddress (map->start_input_registers);
+      uint16_t * dest = map->tab_input_registers;
+
+      return  q->readInputRegisters (addr, dest, nb);
+    }
+    return 0;
+  }
+
+  // ---------------------------------------------------------------------------
+  int BufferedSlave::Private::updateSlaveCoilFromBlock() {
+    PIMP_Q (Slave);
+
+    int nb = map->nb_bits;
+    if (q->isOpen() && nb > 0) {
+      int addr = q->dataAddress (map->start_bits);
+      uint8_t * src = map->tab_bits;
+
+      if (nb == 1) {
+
+        return q->writeCoil (addr, src[0] != 0);
+      }
+      else {
+
+        return  q->writeCoils (addr, (bool *) src, nb);
+      }
+    }
+    return 0;
+  }
+
+  // ---------------------------------------------------------------------------
+  int BufferedSlave::Private::updateSlaveHoldingRegisterFromBlock() {
+    PIMP_Q (Slave);
+
+    int nb = map->nb_registers;
+    if (q->isOpen() && nb > 0) {
+      int addr = q->dataAddress (map->start_registers);
+      uint16_t * src = map->tab_registers;
+
+      if (nb == 1) {
+
+        return q->writeRegister (addr, src[0]);
+      }
+      else {
+
+        return  q->writeRegisters (addr, src, nb);
+      }
+    }
+    return 0;
   }
 
   // ---------------------------------------------------------------------------
@@ -777,6 +935,47 @@ namespace Modbus {
           }
 
           s->setBlock (t, nmemb, startAddr);
+          if (b.contains ("default")) {
+            auto values = j["default"];
+
+            if (t == InputRegister || t == HoldingRegister) {
+              std::vector<uint16_t> words;
+
+              for (int i = 0; i < values.size(); i++) {
+                unsigned long ul;
+                auto s = values[i].get<std::string>();
+
+                try {
+                  ul = std::stoi (s, nullptr, 0);
+                }
+                catch (const std::invalid_argument& ia) {
+                  ul = 0;
+                }
+                if (ul > UINT16_MAX) {
+                  throw std::invalid_argument ("Invalid value: " + s + " in JSON file !");
+                }
+                words.push_back (ul);
+              }
+              if (t == InputRegister) {
+
+                int rc = s->writeInputRegisters (startAddr, words.data(), words.size());
+                if (rc < 0) {
+                  throw std::system_error (errno, std::generic_category(), "writeInputRegisters() from Json::setConfig(BufferedSlave *)");
+                }
+              }
+              else {
+
+                int rc = s->writeRegisters (startAddr, words.data(), words.size());
+                if (rc < 0) {
+                  throw std::system_error (errno, std::generic_category(), "writeRegisters() from Json::setConfig(BufferedSlave *)");
+                }
+              }
+            }
+            else {
+
+            }
+          }
+
         }
       }
     }
