@@ -131,6 +131,14 @@ namespace Modbus {
       int pduAddress (int addr) const;
       
       /**
+       * @brief returns the address in the MODBUS data model corresponding to a PDU address.
+       *
+       * If the PDU addressing mode is not enabled (which is the case by default),
+       * the data model address is equal to the PDU address plus 1, otherwise they are equal.
+       */
+      int dataAddress (int addr) const;
+      
+      /**
        * @brief Read many discrete inputs (input bits)
        *
        * This function shall read the content of the @b nb input bits to the

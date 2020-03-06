@@ -260,6 +260,13 @@ namespace Modbus {
 
     return dataAddr - (d->pduAddressing ? 0 : 1);
   }
+  
+  // ---------------------------------------------------------------------------
+  int Slave::dataAddress (int pduAddr) const {
+    PIMP_D (const Slave);
+
+    return pduAddr + (d->pduAddressing ? 0 : 1);
+  }
 
   // ---------------------------------------------------------------------------
   // static
