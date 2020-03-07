@@ -21,7 +21,10 @@
 #include "config.h"
 #include <chrono>
 #include <thread>
-#include <iostream> // for debug purposes
+// for debug purposes
+#include <iostream> 
+#include <sstream>
+#include <iomanip>
 
 using json = nlohmann::json;
 
@@ -101,7 +104,7 @@ namespace Modbus {
 
   // ---------------------------------------------------------------------------
   int Device::flush() {
-    
+
     if (isValid()) {
       PIMP_D (Device);
 
@@ -466,6 +469,13 @@ namespace Modbus {
       }
       // std::cout << "config > " << config << std::endl; // debug
       setConfig (config);
+      if (debug) {
+        std::ostringstream oss;
+        std::cout << "----=== [" << jsonfile << "] ===----" << std::endl;
+        oss << std::setw (2) << j;
+        std::cout << oss.str() << std::endl << std::endl;
+      }
+
     }
     else {
 
