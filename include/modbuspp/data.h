@@ -20,32 +20,38 @@
 #include <cstring>    // memcpy ...
 #include <array>
 #include <type_traits>
+#include <limits>
+#include <string>
+
 #include <modbuspp/global.h>
 #include <modbuspp/swap.h>
 
 namespace Modbus {
 
   class Slave;
+  class BufferedSlave;
   class Message;
+  class Request;
+  class Response;
 
   /**
    * @class Data
    * @brief Arithmetic data in multiple 16-bit Modbus registers
-   * 
-   * Data is a template class for storing, transmitting, and receiving 
+   *
+   * Data is a template class for storing, transmitting, and receiving
    * arithmetic data in multiple 16-bit Modbus registers.
-   * 
-   * @param T is a type of arithmetic data (int, float ...) of a size greater 
+   *
+   * @param T is a type of arithmetic data (int, float ...) of a size greater
    * than or equal to 2.
-   * @param e is the order of bytes and words in the data model used by the 
-   * user's Modbus network. By default it is the big endian order for bytes 
+   * @param e is the order of bytes and words in the data model used by the
+   * user's Modbus network. By default it is the big endian order for bytes
    * and words that is used.
-   * 
+   *
    * @example master/read-holding-data/main.cpp
    * @example master/report-slave-id/main.cpp
    * @example master/write-holding-data/main.cpp
    * @example server/clock-server/main.cpp
-   * 
+   *
    * @author Pascal JEAN, aka epsilonrt
    * @copyright GNU Lesser General Public License
    */
@@ -57,7 +63,7 @@ namespace Modbus {
 
       /**
        * @brief Default constructor
-       * 
+       *
        * The default value of T is 0.
        */
       Data() : m_endian (e) {
@@ -131,6 +137,14 @@ namespace Modbus {
       }
 
       /**
+       * @brief Set the bytes and words endianness
+       */
+      void setEndianness (Endian endian) {
+        m_endian = endian;
+        updateRegisters();
+      }
+
+      /**
        * @brief Number of bytes of type T
        */
       std::size_t size() const {
@@ -143,7 +157,7 @@ namespace Modbus {
       std::array < uint16_t, sizeof (T) / 2 > & registers() {
         return m_registers;
       }
-      
+
       /**
        * @brief Array of Modbus registers corresponding to the T value
        */
@@ -153,7 +167,7 @@ namespace Modbus {
 
       /**
        * @brief Swap bytes and words of a T value @b v
-       * 
+       *
        * The order used is @b endianness().
        */
       void swap (T & v) {
@@ -175,7 +189,7 @@ namespace Modbus {
 
       /**
        * @brief Prints the hexadecimal values of a byte array
-       * 
+       *
        * For debugging purpose.
        */
       static void print (const uint8_t * p, const size_t s) {
@@ -188,7 +202,7 @@ namespace Modbus {
 
       /**
        * @brief Prints the hexadecimal values of T value
-       * 
+       *
        * For debugging purpose.
        */
       static void print (const T & v) {
@@ -197,7 +211,7 @@ namespace Modbus {
 
       /**
        * @brief Prints the hexadecimal values of the current T value
-       * 
+       *
        * For debugging purpose.
        */
       void print () {
@@ -206,9 +220,12 @@ namespace Modbus {
       }
 
       friend class Slave;
+      friend class BufferedSlave;
       friend class Message;
+      friend class Request;
+      friend class Response;
 
-  protected:
+    protected:
 
 #ifndef __DOXYGEN__
       // update MODBUS registers from data value
@@ -243,5 +260,45 @@ namespace Modbus {
       Endian m_endian;
       std::array < uint16_t, sizeof (T) / 2 > m_registers;
   };
+
+  /**
+   * @brief Convert string to T
+   *
+   * Parses @b str interpreting its content as a T number, which is returned as a value of type T.
+   * T may be uint16_t, uint32_t, uint64_t, int16_t, int32_t, int64_t, float, double, long double
+   */
+  template <typename T> void strToT (T & v, const std::string & str, int base = 0) {
+    size_t idx = 0;
+
+    if (std::is_same<T, uint16_t>::value || std::is_same<T, uint32_t>::value || std::is_same<T, uint64_t>::value) {
+      unsigned long long ull = std::stoull (str, &idx, base);
+
+      if (ull > std::numeric_limits<T>::max()) {
+        throw std::out_of_range (str);
+      }
+      v = static_cast<T> (ull);
+    }
+    else if (std::is_same<T, int16_t>::value || std::is_same<T, int32_t>::value || std::is_same<T, int64_t>::value) {
+      unsigned long long ll = std::stoll (str, &idx, base);
+
+      if (ll > std::numeric_limits<T>::max() || ll < std::numeric_limits<T>::lowest()) {
+        throw std::out_of_range (str);
+      }
+      v = static_cast<T> (ll);
+    }
+    else if (std::is_same<T, float>::value || std::is_same<T, double>::value || std::is_same<T, double>::value) {
+      long double ld = std::stold (str, &idx);
+
+      if (ld > std::numeric_limits<T>::max() || ld < std::numeric_limits<T>::lowest()) {
+        throw std::out_of_range (str);
+      }
+      v = static_cast<T> (ld);
+    }
+
+    if (idx < str.size()) {
+
+      throw std::invalid_argument (str);
+    }
+  }
 }
 /* ========================================================================== */
