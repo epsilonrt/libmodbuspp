@@ -6,7 +6,7 @@ This example is intended to be compiled with [Codelite](https://codelite.org).
 
 If you want to compile it without codelite, you can do it with [GNU make](https://www.gnu.org/software/make/) :
 
-		make -f virtual-server.mk
+		make -f callback-server-json.mk
 
 You can then run the program that is in the Debug folder.
 
@@ -16,5 +16,5 @@ should follow my advice and use CodeLite...
 This library provides a file for pkg-config that should also allow you to 
 compile with gcc:
 
-		g++ -o virtual-server $(pkg-config --cflags --libs modbuspp) main.cpp
+		g++ -o callback-server-json $(pkg-config --cflags --libs modbuspp) main.cpp
 

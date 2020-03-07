@@ -102,8 +102,6 @@
     <File Name="COPYING.LESSER"/>
     <File Name="README.md"/>
   </VirtualDirectory>
-  <Dependencies Name="Debug"/>
-  <Dependencies Name="Release"/>
   <VirtualDirectory Name="tests">
     <File Name="tests/CMakeLists.txt"/>
   </VirtualDirectory>
@@ -197,4 +195,6 @@
       </Completion>
     </Configuration>
   </Settings>
+  <Dependencies Name="Debug"/>
+  <Dependencies Name="Release"/>
 </CodeLite_Project>

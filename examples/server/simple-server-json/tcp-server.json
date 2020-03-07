@@ -1,0 +1,41 @@
+{
+  "modbuspp-server": {
+    "mode": "tcp",
+    "connection": "localhost",
+    "settings": "1502",
+    "debug": true,
+    "recovery-link": true,
+    "response-timeout": 500,
+    "byte-timeout": 500,
+    "slaves": [
+      {
+        "id": 10,
+        "blocks": [
+          {
+            "table": "holding-register",
+            "starting-address": 1,
+            "data-type": "float",
+            "quantity": 4,
+            "endian" : "cdab",
+            "values" : [1.5,-3.14,5.23e12,1.63e-6]
+          },
+          {
+            "table": "input-register",
+            "quantity": 2,
+            "values" : [101,"0x100"]
+          },
+          {
+            "table": "coil",
+            "quantity": 12,
+            "values" : ["0x5A",true,1,false,0]
+          },          
+          {
+            "table": "discrete-input",
+            "quantity": 4,
+            "values" : [0,0,1,1]
+          }
+        ]
+      }
+    ]  
+  }
+}

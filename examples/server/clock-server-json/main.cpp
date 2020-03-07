@@ -178,13 +178,9 @@ int main (int argc, char **argv) {
       while (srv.isOpen());
     }
   }
-  catch (std::logic_error & e) {
+  catch (std::exception & e) {
 
-    cerr << "Logic error: " << e.what() << endl;
-  }
-  catch (std::runtime_error & e) {
-
-    cerr << "Runtime error: " << e.what() << endl;
+    cerr << "Error: " << e.what() << endl;
   }
   catch (...) {
 

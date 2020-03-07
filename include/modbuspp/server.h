@@ -56,7 +56,8 @@ namespace Modbus {
     *
     * @example server/clock-server/main.cpp
     * @example server/clock-server-json/main.cpp
-    * @example server/virtual-server-json/main.cpp
+    * @example server/simple-server-json/main.cpp
+    * @example server/callback-server-json/main.cpp
     *
     * @author Pascal JEAN, aka epsilonrt
     * @copyright GNU Lesser General Public License

@@ -3,10 +3,10 @@
 ## any manual changes will be erased      
 ##
 ## Debug
-ProjectName            :=read-input-registers
+ProjectName            :=callback-server-json
 ConfigurationName      :=Debug
 WorkspacePath          :=/home/pascal/src/libmodbuspp
-ProjectPath            :=/home/pascal/src/libmodbuspp/examples/master/read-input-registers
+ProjectPath            :=/home/pascal/src/libmodbuspp/examples/server/callback-server-json
 IntermediateDirectory  :=./Debug
 OutDir                 := $(IntermediateDirectory)
 CurrentFileName        :=
@@ -32,7 +32,7 @@ Preprocessors          :=
 ObjectSwitch           :=-o 
 ArchiveOutputSwitch    := 
 PreprocessOnlySwitch   :=-E
-ObjectsFileList        :="read-input-registers.txt"
+ObjectsFileList        :="callback-server-json.txt"
 PCHCompileFlags        :=
 MakeDirCommand         :=mkdir -p
 LinkOptions            := $(shell pkg-config --libs modbuspp) 
@@ -92,7 +92,7 @@ PreBuild:
 ## Objects
 ##
 $(IntermediateDirectory)/main.cpp$(ObjectSuffix): main.cpp $(IntermediateDirectory)/main.cpp$(DependSuffix)
-	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/pascal/src/libmodbuspp/examples/master/read-input-registers/main.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/main.cpp$(ObjectSuffix) $(IncludePath)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/pascal/src/libmodbuspp/examples/server/callback-server-json/main.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/main.cpp$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/main.cpp$(DependSuffix): main.cpp
 	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/main.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/main.cpp$(DependSuffix) -MM main.cpp
 

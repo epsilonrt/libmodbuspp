@@ -1,17 +1,20 @@
 /**
- * @brief libmodbuspp virtual-server-json example
+ * @brief libmodbuspp callback-server-json example
  *
- * Shows how to use libmodbuspp to build a virtual MODBUS server.
- * the MODBUS server is configured from the JSON ./server.json file
+ * Shows how to use a callback function to handle read messages from the input 
+ * registers. The values returned are purely dummy, they correspond to the value 
+ * of a counter which is incremented each time a register is read.
+ * 
+ * the MODBUS server is configured from a JSON file
  *
  * @code
- * virtual-server ../virtual-server-tcp.json
+ * callback-server-json ../callback-server-tcp.json
  * @endcode
  *
  * Once the server has started you can test it with mbpoll :
  *
  * @code
-    $ mbpoll -mtcp -p1502 -a10 -t3 -c8 localhost
+    $ mbpoll -mtcp -p1502 -a10 -t3 -c4 localhost -1
     mbpoll 1.4-12 - FieldTalk(tm) Modbus(R) Master Simulator
     Copyright © 2015-2019 Pascal JEAN, https://github.com/epsilonrt/mbpoll
     This program comes with ABSOLUTELY NO WARRANTY.
@@ -20,23 +23,19 @@
 
     Protocol configuration: Modbus TCP
     Slave configuration...: address = [10]
-                            start reference = 1, count = 8
+                            start reference = 1, count = 4
     Communication.........: localhost, port 1502, t/o 1.00 s, poll rate 1000 ms
     Data type.............: 16-bit register, input register table
 
-    -- Polling slave 10... Ctrl-C to stop)
-    [1]:  37
-    [2]:  40
-    [3]:  15
-    [4]:  28
-    [5]:  11
-    [6]:  2019
-    [7]:  4
-    [8]:  332
+    -- Polling slave 10...
+    [1]: 	1
+    [2]: 	2
+    [3]: 	3
+    [4]: 	4
  * @endcode
  *
- * These data correspond to 15:40:37 on Thursday 28/11/2019, 332nd day of the
- * year. To read the time difference from GMT (in seconds) :
+ * Since no address check is performed in the callback function, the program 
+ * sends a response regardless of the slave address.
  */
 #include <csignal>
 #include <thread>
@@ -50,12 +49,12 @@ Server srv; // instantiates new MODBUS Server
 
 /* -----------------------------------------------------------------------------
  * Incoming message handler
- * This function is called each time a MODBUS message is received by the Server 
+ * This function is called each time a MODBUS message is received by the Server
  * class on the backend network (TCP-IP or OSL).
- * Here the function analyzes the message, if it is a message for reading input 
- * registers (FC 4), a response is constructed which sends dummy values which 
- * are incremented with each reading. The response is sent using the 
- * sendRawMessage() function, which automatically completes the message with a 
+ * Here the function analyzes the message, if it is a message for reading input
+ * registers (FC 4), a response is constructed which sends dummy values which
+ * are incremented with each reading. The response is sent using the
+ * sendRawMessage() function, which automatically completes the message with a
  * header or CRC.
  */
 int messageHandler (Message * req, Device * dev) {
@@ -63,15 +62,15 @@ int messageHandler (Message * req, Device * dev) {
   cout << "Receive message, size : " << req->aduSize() << endl;
   if (req->function() == ReadInputRegisters) {
     // the dummy word will be the returned value, incremented after each reading
-    static uint16_t dummy = 1; 
-    
+    static uint16_t dummy = 1;
+
     // get request parameters
     uint16_t N = req->quantity();
     uint16_t index = req->startingAddress();
-    
+
     // build response, see page 16 of MODBUS Application Protocol Specification
     Response rsp (*req); // uses copy constructor to keep transaction id
-    rsp.setSize(1); // keep until function code
+    rsp.setSize (1); // keep until function code
     rsp.setByteCount (N * 2);
     for (uint16_t i = 0; i < N; i++) {
 
@@ -105,7 +104,7 @@ int main (int argc, char **argv) {
 
   string  jsonfile = argv[1];
 
-  cout << "Virtual Server" << endl;
+  cout << "Callback Server" << endl;
   // CTRL+C and kill call triggers the trap sighandler()
   signal (SIGINT, sighandler);
   signal (SIGTERM, sighandler);
@@ -128,13 +127,9 @@ int main (int argc, char **argv) {
       }
     }
   }
-  catch (std::logic_error & e) {
+  catch (std::exception & e) {
 
-    cerr << "Logic error: " << e.what() << endl;
-  }
-  catch (std::runtime_error & e) {
-
-    cerr << "Runtime error: " << e.what() << endl;
+    cerr << "Error: " << e.what() << endl;
   }
   catch (...) {
 

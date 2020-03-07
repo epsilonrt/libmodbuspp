@@ -14,7 +14,8 @@
     <VirtualDirectory Name="server">
       <Project Name="clock-server-json" Path="examples/server/clock-server-json/clock-server-json.project" Active="No"/>
       <Project Name="clock-server" Path="examples/server/clock-server/clock-server.project" Active="No"/>
-      <Project Name="virtual-server" Path="examples/server/virtual-server-json/virtual-server.project" Active="No"/>
+      <Project Name="callback-server-json" Path="examples/server/callback-server-json/callback-server-json.project" Active="No"/>
+      <Project Name="simple-server-json" Path="examples/server/simple-server-json/simple-server-json.project" Active="No"/>
     </VirtualDirectory>
     <VirtualDirectory Name="router">
       <Project Name="router-json" Path="examples/router/router-json/router-json.project" Active="No"/>
@@ -35,9 +36,10 @@
       <Project Name="router-json" ConfigName="Debug"/>
       <Project Name="clock-server" ConfigName="Debug"/>
       <Project Name="router-simple" ConfigName="Debug"/>
-      <Project Name="virtual-server" ConfigName="Debug"/>
       <Project Name="unit-test-server" ConfigName="Debug"/>
       <Project Name="unit-test-device" ConfigName="Debug"/>
+      <Project Name="callback-server-json" ConfigName="Debug"/>
+      <Project Name="simple-server-json" ConfigName="Debug"/>
     </WorkspaceConfiguration>
     <WorkspaceConfiguration Name="Release" Selected="yes">
       <Environment/>
@@ -48,9 +50,10 @@
       <Project Name="router-json" ConfigName="Release"/>
       <Project Name="clock-server" ConfigName="Release"/>
       <Project Name="router-simple" ConfigName="Release"/>
-      <Project Name="virtual-server" ConfigName="Release"/>
       <Project Name="unit-test-server" ConfigName="Release"/>
       <Project Name="unit-test-device" ConfigName="Release"/>
+      <Project Name="callback-server-json" ConfigName="Release"/>
+      <Project Name="simple-server-json" ConfigName="Release"/>
     </WorkspaceConfiguration>
   </BuildMatrix>
 </CodeLite_Workspace>

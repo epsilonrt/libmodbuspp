@@ -3,17 +3,17 @@
 ## any manual changes will be erased      
 ##
 ## Debug
-ProjectName            :=virtual-server
+ProjectName            :=simple-server-json
 ConfigurationName      :=Debug
 WorkspacePath          :=/home/pascal/src/libmodbuspp
-ProjectPath            :=/home/pascal/src/libmodbuspp/examples/server/virtual-server-json
+ProjectPath            :=/home/pascal/src/libmodbuspp/examples/server/simple-server-json
 IntermediateDirectory  :=./Debug
 OutDir                 := $(IntermediateDirectory)
 CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
 User                   :=epsilonrt
-Date                   :=03/03/20
+Date                   :=03/07/20
 CodeLitePath           :=/home/pascal/.codelite
 LinkerName             :=/usr/bin/g++
 SharedObjectLinkerName :=/usr/bin/g++ -shared -fPIC
@@ -32,7 +32,7 @@ Preprocessors          :=
 ObjectSwitch           :=-o 
 ArchiveOutputSwitch    := 
 PreprocessOnlySwitch   :=-E
-ObjectsFileList        :="virtual-server.txt"
+ObjectsFileList        :="simple-server-json.txt"
 PCHCompileFlags        :=
 MakeDirCommand         :=mkdir -p
 LinkOptions            := $(shell pkg-config --libs modbuspp) 
@@ -92,7 +92,7 @@ PreBuild:
 ## Objects
 ##
 $(IntermediateDirectory)/main.cpp$(ObjectSuffix): main.cpp $(IntermediateDirectory)/main.cpp$(DependSuffix)
-	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/pascal/src/libmodbuspp/examples/server/virtual-server-json/main.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/main.cpp$(ObjectSuffix) $(IncludePath)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "/home/pascal/src/libmodbuspp/examples/server/simple-server-json/main.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/main.cpp$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/main.cpp$(DependSuffix): main.cpp
 	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/main.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/main.cpp$(DependSuffix) -MM main.cpp
 

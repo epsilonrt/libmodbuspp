@@ -1,14 +1,15 @@
 /**
- * @brief libmodbuspp router-json example
+ * @brief libmodbuspp simple-server-json example
  *
- * Shows how to use libmodbuspp to build a MODBUS time server.
- * the MODBUS router is configured from a JSON file
+ * Shows how to make a purely virtual MODBUS TCP server, the JSON file describes 
+ * the different data blocks (coils, discrete inputs, input and storage registers) 
+ * and initializes the values at startup.
  *
  * @code
- * router-json json_filename
+ * simple-server-json ../tcp-server.json
  * @endcode
  *
- * Once the router has started you can test it with mbpoll :
+ * Once the server has started you can test it with mbpoll :
  *
  * @code
     $ mbpoll -mtcp -p1502 -a10 -t3 -c8 localhost
@@ -35,23 +36,6 @@
     [8]:  332
  * @endcode
  *
- * These data correspond to 15:40:37 on Thursday 28/11/2019, 332nd day of the
- * year. To read the time difference from GMT (in seconds) :
- *
- * @code
-    $ mbpoll -mtcp -p1502 -a10 -t4:int -B -1 localhost
-      ....
-      -- Polling slave 10...
-      [1]:  3600
- * @endcode
- *
- * To set the offset to GMT-2 hours :
- *
- * @code
-    $ mbpoll -mtcp -p1502 -a10 -t4:int -B localhost -- -7200
-      ....
-      Written 1 references.
- * @endcode
  */
 #include <csignal>
 #include <thread>
@@ -61,15 +45,16 @@
 using namespace std;
 using namespace Modbus;
 
-Router router; // instantiates new MODBUS Router
+Server srv; // instantiates new MODBUS Server
 
 // -----------------------------------------------------------------------------
 // Signal trap, triggers during a CTRL+C or if kill is called
 void
 sighandler (int sig) {
 
-  router.close();
+  srv.close();
   cout << "everything was closed." << endl << "Have a nice day !" << endl;
+  exit (EXIT_SUCCESS);
 }
 
 // -----------------------------------------------------------------------------
@@ -78,50 +63,28 @@ int main (int argc, char **argv) {
   if (argc < 2) {
 
     cerr << "Error: the JSON filename must be provided as a parameter on the command line !" << endl;
-    cerr << "e.g. : " << argv[0] << " router-tcp-rs232.json" << endl;
+    cerr << "e.g. : " << argv[0] << " virtual-server-tcp.json" << endl;
     exit (EXIT_FAILURE);
   }
 
   string  jsonfile = argv[1];
 
-  cout << "--- Json Modbus Router ---" << endl;
-
+  cout << "Simple Server" << endl;
   // CTRL+C and kill call triggers the trap sighandler()
   signal (SIGINT, sighandler);
   signal (SIGTERM, sighandler);
-  cout << "Press CTRL+C to stop... " << endl;
+  cout << "Press CTRL+C to stop... " << endl << endl;
 
   try {
     cout << "opening " << jsonfile << "..." << endl;
-    router.setConfig (jsonfile, "modbuspp-router");
+    srv.setConfig (jsonfile, "modbuspp-server");
 
-    if (router.debug()) {
-      // if debug, list masters and slaves
-      cout << endl;
-      for (const auto & m : router.masters()) {
-
-        auto master = m.second;
-        cout << "Master " << m.first << " connected through " << flush;
-        cout << master->connection() << ":" ;
-        cout << master->settings() << " with the slaves below:" << endl;
-        for (const auto & s : router.slaves()) {
-
-          auto slave = s.second;
-          if (slave->device() == master.get()) {
-            cout << "> id: " << slave->number() << endl;
-          }
-        }
-        cout << endl;
-      }
-    }
-
-    if (router.open ()) { // open a connection
+    if (srv.open ()) { // open a connection
       cout << "Listening server on " <<
-           router.connection() << ":" << router.settings() << "..."
-           << endl << endl;
+           srv.connection() << ":" << srv.settings() << "..." << endl << endl;
 
-      router.run();
-      while (router.isOpen()) {
+      srv.run();
+      while (srv.isOpen()) {
 
         // std::this_thread::yield();
         std::this_thread::sleep_for (std::chrono::milliseconds (200));
@@ -136,7 +99,7 @@ int main (int argc, char **argv) {
 
     cerr << "Unattended exception !" << endl;
   }
-  
+
   return EXIT_FAILURE;
 }
 /* ========================================================================== */
