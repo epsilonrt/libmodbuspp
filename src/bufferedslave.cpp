@@ -923,61 +923,170 @@ namespace Modbus {
       if (j.contains ("blocks")) {
 
         auto blocks = j["blocks"];
-        for (const auto & b : blocks) {
-          auto t = b["table"].get<Table>();
-          auto nmemb = b["quantity"].get<int>();
-          int startAddr = -1;
+        for (const auto & block : blocks) {
+          int startAddr = s->dataAddress (0);
+          DataType dt (Uint16);
+          auto table = block["table"].get<Table>(); // mandatory
+          auto nmemb = block["quantity"].get<int>(); // mandatory
 
-          if (j.contains ("starting-address")) {
+          if (block.contains ("starting-address")) {
 
-            auto i = b["starting-address"].get<int>();
-            startAddr = i;
+            block["starting-address"].get_to (startAddr);
           }
 
-          s->setBlock (t, nmemb, startAddr);
-          if (b.contains ("default")) {
-            auto values = j["default"];
+          if (block.contains ("data-type")) {
 
-            if (t == InputRegister || t == HoldingRegister) {
-              std::vector<uint16_t> words;
+            //auto de = block["data-type"].get<DataEnum> ();
+            //dt = de;
+            block["data-type"].get_to (dt.value());
+            nmemb *= dt.size() / sizeof (uint16_t);
+          }
 
-              for (int i = 0; i < values.size(); i++) {
-                unsigned long ul;
-                auto s = values[i].get<std::string>();
+          s->setBlock (table, nmemb, startAddr);
 
-                try {
-                  ul = std::stoi (s, nullptr, 0);
-                }
-                catch (const std::invalid_argument& ia) {
-                  ul = 0;
-                }
-                if (ul > UINT16_MAX) {
-                  throw std::invalid_argument ("Invalid value: " + s + " in JSON file !");
-                }
-                words.push_back (ul);
-              }
-              if (t == InputRegister) {
+          if (block.contains ("values")) {
 
-                int rc = s->writeInputRegisters (startAddr, words.data(), words.size());
-                if (rc < 0) {
-                  throw std::system_error (errno, std::generic_category(), "writeInputRegisters() from Json::setConfig(BufferedSlave *)");
-                }
-              }
-              else {
+            if (table == InputRegister || table == HoldingRegister) {
 
-                int rc = s->writeRegisters (startAddr, words.data(), words.size());
-                if (rc < 0) {
-                  throw std::system_error (errno, std::generic_category(), "writeRegisters() from Json::setConfig(BufferedSlave *)");
-                }
-              }
+              Json::writeRegisters (s, block);
             }
             else {
 
+              // Coils and discrete inputs
+              Json::writeBits (s, block);
             }
+            //---- values
           }
 
         }
       }
+    }
+
+
+    //--------------------------------------------------------------------------
+    int writeBits (BufferedSlave * s, const nlohmann::json & block) {
+      int rc = 0;
+      const auto & values = block["values"];
+      auto nmemb = block["quantity"].get<int>(); // mandatory
+
+      if (values.is_array() && values.size() > 0 && nmemb > 0) {
+        std::vector<uint8_t> vect;
+        auto table = block["table"].get<Table>(); // mandatory
+        int addr = s->dataAddress (0);
+
+        if (block.contains ("values-address")) {
+
+          block["values-address"].get_to (addr);
+        }
+
+        if (getBitValues (vect, nmemb, values) > 0) {
+          if (table == Coil) {
+
+            rc = s->writeCoils (addr, (bool *) vect.data(), vect.size());
+          }
+          else {
+
+            rc = s->writeDiscreteInputs (addr, (bool *) vect.data(), vect.size());
+          }
+        }
+      }
+
+      return rc;
+    }
+
+    //--------------------------------------------------------------------------
+    int writeRegisters (BufferedSlave * s, const nlohmann::json & block) {
+      DataType dt (Uint16);
+
+      if (block.contains ("data-type")) {
+
+        block["data-type"].get_to (dt.value());
+      }
+
+      switch (dt.value()) {
+        case Uint16:
+          break;
+        case Uint32:
+          return Json::writeRegisters<uint32_t> (s, block);
+          break;
+        case Uint64:
+          return Json::writeRegisters<uint64_t> (s, block);
+          break;
+        case Int16:
+          return Json::writeRegisters<int16_t> (s, block);
+          break;
+        case Int32:
+          return Json::writeRegisters<int32_t> (s, block);
+          break;
+        case Int64:
+          return Json::writeRegisters<int64_t> (s, block);
+          break;
+        case Float:
+          return Json::writeRegisters<float> (s, block);
+          break;
+        case Double:
+          return Json::writeRegisters<double> (s, block);
+          break;
+        case LongDouble:
+          return Json::writeRegisters<long double> (s, block);
+          break;
+      }
+      return Json::writeRegisters<uint16_t> (s, block);
+    }
+
+    //--------------------------------------------------------------------------
+    int getBitValues (std::vector<uint8_t> & data, int nmemb,
+                      const nlohmann::json & values) {
+
+      for (const auto & v : values) {
+
+        if (v.is_string()) {
+          size_t idx;
+          auto str = v.get<std::string>();
+
+          unsigned long ul = stoul (str, &idx, 0);
+          if (idx < str.size() || ul > std::numeric_limits<uint8_t>::max()) {
+            throw std::invalid_argument (
+              "Cannot convert " + str +
+              " to a byte, value must be between 0 and 0xFF");
+          }
+
+          int m = std::min (nmemb, 8);
+          uint8_t byte = ul;
+
+          for (int i = 0; i < m; i++) {
+            uint8_t b = byte & (1 << i) ? true : false;
+            data.push_back (b);
+            nmemb--;
+          }
+        }
+        else { // numeric type
+          bool b;
+
+          try {
+            // try to convert to bool : true/false
+            v.get_to (b);
+          }
+          catch (nlohmann::json::exception& e) {
+            // unable to convert to bool, try with 0/1
+            int i;
+            v.get_to (i);
+            if (i != 0 && i != 1) {
+              throw std::invalid_argument (
+                std::to_string (i) +
+                " not a binary value (must be 0/1 or true/false)");
+            }
+            b = (i != 0);
+          }
+          data.push_back (b);
+          nmemb--;
+        }
+
+        if (nmemb <= 0) {
+          break;
+        }
+      }
+      return data.size();
     }
   }
 }

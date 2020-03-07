@@ -262,15 +262,112 @@ namespace Modbus {
   };
 
   /**
+   * @class DataType
+   * @author epsilonrt
+   * @date 03/07/20
+   * @file data.h
+   * @brief Data type helper class
+   */
+  class DataType {
+    public:
+      /**
+       * @brief Constructor from a value of DataEnum
+       */
+      DataType (const DataEnum & t = Uint16) : m_value (t) {}
+
+      /**
+       * @brief Number of bytes of current type
+       */
+      size_t size() const {
+
+        switch (m_value) {
+          case Int32:
+          case Uint32:
+            return  sizeof (uint32_t);
+            break;
+          case Int64:
+          case Uint64:
+            return  sizeof (uint64_t);
+            break;
+          case Float:
+            return  sizeof (float);
+            break;
+          case Double:
+            return  sizeof (double);
+            break;
+          case LongDouble:
+            return  sizeof (long double);
+            break;
+        }
+        return sizeof (uint16_t);
+      }
+
+      /**
+       * @brief  Overload of the reference operator on the T value
+       */
+      operator DataEnum&() {
+        return m_value;
+      }
+
+      /**
+       * @overload
+       */
+      operator const DataEnum&() const {
+        return m_value;
+      }
+
+      /**
+       * @brief Access to the DataEnum value
+       */
+      DataEnum& value() {
+        return m_value;
+      }
+
+      /**
+       * @overload
+       */
+      const DataEnum& value() const {
+        return m_value;
+      }
+
+      /**
+       * @brief Overload of the pointer operator on the DataEnum value
+       */
+      DataEnum* operator&() {
+        return & m_value;
+      }
+
+      /**
+       * @overload
+       */
+      const DataEnum* operator&() const {
+        return & m_value;
+      }
+
+      /**
+       * @brief Overload of the assignment operator from a DataEnum value
+       */
+      DataEnum& operator= (const DataEnum& t) {
+        m_value = t;
+        return m_value;
+      }
+
+    private:
+      DataEnum m_value;
+  };
+
+  /**
    * @brief Convert string to T
    *
    * Parses @b str interpreting its content as a T number, which is returned as a value of type T.
    * T may be uint16_t, uint32_t, uint64_t, int16_t, int32_t, int64_t, float, double, long double
    */
-  template <typename T> void strToT (T & v, const std::string & str, int base = 0) {
+  template <typename T>
+  void strToT (T & v, const std::string & str, int base = 0) {
     size_t idx = 0;
 
-    if (std::is_same<T, uint16_t>::value || std::is_same<T, uint32_t>::value || std::is_same<T, uint64_t>::value) {
+    if (std::is_same<T, uint16_t>::value || std::is_same<T, uint32_t>::value ||
+        std::is_same<T, uint64_t>::value) {
       unsigned long long ull = std::stoull (str, &idx, base);
 
       if (ull > std::numeric_limits<T>::max()) {
@@ -278,18 +375,23 @@ namespace Modbus {
       }
       v = static_cast<T> (ull);
     }
-    else if (std::is_same<T, int16_t>::value || std::is_same<T, int32_t>::value || std::is_same<T, int64_t>::value) {
+    else if (std::is_same<T, int16_t>::value || std::is_same<T, int32_t>::value
+             || std::is_same<T, int64_t>::value) {
       unsigned long long ll = std::stoll (str, &idx, base);
 
-      if (ll > std::numeric_limits<T>::max() || ll < std::numeric_limits<T>::lowest()) {
+      if (ll > std::numeric_limits<T>::max()
+          || ll < std::numeric_limits<T>::lowest()) {
         throw std::out_of_range (str);
       }
       v = static_cast<T> (ll);
     }
-    else if (std::is_same<T, float>::value || std::is_same<T, double>::value || std::is_same<T, double>::value) {
+    else if (std::is_same<T, float>::value || std::is_same<T, double>::value ||
+             std::is_same<T, double>::value) {
       long double ld = std::stold (str, &idx);
 
-      if (ld > std::numeric_limits<T>::max() || ld < std::numeric_limits<T>::lowest()) {
+      if (ld > std::numeric_limits<T>::max() ||
+          ld < std::numeric_limits<T>::lowest()) {
+
         throw std::out_of_range (str);
       }
       v = static_cast<T> (ld);
@@ -297,7 +399,7 @@ namespace Modbus {
 
     if (idx < str.size()) {
 
-      throw std::invalid_argument (str);
+      throw std::invalid_argument ("Unable to convert " + str + " to arithmetic value");
     }
   }
 }

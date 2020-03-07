@@ -180,5 +180,22 @@ namespace Modbus {
     GatewayTarget = MODBUS_EXCEPTION_GATEWAY_TARGET,
     ExceptionMax = MODBUS_EXCEPTION_MAX
   };
+  
+  /**
+   * @enum DataEnum
+   * @brief Enumerations of Data T
+   */
+  enum DataEnum {
+    Uint16 = 0,
+    Uint32,
+    Uint64,
+    Int16,
+    Int32,
+    Int64,
+    Float,
+    Double,
+    LongDouble
+  };
+  
 }
 /* ========================================================================== */
