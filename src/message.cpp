@@ -206,14 +206,17 @@ namespace Modbus {
   }
 
   // ---------------------------------------------------------------------------
-  bool Message::crc (uint16_t & c) const {
+  uint16_t Message::crc () const {
 
-    if (net() == Rtu && aduSize() >= 4) {
-      
-      c = word (size() - 2);
-      return true;
+    if (net() != Rtu) {
+
+      throw std::domain_error ("Unable to return CRC if backend is not RTU !");
     }
-    return false;
+    if (aduSize() >= 4) {
+
+      throw std::invalid_argument ("Unable to return CRC if ADU size less than 4 !");
+    }
+    return word (size() - 2);
   }
 
   // ---------------------------------------------------------------------------

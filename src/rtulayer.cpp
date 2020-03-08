@@ -227,13 +227,8 @@ namespace Modbus {
 
   // ---------------------------------------------------------------------------
   bool RtuLayer::checkMessage (const Message & msg) {
-    uint16_t crc;
-    
-    if  (msg.crc (crc)) {
-      
-      return crc16(msg.adu(),msg.aduSize()-2) == crc;
-    }
-    return false;
+
+    return crc16 (msg.adu(), msg.aduSize() - 2) == msg.crc ();
   }
 
   // ---------------------------------------------------------------------------
@@ -284,7 +279,7 @@ namespace Modbus {
 
     /* pass through message buffer */
     while (count--) {
-      
+
       i = crcHi ^ *buf++; /* calculate the CRC  */
       crcHi = crcLo ^ rtu::CrcHiTable[i];
       crcLo = rtu::CrcLoTable[i];

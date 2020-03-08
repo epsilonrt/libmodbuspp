@@ -209,9 +209,11 @@ namespace Modbus {
       
       /**
        * @brief Return the CRC read in the message
-       * @return true if successfull, false if net()!=Rtu or aduSize()<4 
+       *
+       * throw an std::domain_error exception if net()!=Rtu,
+       * an std::invalid_argument exception  if aduSize()<4.
        */
-      bool crc (uint16_t & c) const;
+      uint16_t crc () const;
 
       /**
        * @brief Empties the message and returns it to the initial state
