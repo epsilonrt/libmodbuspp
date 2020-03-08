@@ -216,9 +216,46 @@ namespace Modbus {
       uint16_t crc () const;
 
       /**
-       * @brief Empties the message and returns it to the initial state
+       * @brief Returns TCP/IP transaction identifier
+       *
+       * It is used for transaction pairing, the MODBUS server copies in the
+       * response the transaction identifier of the request.
+       *
+       * This value is at the offset[-7] of the PDU.
+       *
+       * Throw an std::domain_error exception if net()!=Tcp,
        */
-      void clear();
+      uint16_t transactionIdentifier() const;
+      
+      
+      /**
+       * @brief Sets TCP/IP transaction identifier
+       *
+       * It is used for transaction pairing, the MODBUS server copies in the
+       * response the transaction identifier of the request.
+       *
+       * This value is at the offset[-7] of the PDU.
+       *
+       * Throw an std::domain_error exception if net()!=Tcp,
+       */
+      void setTransactionIdentifier (uint16_t tid);
+
+      /**
+       * @brief Returns the underlying ADU bytes pointer
+       */
+      uint8_t * pdu ();
+
+      /**
+       * @overload
+       */
+      const uint8_t * pdu () const;
+
+      /**
+       * @brief Returns the ADU byte corresponding to the index provided
+       *
+       * @b i must be between 0 and @b (maxAduLength() - aduHeaderLength() - 1)
+       */
+      uint8_t pdu (uint16_t i) const;
 
       /**
        * @brief returns the number of bytes of the PDU
@@ -227,6 +264,11 @@ namespace Modbus {
        */
       size_t size() const;
       
+      /**
+       * @brief Empties the message and returns it to the initial state
+       */
+      void clear();
+
       /**
        * @brief Change the size of the PDU
        * 

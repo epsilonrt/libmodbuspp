@@ -192,6 +192,48 @@ namespace Modbus {
   }
 
   // ---------------------------------------------------------------------------
+  uint16_t Message::transactionIdentifier() const {
+
+    if (net() != Tcp) {
+
+      throw std::domain_error ("Unable to return transaction identifier if backend is not TCP !");
+    }
+    return Message::word (-7);
+  }
+
+
+  // ---------------------------------------------------------------------------
+  void Message::setTransactionIdentifier (uint16_t tid) {
+
+    if (net() != Tcp) {
+
+      throw std::domain_error ("Unable to set transaction identifier if backend is not TCP !");
+    }
+    setWord (-7, tid);
+  }
+
+  // ---------------------------------------------------------------------------
+  uint8_t * Message::pdu () {
+    PIMP_D (Message);
+
+    return & d->adu[d->pduBegin];
+  }
+
+  // ---------------------------------------------------------------------------
+  const uint8_t * Message::pdu () const {
+    PIMP_D (const Message);
+
+    return & d->adu[d->pduBegin];
+  }
+
+  // ---------------------------------------------------------------------------
+  uint8_t Message::pdu (uint16_t i) const {
+    PIMP_D (const Message);
+
+    return d->adu[d->pduBegin + i];
+  }
+
+  // ---------------------------------------------------------------------------
   void Message::setSize (size_t size) {
     PIMP_D (Message);
 
