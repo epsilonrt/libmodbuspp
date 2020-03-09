@@ -84,6 +84,8 @@
     <File Name="src/router.cpp"/>
     <File Name="src/router_p.h"/>
     <File Name="src/json_p.h"/>
+    <File Name="src/response_p.h"/>
+    <File Name="src/request_p.h"/>
   </VirtualDirectory>
   <VirtualDirectory Name="lib">
     <File Name="lib/CMakeLists.txt"/>

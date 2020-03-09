@@ -26,6 +26,9 @@ namespace Modbus {
       Private (Request * q, NetLayer * b);
       Private (Request * q, NetLayer * b, const std::vector<uint8_t> & m);
       Private (Request * q, NetLayer * b, Function f);
+      Private (Request * q, Net n);
+      Private (Request * q, Net n, const std::vector<uint8_t> & m);
+      Private (Request * q, Net n, Function f);
       virtual ~Private();
       PIMP_DECLARE_PUBLIC (Request)
   };

@@ -64,6 +64,22 @@ namespace Modbus {
     Request (dev.backend(), f) {}
 
   // ---------------------------------------------------------------------------
+  Request::Request (Net net) :
+    Message (*new Private (this, net)) {}
+
+  // ---------------------------------------------------------------------------
+  Request::Request (Net net, const std::vector<uint8_t> & adu) :
+    Message (*new Private (this, net, adu)) {}
+
+  // ---------------------------------------------------------------------------
+  Request::Request (Net net, const uint8_t * adu, size_t len) :
+    Request (net, std::vector<uint8_t> (adu, adu + len)) {}
+
+  // ---------------------------------------------------------------------------
+  Request::Request (Net net, Function f) :
+    Message (*new Private (this, net, f)) {}
+
+  // ---------------------------------------------------------------------------
   Request::Request (const Request & other) :
     Message (other) {}
 
@@ -191,6 +207,18 @@ namespace Modbus {
   // ---------------------------------------------------------------------------
   Request::Private::Private (Request * q, NetLayer * b, Function f) :
     Message::Private (q, b, f) {}
+
+  // ---------------------------------------------------------------------------
+  Request::Private::Private (Request * q, Net n) :
+    Message::Private (q, n) {}
+
+  // ---------------------------------------------------------------------------
+  Request::Private::Private (Request * q, Net n, const std::vector<uint8_t> & m) :
+    Message::Private (q, n, m) {}
+
+  // ---------------------------------------------------------------------------
+  Request::Private::Private (Request * q, Net n, Function f) :
+    Message::Private (q, n, f) {}
     
   // ---------------------------------------------------------------------------
   Request::Private::~Private() = default;

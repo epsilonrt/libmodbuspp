@@ -35,12 +35,16 @@ namespace Modbus {
        */
       explicit Request (NetLayer & backend);
       explicit Request (Device & dev);
+      explicit Request (Net net);
       Request (NetLayer & backend, const std::vector<uint8_t> & adu);
       Request (Device & dev, const std::vector<uint8_t> & adu);
+      Request (Net net, const std::vector<uint8_t> & adu);
       Request (NetLayer & backend, const uint8_t * adu, size_t adulength);
       Request (Device & dev, const uint8_t * adu, size_t adulength);
+      Request (Net net, const uint8_t * adu, size_t adulength);
       Request (NetLayer & backend, Function func);
       Request (Device & dev, Function func);
+      Request (Net net, Function func);
 
       /**
        * @brief Constructs a copy of @b other

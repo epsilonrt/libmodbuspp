@@ -18,7 +18,8 @@
 #include <sstream>
 #include <cstring>
 #include <modbuspp/device.h>
-#include <modbuspp/netlayer.h>
+#include <modbuspp/rtulayer.h>
+#include <modbuspp/tcplayer.h>
 #include "message_p.h"
 #include "config.h"
 
@@ -36,7 +37,7 @@ namespace Modbus {
   // ---------------------------------------------------------------------------
   Message::Message (NetLayer & backend) :
     d_ptr (new Private (this, &backend)) {}
-
+    
   // ---------------------------------------------------------------------------
   Message::Message (Device & dev) :
     Message (dev.backend()) {}
@@ -64,6 +65,22 @@ namespace Modbus {
   // ---------------------------------------------------------------------------
   Message::Message (Device & dev, Function f) :
     Message (dev.backend(), f) {}
+
+  // ---------------------------------------------------------------------------
+  Message::Message (Net net) :
+    d_ptr (new Private (this, net)) {}
+
+  // ---------------------------------------------------------------------------
+  Message::Message (Net net, const std::vector<uint8_t> & adu) :
+    d_ptr (new Private (this, net, adu)) {}
+
+  // ---------------------------------------------------------------------------
+  Message::Message (Net net, const uint8_t * adu, size_t len) :
+    Message (net, std::vector<uint8_t> (adu, adu + len)) {}
+
+  // ---------------------------------------------------------------------------
+  Message::Message (Net net, Function f) :
+    d_ptr (new Private (this, net, f)) {}
 
   // ---------------------------------------------------------------------------
   Message::Message (const Message & other) :
@@ -386,6 +403,50 @@ namespace Modbus {
   // ---------------------------------------------------------------------------
   Message::Private::Private (Message * q, NetLayer * b, Function func) :
     Private (q, b) {
+
+    adu[pduBegin] = static_cast<uint8_t> (func);
+  }
+
+  // ---------------------------------------------------------------------------
+  Message::Private::Private (Message * q, Net n) :
+    q_ptr (q), net (n), aduSize (0),  isResponse (false) {
+    NetLayer * b;
+    
+    switch (net) {
+
+      case Tcp:
+        b = new TcpLayer ("*", "1502");
+        break;
+
+      case Rtu:
+        b = new RtuLayer ("COM1", "9600E1");
+        break;
+
+      default:
+        throw std::invalid_argument (
+          "Error: Unable to create Modbus Device for this net !");
+        break;
+    }
+
+    pduBegin = modbus_get_header_length (b->context());
+    maxAduLength =  b->maxAduLength();
+    delete b;
+    adu.resize (maxAduLength, 0);
+    if (net == Tcp) {
+      adu[6] = MODBUS_TCP_SLAVE;
+    }
+  }
+  
+  // ---------------------------------------------------------------------------
+  Message::Private::Private (Message * q, Net n, const std::vector<uint8_t> & m) :
+    Private (q, n) {
+
+    adu = m;
+  }
+
+  // ---------------------------------------------------------------------------
+  Message::Private::Private (Message * q, Net n, Function func) :
+    Private (q, n) {
 
     adu[pduBegin] = static_cast<uint8_t> (func);
   }

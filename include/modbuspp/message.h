@@ -53,12 +53,16 @@ namespace Modbus {
        */
       explicit Message (NetLayer & backend);
       explicit Message (Device & dev);
+      explicit Message (Net net);
       Message (NetLayer & backend, const std::vector<uint8_t> & adu);
       Message (Device & dev, const std::vector<uint8_t> & adu);
+      Message (Net net, const std::vector<uint8_t> & adu);
       Message (NetLayer & backend, const uint8_t * adu, size_t adulength);
       Message (Device & dev, const uint8_t * adu, size_t adulength);
+      Message (Net net, const uint8_t * adu, size_t adulength);
       Message (NetLayer & backend, Function func);
       Message (Device & dev, Function func);
+      Message (Net net, Function func);
 
       /**
        * @brief Constructs a copy of @b other

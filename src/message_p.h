@@ -25,6 +25,9 @@ namespace Modbus {
       Private (Message * q, NetLayer * b);
       Private (Message * q, NetLayer * b, const std::vector<uint8_t> & m);
       Private (Message * q, NetLayer * b, Function f);
+      Private (Message * q, Net n);
+      Private (Message * q, Net n, const std::vector<uint8_t> & m);
+      Private (Message * q, Net n, Function f);
       virtual ~Private();
 
       Message * const q_ptr;
