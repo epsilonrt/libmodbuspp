@@ -230,7 +230,13 @@ namespace Modbus {
        * extra data relating to the backend, if successful. Otherwise it shall 
        * return -1 and set errno.
        */
-      int sendRawRequest (const Request & req);
+      int sendRawRequest (const uint8_t * req, size_t len);
+      
+
+      /**
+       * @overload 
+       */
+      int sendRawRequest (const Message & req);
       
       /**
        * @brief Receive a confirmation request
@@ -244,7 +250,12 @@ namespace Modbus {
        * return the response length if sucessful. Otherwise it shall return -1 
        * and set errno.
        */
-      int receiveResponse (Response & rsp);
+      int receiveResponse (uint8_t * rsp);
+
+      /**
+       * @overload 
+       */
+      int receiveResponse (Message & rsp);
 
     protected:
       class Private;
