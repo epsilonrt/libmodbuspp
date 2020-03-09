@@ -146,7 +146,7 @@ namespace Modbus {
   // ---------------------------------------------------------------------------
   int Master::sendRawRequest (const Message & req) {
 
-    return sendRawRequest (req.adu(), req.aduSize());
+    return sendRawRequest (req.adu() - 1, req.aduSize() + 1);
   }
 
   // ---------------------------------------------------------------------------
