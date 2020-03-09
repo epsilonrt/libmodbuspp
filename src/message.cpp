@@ -37,7 +37,7 @@ namespace Modbus {
   // ---------------------------------------------------------------------------
   Message::Message (NetLayer & backend) :
     d_ptr (new Private (this, &backend)) {}
-    
+
   // ---------------------------------------------------------------------------
   Message::Message (Device & dev) :
     Message (dev.backend()) {}
@@ -370,6 +370,13 @@ namespace Modbus {
   }
 
   // ---------------------------------------------------------------------------
+  void Message::setResponseFlag (bool flag)  {
+    PIMP_D (Message);
+
+    d->isResponse = flag;
+  }
+
+  // ---------------------------------------------------------------------------
   std::ostream& operator<< (std::ostream& os, const Message & m)  {
 
     m.print (os);
@@ -411,7 +418,7 @@ namespace Modbus {
   Message::Private::Private (Message * q, Net n) :
     q_ptr (q), net (n), aduSize (0),  isResponse (false) {
     NetLayer * b;
-    
+
     switch (net) {
 
       case Tcp:
@@ -436,7 +443,7 @@ namespace Modbus {
       adu[6] = MODBUS_TCP_SLAVE;
     }
   }
-  
+
   // ---------------------------------------------------------------------------
   Message::Private::Private (Message * q, Net n, const std::vector<uint8_t> & m) :
     Private (q, n) {

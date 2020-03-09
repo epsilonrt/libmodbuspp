@@ -359,6 +359,16 @@ namespace Modbus {
       bool isResponse() const;
       
       /**
+       * @brief Sets the response flag
+       * 
+       * This flag indicates that the message is a response, it allows to keep 
+       * the instance of the request to make a response. This could be useful 
+       * in order to keep the transaction identifier intact in the case of a 
+       * TCP ADU.
+       */
+      void setResponseFlag (bool flag = true);
+      
+      /**
        * @brief Inserts the message @b m byte sequence into @b os.
        */
       friend std::ostream& operator<< (std::ostream& os, const Message & m);
