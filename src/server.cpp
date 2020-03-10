@@ -265,7 +265,7 @@ namespace Modbus {
     if (modbus_set_slave (ctx(), slaveAddr) != 0) {
       std::ostringstream oss;
 
-      oss << "Error: Unable to add slave[" << slaveAddr << "]\n" << lastError();
+      oss << "Unable to add slave[" << slaveAddr << "]\n" << lastError();
       throw std::invalid_argument (oss.str());
     }
 

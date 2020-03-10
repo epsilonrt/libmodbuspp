@@ -305,7 +305,7 @@ namespace Modbus {
     if (! ctx) {
 
       throw std::invalid_argument (
-        "Error: Unable to create RTU Modbus Backend("
+        "Unable to create RTU Modbus Backend("
         + port + "," + settings + ")\n" + lastError());
     }
     oneByteTime = modbus_rtu_get_rts_delay (ctx);

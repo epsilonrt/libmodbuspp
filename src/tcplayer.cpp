@@ -111,7 +111,7 @@ namespace Modbus {
     if (! ctx) {
 
       throw std::invalid_argument (
-        "Error: Unable to create TCP Modbus Backend(" +
+        "Unable to create TCP Modbus Backend(" +
         host + ":" + service + ")\n" + lastError());
     }
   }

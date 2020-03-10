@@ -91,7 +91,7 @@ namespace Modbus {
       }
       return -1; // errno set by modbus_set_slave
     }
-    throw std::runtime_error ("Error: slave id or backend not set !");
+    throw std::runtime_error ("Slave id or backend not set !");
   }
 
   // ---------------------------------------------------------------------------
@@ -107,7 +107,7 @@ namespace Modbus {
       }
       return -1; // errno set by modbus_set_slave
     }
-    throw std::runtime_error ("Error: slave id or backend not set !");
+    throw std::runtime_error ("Slave id or backend not set !");
   }
 
   // ---------------------------------------------------------------------------
@@ -124,7 +124,7 @@ namespace Modbus {
       }
       return -1; // errno set by modbus_set_slave
     }
-    throw std::runtime_error ("Error: slave id or backend not set !");
+    throw std::runtime_error ("Slave id or backend not set !");
   }
 
   // ---------------------------------------------------------------------------
@@ -140,7 +140,7 @@ namespace Modbus {
       }
       return -1; // errno set by modbus_set_slave
     }
-    throw std::runtime_error ("Error: slave id or backend not set !");
+    throw std::runtime_error ("Slave id or backend not set !");
   }
 
   // ---------------------------------------------------------------------------
@@ -156,7 +156,7 @@ namespace Modbus {
       }
       return -1; // errno set by modbus_set_slave
     }
-    throw std::runtime_error ("Error: slave id or backend not set !");
+    throw std::runtime_error ("Slave id or backend not set !");
   }
 
   // ---------------------------------------------------------------------------
@@ -172,7 +172,7 @@ namespace Modbus {
       }
       return -1; // errno set by modbus_set_slave
     }
-    throw std::runtime_error ("Error: slave id or backend not set !");
+    throw std::runtime_error ("Slave id or backend not set !");
   }
 
   // ---------------------------------------------------------------------------
@@ -187,7 +187,7 @@ namespace Modbus {
       }
       return -1; // errno set by modbus_set_slave
     }
-    throw std::runtime_error ("Error: slave id or backend not set !");
+    throw std::runtime_error ("Slave id or backend not set !");
   }
 
   // ---------------------------------------------------------------------------
@@ -203,7 +203,7 @@ namespace Modbus {
       }
       return -1; // errno set by modbus_set_slave
     }
-    throw std::runtime_error ("Error: slave id or backend not set !");
+    throw std::runtime_error ("Slave id or backend not set !");
   }
 
 
@@ -221,7 +221,7 @@ namespace Modbus {
       }
       return -1; // errno set by modbus_set_slave
     }
-    throw std::runtime_error ("Error: slave id or backend not set !");
+    throw std::runtime_error ("Slave id or backend not set !");
   }
 
   // ---------------------------------------------------------------------------
@@ -237,7 +237,7 @@ namespace Modbus {
       }
       return -1; // errno set by modbus_set_slave
     }
-    throw std::runtime_error ("Error: slave id or backend not set !");
+    throw std::runtime_error ("Slave id or backend not set !");
   }
 
   // ---------------------------------------------------------------------------

@@ -64,7 +64,7 @@ namespace Modbus {
       d->recoveryLink = recovery;
       return true;
     }
-    throw std::runtime_error ("Error: backend not set !");
+    throw std::runtime_error ("Backend not set !");
   }
 
   // ---------------------------------------------------------------------------
@@ -140,7 +140,7 @@ namespace Modbus {
 
       return modbus_send_raw_request (d->ctx(), req, len);;
     }
-    throw std::runtime_error ("Error: backend not set !");
+    throw std::runtime_error ("Backend not set !");
   }
 
   // ---------------------------------------------------------------------------
@@ -157,7 +157,7 @@ namespace Modbus {
 
       return modbus_receive_confirmation (d->ctx(), rsp);
     }
-    throw std::runtime_error ("Error: backend not set !");
+    throw std::runtime_error ("Backend not set !");
   }
 
   // ---------------------------------------------------------------------------
@@ -220,7 +220,7 @@ namespace Modbus {
       if (modbus_set_slave (ctx(), slaveAddr) != 0) {
         std::ostringstream oss;
 
-        oss << "Error: Unable to add slave[" << slaveAddr << "]\n" << lastError();
+        oss << "Unable to add slave[" << slaveAddr << "]\n" << lastError();
         throw std::invalid_argument (oss.str());
       }
 
@@ -237,7 +237,7 @@ namespace Modbus {
       }
       return s.get();
     }
-    throw std::runtime_error ("Error: backend not set !");
+    throw std::runtime_error ("Backend not set !");
   }
 
   // ---------------------------------------------------------------------------

@@ -110,7 +110,7 @@ namespace Modbus {
 
       return modbus_flush (d->ctx());
     }
-    throw std::runtime_error ("Error: backend not set !");
+    throw std::runtime_error ("Backend not set !");
   }
 
   // ---------------------------------------------------------------------------
@@ -187,7 +187,7 @@ namespace Modbus {
 
       return *d->backend;
     }
-    throw std::domain_error ("Error: Unable to return backend !");
+    throw std::domain_error ("Unable to return backend !");
   }
 
   // ---------------------------------------------------------------------------
@@ -198,7 +198,7 @@ namespace Modbus {
 
       return * reinterpret_cast<RtuLayer *> (d->backend);
     }
-    throw std::domain_error ("Error: Unable to return RTU layer !");
+    throw std::domain_error ("Unable to return RTU layer !");
   }
 
   // ---------------------------------------------------------------------------
@@ -209,7 +209,7 @@ namespace Modbus {
 
       return * reinterpret_cast<TcpLayer *> (d->backend);
     }
-    throw std::domain_error ("Error: Unable to return TCP layer !");
+    throw std::domain_error ("Unable to return TCP layer !");
   }
 
   // ---------------------------------------------------------------------------
@@ -220,7 +220,7 @@ namespace Modbus {
 
       return modbus_set_response_timeout (d->ctx(), t.sec(), t.usec()) == 0;
     }
-    throw std::runtime_error ("Error: backend not set !");
+    throw std::runtime_error ("Backend not set !");
   }
 
   // ---------------------------------------------------------------------------
@@ -237,7 +237,7 @@ namespace Modbus {
 
       return modbus_get_response_timeout (d->ctx(), &t.m_sec, &t.m_usec) == 0;
     }
-    throw std::runtime_error ("Error: backend not set !");
+    throw std::runtime_error ("Backend not set !");
   }
 
   // ---------------------------------------------------------------------------
@@ -256,7 +256,7 @@ namespace Modbus {
 
       return modbus_set_byte_timeout (d->ctx(), t.sec(), t.usec()) == 0;
     }
-    throw std::runtime_error ("Error: backend not set !");
+    throw std::runtime_error ("Backend not set !");
   }
 
   // ---------------------------------------------------------------------------
@@ -273,7 +273,7 @@ namespace Modbus {
 
       return modbus_get_byte_timeout (d->ctx(), &t.m_sec, &t.m_usec) == 0;
     }
-    throw std::runtime_error ("Error: backend not set !");
+    throw std::runtime_error ("Backend not set !");
   }
 
   // ---------------------------------------------------------------------------
@@ -292,7 +292,7 @@ namespace Modbus {
 
       return modbus_set_indication_timeout (d->ctx(), t.sec(), t.usec()) == 0;
     }
-    throw std::runtime_error ("Error: backend not set !");
+    throw std::runtime_error ("Backend not set !");
   }
 
   // ---------------------------------------------------------------------------
@@ -309,7 +309,7 @@ namespace Modbus {
 
       return modbus_get_indication_timeout (d->ctx(), &t.m_sec, &t.m_usec) == 0;
     }
-    throw std::runtime_error ("Error: backend not set !");
+    throw std::runtime_error ("Backend not set !");
   }
 
   // ---------------------------------------------------------------------------
@@ -332,7 +332,7 @@ namespace Modbus {
       }
       return d->debug == debug;
     }
-    throw std::runtime_error ("Error: backend not set !");
+    throw std::runtime_error ("Backend not set !");
   }
 
   // ---------------------------------------------------------------------------
@@ -414,7 +414,7 @@ namespace Modbus {
 
       return rc;
     }
-    throw std::runtime_error ("Error: backend not set !");
+    throw std::runtime_error ("Backend not set !");
   }
 
   // ---------------------------------------------------------------------------
@@ -509,7 +509,7 @@ namespace Modbus {
 
       default:
         throw std::invalid_argument (
-          "Error: Unable to create Modbus Device for this net !");
+          "Unable to create Modbus Device for this net !");
         break;
     }
   }
