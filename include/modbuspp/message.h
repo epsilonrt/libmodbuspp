@@ -367,7 +367,7 @@ namespace Modbus {
        * 
        * for debugging.
        */
-      void print (std::ostream& os) const;
+      void print (std::ostream& os = std::cout) const;
 
       /**
        * @brief Prints all bytes of the message on the output stream provided
