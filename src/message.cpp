@@ -273,22 +273,20 @@ namespace Modbus {
   }
 
   // ---------------------------------------------------------------------------
-  bool Message::setPdu (const uint8_t * data, size_t len) {
+  void Message::setPdu (const uint8_t * data, size_t len) {
     PIMP_D (Message);
 
     memcpy (pdu(), data, len);
     setSize (len);
-    return prepareToSend();
   }
 
   // ---------------------------------------------------------------------------
-  bool Message::setPdu (const Message & src) {
+  void Message::setPdu (const Message & src) {
     PIMP_D (Message);
     auto it = src.d_func()->adu.cbegin() + src.aduHeaderLength();
 
     std::copy (it, it + src.size(), d->adu.begin());
     setSize (src.size());
-    bool prepareToSend();
   }
 
   // ---------------------------------------------------------------------------

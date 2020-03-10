@@ -247,19 +247,14 @@ namespace Modbus {
       /**
        * @brief Set the PDU data
        *
-       * Copy @b data to the PDU message, set the PDU size and prepare the
-       * message to send.
-       * The message must at least have its established function (len >= 1), 
-       * otherwise preparation is impossible.
-       * 
-       * @return true if the message has been prepared.
+       * Copy @b data to the PDU message, set the PDU size.
        */
-      bool setPdu (const uint8_t * data, size_t len);
+      void setPdu (const uint8_t * data, size_t len);
       
       /**
        * @overload
        */
-      bool setPdu (const Message & src);
+      void setPdu (const Message & src);
       
       /**
        * @brief Prepare the message before sending
