@@ -165,7 +165,7 @@ namespace Modbus {
       /**
        * @overload
        */
-      virtual bool checkMessage (const Message & msg);
+      static bool checkMessage (const Message & msg);
 
       /**
        * @brief Extracts the baudrate from a settings string.

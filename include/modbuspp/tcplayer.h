@@ -74,7 +74,7 @@ namespace Modbus {
       /**
        * @overload
        */
-      virtual bool checkMessage (const Message & msg);
+      static bool checkMessage (const Message & msg);
 
     protected:
       class Private;

@@ -105,7 +105,7 @@ namespace Modbus {
       /**
        * @brief Return true if the message is valid for this backend
        */
-      virtual bool checkMessage (const Message & msg);
+      static bool checkMessage (const Message & msg);
 
       /**
        * @brief last error message
