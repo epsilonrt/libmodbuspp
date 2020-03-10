@@ -171,7 +171,7 @@ namespace Modbus {
     
     if (rc > 0) {
 
-      resp.setAduSize (rc);
+      resp.setAduSize (net() == Tcp ? rc : rc - 2); // remove CRC
     }
     return rc;
   }
