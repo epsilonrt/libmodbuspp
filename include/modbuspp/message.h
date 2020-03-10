@@ -245,6 +245,37 @@ namespace Modbus {
       void setTransactionIdentifier (uint16_t tid);
 
       /**
+       * @brief Set the PDU data
+       *
+       * Copy @b data to the PDU message, set the PDU size and prepare the
+       * message to send.
+       * The message must at least have its established function (len >= 1), 
+       * otherwise preparation is impossible.
+       * 
+       * @return true if the message has been prepared.
+       */
+      bool setPdu (const uint8_t * data, size_t len);
+      
+      /**
+       * @overload
+       */
+      bool setPdu (const Message & src);
+      
+      /**
+       * @brief Prepare the message before sending
+       * 
+       * This function updates the ADU header or adds the CRC at the end 
+       * depending on the network used. 
+       * 
+       * If the message is a request transmitted over TCP, it needs a 
+       * transaction identifier. If the backend is defined by the constructor, 
+       * the TCP transaction identifier is provided by the backend and will 
+       * therefore be consistent on the network, otherwise, it is the message 
+       * that provides this value (which may be inconsistent on the network...)
+       */
+      bool prepareToSend();
+      
+      /**
        * @brief Returns the underlying ADU bytes pointer
        */
       uint8_t * pdu ();

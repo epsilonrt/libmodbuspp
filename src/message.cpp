@@ -230,6 +230,68 @@ namespace Modbus {
   }
 
   // ---------------------------------------------------------------------------
+  bool Message::prepareToSend() {
+    PIMP_D (Message);
+
+    if (d->backend) {
+
+      return d->backend->prepareToSend (*this);
+    }
+    else {
+      if (size() >= 1) {
+        switch (net()) {
+
+          case Tcp: {
+            int i = -aduHeaderLength();
+
+            if (!isResponse()) {
+
+              setWord (i, d->transactionId++);
+              setWord (i + 2, 0);
+            }
+            setWord (i + 4, size() + 1);
+          }
+          break;
+
+          case Rtu: {
+            uint16_t crc = RtuLayer::crc16 (adu(), aduSize());
+
+            setWord (size(), crc);
+          }
+          break;
+
+          default:
+            throw std::invalid_argument (
+              "Unable to set PDU for this net !");
+            break;
+        }
+        return true;
+      }
+      return false;
+    }
+
+  }
+
+  // ---------------------------------------------------------------------------
+  bool Message::setPdu (const uint8_t * data, size_t len) {
+    PIMP_D (Message);
+
+    memcpy (pdu(), data, len);
+    setSize (len);
+    return prepareToSend();
+  }
+
+  // ---------------------------------------------------------------------------
+  bool Message::setPdu (const Message & src) {
+    PIMP_D (Message);
+    auto it = src.d_func()->adu.cbegin() + src.aduHeaderLength();
+
+    std::copy (it, it + src.size(), d->adu.begin());
+    setSize (src.size());
+    bool prepareToSend();
+  }
+
+  // ---------------------------------------------------------------------------
   uint8_t * Message::pdu () {
     PIMP_D (Message);
 
@@ -392,7 +454,8 @@ namespace Modbus {
   // ---------------------------------------------------------------------------
   Message::Private::Private (Message * q, NetLayer * b) :
     q_ptr (q), net (b->net()), pduBegin (modbus_get_header_length (b->context())),
-    aduSize (0), maxAduLength (b->maxAduLength()), isResponse (false) {
+    aduSize (0), maxAduLength (b->maxAduLength()), isResponse (false),
+    backend (b), transactionId (1) {
 
     adu.resize (maxAduLength, 0);
     if (net == Tcp) {
@@ -416,7 +479,8 @@ namespace Modbus {
 
   // ---------------------------------------------------------------------------
   Message::Private::Private (Message * q, Net n) :
-    q_ptr (q), net (n), aduSize (0),  isResponse (false) {
+    q_ptr (q), net (n), aduSize (0),  isResponse (false), backend (0),
+    transactionId (1) {
     NetLayer * b;
 
     switch (net) {
@@ -431,7 +495,7 @@ namespace Modbus {
 
       default:
         throw std::invalid_argument (
-          "Error: Unable to create Modbus Device for this net !");
+          "Unable to create Modbus Device for this net !");
         break;
     }
 

@@ -32,11 +32,13 @@ namespace Modbus {
 
       Message * const q_ptr;
       Net net;
-      std::vector<uint8_t> adu;
       int pduBegin;
       size_t aduSize;
       uint16_t maxAduLength;
       bool isResponse;
+      NetLayer * backend;
+      uint16_t transactionId;
+      std::vector<uint8_t> adu;
   };
 }
 
