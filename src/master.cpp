@@ -137,8 +137,12 @@ namespace Modbus {
 
     if (isValid()) {
       PIMP_D (Device);
-
-      return modbus_send_raw_request (d->ctx(), req, len);;
+      int rc = modbus_set_slave (d->ctx(), req[0]);
+      if (rc == 0) {
+        
+        rc = modbus_send_raw_request (d->ctx(), req, len);
+      }
+      return rc;
     }
     throw std::runtime_error ("Backend not set !");
   }
