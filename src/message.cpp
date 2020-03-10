@@ -285,7 +285,7 @@ namespace Modbus {
     PIMP_D (Message);
     auto it = src.d_func()->adu.cbegin() + src.aduHeaderLength();
 
-    std::copy (it, it + src.size(), d->adu.begin());
+    std::copy (it, it + src.size(), d->adu.begin() + d->pduBegin);
     setSize (src.size());
   }
 
