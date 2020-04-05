@@ -41,19 +41,43 @@
       <Project Name="callback-server-json" ConfigName="Debug"/>
       <Project Name="simple-server-json" ConfigName="Debug"/>
     </WorkspaceConfiguration>
-    <WorkspaceConfiguration Name="Release" Selected="yes">
+    <WorkspaceConfiguration Name="Release" Selected="no">
       <Environment/>
-      <Project Name="libmodbuspp" ConfigName="Release"/>
-      <Project Name="libmodbuspp-doc" ConfigName="Release"/>
-      <Project Name="rw-holding-json" ConfigName="Release"/>
-      <Project Name="clock-server-json" ConfigName="Release"/>
-      <Project Name="router-json" ConfigName="Release"/>
-      <Project Name="clock-server" ConfigName="Release"/>
-      <Project Name="router-simple" ConfigName="Release"/>
+      <Project Name="write-holding-data" ConfigName="Debug"/>
       <Project Name="unit-test-server" ConfigName="Release"/>
       <Project Name="unit-test-device" ConfigName="Release"/>
+      <Project Name="simple-server-json" ConfigName="Debug"/>
+      <Project Name="rw-holding-json" ConfigName="Debug"/>
+      <Project Name="router-simple" ConfigName="Debug"/>
+      <Project Name="router-json" ConfigName="Debug"/>
+      <Project Name="report-slave-id" ConfigName="Debug"/>
+      <Project Name="read-input-registers" ConfigName="Debug"/>
+      <Project Name="read-holding-data" ConfigName="Debug"/>
+      <Project Name="read-coils" ConfigName="Debug"/>
+      <Project Name="libmodbuspp-doc" ConfigName="Release"/>
+      <Project Name="libmodbuspp" ConfigName="Release"/>
+      <Project Name="clock-server-json" ConfigName="Release"/>
+      <Project Name="clock-server" ConfigName="Release"/>
       <Project Name="callback-server-json" ConfigName="Release"/>
-      <Project Name="simple-server-json" ConfigName="Release"/>
+    </WorkspaceConfiguration>
+    <WorkspaceConfiguration Name="RealeaseWithDoc" Selected="yes">
+      <Environment/>
+      <Project Name="write-holding-data" ConfigName="Release"/>
+      <Project Name="unit-test-server" ConfigName="Release"/>
+      <Project Name="unit-test-device" ConfigName="Debug"/>
+      <Project Name="simple-server-json" ConfigName="Debug"/>
+      <Project Name="rw-holding-json" ConfigName="Debug"/>
+      <Project Name="router-simple" ConfigName="Debug"/>
+      <Project Name="router-json" ConfigName="Debug"/>
+      <Project Name="report-slave-id" ConfigName="Debug"/>
+      <Project Name="read-input-registers" ConfigName="Debug"/>
+      <Project Name="read-holding-data" ConfigName="Debug"/>
+      <Project Name="read-coils" ConfigName="Debug"/>
+      <Project Name="libmodbuspp-doc" ConfigName="Release"/>
+      <Project Name="libmodbuspp" ConfigName="ReleaseWithDoc"/>
+      <Project Name="clock-server-json" ConfigName="Debug"/>
+      <Project Name="clock-server" ConfigName="Debug"/>
+      <Project Name="callback-server-json" ConfigName="Debug"/>
     </WorkspaceConfiguration>
   </BuildMatrix>
 </CodeLite_Workspace>
