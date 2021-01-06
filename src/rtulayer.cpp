@@ -247,7 +247,7 @@ namespace Modbus {
   // ---------------------------------------------------------------------------
   // static
   char RtuLayer::parity (const std::string & settings) {
-    char p = 'E';
+    char p = 'N';
     size_t s = settings.length();
 
     if (s >= 2) {
