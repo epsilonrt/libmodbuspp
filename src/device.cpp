@@ -406,7 +406,7 @@ namespace Modbus {
       }
       while (d->recoveryLink && rc == -1 && !msg->isResponse());
 
-      if (rc > 0 && rc != msg->size()) {
+      if (rc > 0 && rc != msg->aduSize()) {
 
         errno = EMBBADDATA;
         return -1;
