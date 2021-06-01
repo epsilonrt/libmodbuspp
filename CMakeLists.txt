@@ -108,10 +108,6 @@ include (GitVersion)
 GetGitVersion(MODBUSPP_VERSION)
 set(MODBUSPP_VERSION
   ${MODBUSPP_VERSION_MAJOR}.${MODBUSPP_VERSION_MINOR}.${MODBUSPP_VERSION_PATCH})
-configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/config.h.in
-                ${CMAKE_CURRENT_BINARY_DIR}/config.h @ONLY)
-configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/version.h.in
-                ${CMAKE_CURRENT_BINARY_DIR}/version.h @ONLY)
 
 include(CheckTypeSize)
 check_type_size(bool SIZEOF_BOOL BUILTIN_TYPES_ONLY LANGUAGE CXX)
@@ -126,6 +122,11 @@ check_symbol_exists(TIOCM_RTS sys/ioctl.h MODBUSPP_HAVE_TIOCM_RTS)
 
 list(APPEND CMAKE_REQUIRED_LIBRARIES ${LIBMODBUS_NAME})
 check_symbol_exists(modbus_rtu_set_recv_filter ${LIBMODBUS_NAME}/modbus-rtu.h MODBUSPP_HAVE_RTU_MULTI_SLAVES)
+
+configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/config.h.in
+                ${CMAKE_CURRENT_BINARY_DIR}/config.h @ONLY)
+configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/version.h.in
+                ${CMAKE_CURRENT_BINARY_DIR}/version.h @ONLY)
 
 # Make relative paths absolute (needed later on)
 foreach(p LIB BIN INCLUDE CMAKE DATA DOC CODELITE)
