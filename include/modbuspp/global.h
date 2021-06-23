@@ -49,6 +49,14 @@ namespace Modbus {
      */
     Rtu,
     /**
+     * @brief ASCII backend
+     *
+     * The ASCII backend is used in serial communication.
+     * The hex value of the binary data is transmitted 
+     * in ASCII character representation.
+     */
+    Ascii,
+    /**
      * @brief TCP backend
      *
      * The TCP PI (Protocol Independent) backend implements a Modbus variant

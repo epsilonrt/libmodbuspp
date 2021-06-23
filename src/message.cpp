@@ -19,6 +19,7 @@
 #include <cstring>
 #include <modbuspp/device.h>
 #include <modbuspp/rtulayer.h>
+#include <modbuspp/asciilayer.h>
 #include <modbuspp/tcplayer.h>
 #include "message_p.h"
 #include "config.h"
@@ -491,6 +492,10 @@ namespace Modbus {
       case Rtu:
         b = new RtuLayer ("COM1", "9600E1");
         break;
+
+      case Ascii:
+	b = new AsciiLayer("COM1", "9600E1");
+	break;
 
       default:
         throw std::invalid_argument (

@@ -16,12 +16,17 @@
  */
 #pragma once
 
-#include <modbuspp/rtulayer.h>
 #include <modbuspp/asciilayer.h>
-#include <modbuspp/tcplayer.h>
-#include <modbuspp/master.h>
-#include <modbuspp/server.h>
-#include <modbuspp/router.h>
-#include <modbuspp/request.h>
-#include <modbuspp/response.h>
+#include "netlayer_p.h"
+
+namespace Modbus {
+
+  class AsciiLayer::Private  : public NetLayer::Private {
+
+    public:
+      Private (const std::string & port, const std::string & settings);
+      int oneByteTime;
+  };
+}
+
 /* ========================================================================== */

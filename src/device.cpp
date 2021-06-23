@@ -15,6 +15,7 @@
  * along with the libmodbuspp Library; if not, see <http://www.gnu.org/licenses/>.
  */
 #include <modbuspp/rtulayer.h>
+#include <modbuspp/asciilayer.h>
 #include <modbuspp/tcplayer.h>
 #include <modbuspp/message.h>
 #include "device_p.h"
@@ -506,6 +507,10 @@ namespace Modbus {
       case Rtu:
         backend = new RtuLayer (connection, settings);
         break;
+
+      case Ascii:
+	backend = new AsciiLayer (connection, settings);
+	break;
 
       default:
         throw std::invalid_argument (
