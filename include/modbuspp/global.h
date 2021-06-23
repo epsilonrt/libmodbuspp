@@ -105,9 +105,9 @@ namespace Modbus {
    * The @b RtsDown mode applies the same procedure but with an inverted RTS flag.
    */
   enum SerialRts {
-    RtsNone = MODBUS_RTU_RTS_NONE, ///< no use of the RTS.
-    RtsUp = MODBUS_RTU_RTS_UP, ///< RTS flag ON during communication, OFF outside.
-    RtsDown = MODBUS_RTU_RTS_DOWN, ///< RTS flag OFF during communication, ON outside.
+    RtsNone = MODBUS_SERIAL_RTS_NONE, ///< no use of the RTS.
+    RtsUp = MODBUS_SERIAL_RTS_UP, ///< RTS flag ON during communication, OFF outside.
+    RtsDown = MODBUS_SERIAL_RTS_DOWN, ///< RTS flag OFF during communication, ON outside.
     UnknownRts = Unknown   ///< Unknown RTS mode.
   };
 

@@ -104,7 +104,7 @@ namespace Modbus {
   SerialMode RtuLayer::serialMode() {
     PIMP_D (RtuLayer);
 
-    int m = modbus_rtu_get_serial_mode (d->ctx);
+    int m = modbus_serial_get_serial_mode (d->ctx);
     if (m != -1) {
       return static_cast<SerialMode> (m);
     }
@@ -115,14 +115,14 @@ namespace Modbus {
   bool RtuLayer::setSerialMode (SerialMode mode) {
     PIMP_D (RtuLayer);
 
-    return (modbus_rtu_set_serial_mode (d->ctx, static_cast<int> (mode)) != -1);
+    return (modbus_serial_set_serial_mode (d->ctx, static_cast<int> (mode)) != -1);
   }
 
   // ---------------------------------------------------------------------------
   SerialRts RtuLayer::rts() {
     PIMP_D (RtuLayer);
 
-    int r = modbus_rtu_get_rts (d->ctx);
+    int r = modbus_serial_get_rts (d->ctx);
     if (r != -1) {
 
       return static_cast<SerialRts> (r);
@@ -134,21 +134,21 @@ namespace Modbus {
   bool RtuLayer::setRts (SerialRts r) {
     PIMP_D (RtuLayer);
 
-    return (modbus_rtu_set_rts (d->ctx, static_cast<int> (r)) != -1);
+    return (modbus_serial_set_rts (d->ctx, static_cast<int> (r)) != -1);
   }
 
   // ---------------------------------------------------------------------------
   int RtuLayer::rtsDelay() {
     PIMP_D (RtuLayer);
 
-    return modbus_rtu_get_rts_delay (d->ctx);
+    return modbus_serial_get_rts_delay (d->ctx);
   }
 
   // ---------------------------------------------------------------------------
   bool RtuLayer::setRtsDelay (int delay) {
     PIMP_D (RtuLayer);
 
-    return (modbus_rtu_set_rts_delay (d->ctx, delay) != -1);
+    return (modbus_serial_set_rts_delay (d->ctx, delay) != -1);
   }
 
   // ---------------------------------------------------------------------------
@@ -316,7 +316,7 @@ namespace Modbus {
         "Unable to create RTU Modbus Backend("
         + port + "," + settings + ")\n" + lastError());
     }
-    oneByteTime = modbus_rtu_get_rts_delay (ctx);
+    oneByteTime = modbus_serial_get_rts_delay (ctx);
   }
 }
 
