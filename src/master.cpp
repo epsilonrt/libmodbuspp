@@ -201,6 +201,7 @@ namespace Modbus {
         break;
 
       case Rtu:
+      case Ascii:
         (void) addSlave (Broadcast);
         break;
     }

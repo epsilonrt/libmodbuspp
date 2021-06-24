@@ -220,6 +220,14 @@ namespace Modbus {
       uint16_t crc () const;
 
       /**
+       * @brief Return the LRC read in the message
+       *
+       * throw an std::domain_error exception if net()!=Rtu,
+       * an std::invalid_argument exception  if aduSize()<8.
+       */
+      uint8_t lrc () const;
+
+      /**
        * @brief Returns TCP/IP transaction identifier
        *
        * It is used for transaction pairing, the MODBUS server copies in the

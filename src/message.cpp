@@ -261,6 +261,13 @@ namespace Modbus {
           }
           break;
 
+          case Ascii: {
+            uint8_t lrc = AsciiLayer::lrc8 (adu(), aduSize());
+
+            setByte(size(), lrc);
+          }
+          break;
+
           default:
             throw std::invalid_argument (
               "Unable to set PDU for this net !");
@@ -337,6 +344,32 @@ namespace Modbus {
       throw std::invalid_argument ("Unable to return CRC if ADU size less than 4 !");
     }
     return word (size() - 2);
+  }
+
+  // ---------------------------------------------------------------------------
+  uint8_t Message::lrc () const {
+    std::cout << "message::lrc\n";
+    if (net() != Ascii) {
+
+      throw std::domain_error ("Unable to return LRC if backend is not ASCII !");
+    }
+    if (aduSize() >= 4) {
+
+      throw std::invalid_argument ("Unable to return LRC if ADU size less than 8 !");
+    }
+    uint16_t lrc = word (size() - 2);
+    uint8_t lrc_hi = lrc >> 8 & 0xFF;
+    uint8_t lrc_lo = lrc & 0xFF;
+    lrc_hi -= '0';
+    lrc_lo -= '0';
+
+    std::cout << "lrc_hi: " << lrc_hi << "\n";
+    std::cout << "lrc_lo: " << lrc_lo << "\n";
+	
+    uint8_t lrc_8_bit = lrc_hi << 4;
+    lrc_8_bit |= lrc_lo;
+
+    return lrc_8_bit;
   }
 
   // ---------------------------------------------------------------------------
@@ -490,12 +523,9 @@ namespace Modbus {
         break;
 
       case Rtu:
+      case Ascii:
         b = new RtuLayer ("COM1", "9600E1");
         break;
-
-      case Ascii:
-	b = new AsciiLayer("COM1", "9600E1");
-	break;
 
       default:
         throw std::invalid_argument (

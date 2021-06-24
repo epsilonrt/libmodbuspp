@@ -296,6 +296,7 @@ namespace Modbus {
         break;
 
       case Rtu:
+      case Ascii:
         isOk = Device::Private::open();
 
       default:

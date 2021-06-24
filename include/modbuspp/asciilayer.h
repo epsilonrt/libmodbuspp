@@ -192,7 +192,7 @@ namespace Modbus {
       /**
        * @brief Performing Modbus CRC16 generation of the buffer @b buf
        */
-      static uint16_t crc16 (const uint8_t * buf, uint16_t count);
+      static uint8_t lrc8 (const uint8_t * buffer, uint16_t buffer_length);
 
     protected:
       class Private;

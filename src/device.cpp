@@ -20,6 +20,7 @@
 #include <modbuspp/message.h>
 #include "device_p.h"
 #include "config.h"
+#include "modbuspp/global.h"
 #include <chrono>
 #include <thread>
 // for debug purposes
@@ -200,6 +201,17 @@ namespace Modbus {
       return * reinterpret_cast<RtuLayer *> (d->backend);
     }
     throw std::domain_error ("Unable to return RTU layer !");
+  }
+
+  // ---------------------------------------------------------------------------
+  AsciiLayer & Device::ascii() {
+
+    if (net() == Ascii) {
+      PIMP_D (Device);
+
+      return * reinterpret_cast<AsciiLayer *> (d->backend);
+    }
+    throw std::domain_error ("Unable to return ASCII layer !");
   }
 
   // ---------------------------------------------------------------------------
@@ -544,8 +556,8 @@ namespace Modbus {
   int Device::Private::defaultSlave (int addr) const {
 
     if (addr < 0 && backend != 0) {
-
-      return backend->net() == Rtu ? Broadcast : TcpSlave;
+      Net n = backend->net();	
+      return (n == Rtu || n == Ascii) ? Broadcast : TcpSlave;
     }
     return addr;
   }
@@ -622,6 +634,22 @@ namespace Modbus {
           if (rtu.contains ("rts-delay")) {
             auto r = rtu["rts-delay"].get<int>();
             dev->rtu().setRtsDelay (r);
+          }
+        }
+        if (config.contains ("ascii") && net == Ascii) {
+          auto ascii = config["ascii"];
+
+          if (ascii.contains ("mode")) {
+            auto m = ascii["mode"].get<SerialMode>();
+            dev->ascii().setSerialMode (m);
+          }
+          if (ascii.contains ("rts")) {
+            auto r = ascii["rts"].get<SerialRts>();
+            dev->ascii().setRts (r);
+          }
+          if (ascii.contains ("rts-delay")) {
+            auto r = ascii["rts-delay"].get<int>();
+            dev->ascii().setRtsDelay (r);
           }
         }
       }
