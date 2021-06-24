@@ -253,7 +253,7 @@ namespace Modbus {
 
     Device::Private::setBackend (net, connection, settings);
 #if MODBUSPP_HAVE_SERIAL_MULTI_SLAVES
-    if (net == Rtu) {
+    if (net == Rtu || net == Ascii) {
       modbus_serial_set_recv_filter (ctx(), FALSE);
     }
 #endif
