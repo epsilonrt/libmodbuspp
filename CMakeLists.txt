@@ -93,7 +93,7 @@ else()
   add_subdirectory(3rdparty/json)
 endif()
 
-set (MODBUSPP_CFLAGS_OTHER ${CMAKE_THREAD_LIBS_INIT} ${LIBMODBUS_CFLAGS})
+set (MODBUSPP_CFLAGS_OTHER ${CMAKE_THREAD_LIBS_INIT})
 set (MODBUSPP_LDFLAGS_OTHER ${LIBMODBUS_LDFLAGS} -lpthread)
 
 include (GetDate)
