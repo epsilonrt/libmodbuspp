@@ -50,6 +50,8 @@ namespace Modbus {
       std::promise<void> stopDaemon;
       Message::Callback messageCB;
 
+      std::mutex d_guard;
+
       PIMP_DECLARE_PUBLIC (Server)
   };
 }

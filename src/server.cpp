@@ -27,6 +27,7 @@
 # include <fcntl.h>
 # include <unistd.h>
 #endif
+#include <mutex>
 #include "server_p.h"
 #include "config.h"
 
@@ -314,6 +315,7 @@ namespace Modbus {
 
   // ---------------------------------------------------------------------------
   void Server::Private::close() {
+      std::lock_guard<std::mutex> lg (d_guard);
 
     if (backend->net() == Tcp) {
 
@@ -404,6 +406,7 @@ namespace Modbus {
   // ---------------------------------------------------------------------------
   // static
   int Server::Private::receive (Private * d) {
+      std::lock_guard<std::mutex> lg (d->d_guard);
     int rc;
     if ( (d->backend->net() == Tcp) && !d->isConnected()) {
 
