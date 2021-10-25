@@ -20,6 +20,7 @@
 #include <stdexcept>
 #include <vector>
 #include <iostream>
+#include <functional>
 #include <modbuspp/global.h>
 #include <modbuspp/data.h>
 
@@ -46,7 +47,7 @@ namespace Modbus {
        * @return 1 if the message has been completely processed, 0 if the
        * message has not been processed, -1 if error.
        */
-      typedef int (*Callback) (Message * msg, Device * sender);
+      using Callback = std::function<int(Message*, Device*)>;
 
       /**
        * @brief Constructors
