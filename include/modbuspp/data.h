@@ -220,6 +220,19 @@ namespace Modbus {
         print ( (const uint8_t *) m_registers.data(), size());
       }
 
+      // update data value from MODBUS registers
+      // to call after reading the modbus registers
+      void updateValue() {
+        T v;
+
+        for (auto & r : m_registers) {
+          r = hton (r);
+        }
+        std::memcpy (&v, m_registers.data(), sizeof (T));
+        swap (v);
+        m_value = ntoh (v);
+      }
+
       friend class Slave;
       friend class BufferedSlave;
       friend class Message;
@@ -242,18 +255,6 @@ namespace Modbus {
         }
       }
 
-      // update data value from MODBUS registers
-      // to call after reading the modbus registers
-      void updateValue() {
-        T v;
-
-        for (auto & r : m_registers) {
-          r = hton (r);
-        }
-        std::memcpy (&v, m_registers.data(), sizeof (T));
-        swap (v);
-        m_value = ntoh (v);
-      }
 #endif /* __DOXYGEN__ not defined */
 
     private:
