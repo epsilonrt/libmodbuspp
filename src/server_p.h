@@ -16,6 +16,7 @@
  */
 #pragma once
 
+#include <poll.h>
 #include <map>
 #include <future>
 #include <thread>
@@ -26,9 +27,9 @@ namespace Modbus {
 
   class Server::Private : public Device::Private {
 
+      static const int MAX_CONNECTIONS = 16;
     public:
       Private (Server * q);
-      virtual ~Private();
       virtual void setBackend (Net net, const std::string & connection,
                                const std::string & settings);
       virtual void setConfig (const nlohmann::json & config);
@@ -36,16 +37,17 @@ namespace Modbus {
       virtual bool open();
       virtual void close();
       int task (int rc);
+      int poll (int timeout);
 
       BufferedSlave * addSlave (int slaveAddr, Device * master);
 
       static void * loop (std::future<void> run, Private * d);
       static int receive (Private * d);
 
-      int sock;
+      int listen_sock = -1;
+      std::vector<pollfd> all_pollfds {};
       std::shared_ptr<Request> req;
       std::map <int, std::shared_ptr<BufferedSlave>> slave;
-      std::future<int> receiveTask;
       std::thread daemon;
       std::promise<void> stopDaemon;
       Message::Callback messageCB;

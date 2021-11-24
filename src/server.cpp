@@ -83,24 +83,15 @@ namespace Modbus {
 
   // ---------------------------------------------------------------------------
   int Server::poll (long timeout) {
-
-    if (!isRunning() && isOpen()) {
-      PIMP_D (Server);
-
-      if (!d->receiveTask.valid()) {
-        // starts the receiving thread
-        d->receiveTask = std::async (std::launch::async, Server::Private::receive, d);
-      }
-
-      if (d->receiveTask.wait_for (std::chrono::milliseconds (timeout)) == std::future_status::ready) {
-
-        // message received ?
-        int rc = d->receiveTask.get();
-        return d->task (rc);
-      }
-      return 0;
+    if(isRunning() || not isOpen()){
+        // cann not proceed if the `loop()` is running
+        // OR connection is not established
+        return -1;
     }
-    return -1;
+
+    PIMP_D (Server);
+    return d->poll(timeout);
+
   }
 
   // ---------------------------------------------------------------------------
@@ -184,9 +175,9 @@ namespace Modbus {
   void Server::terminate () {
     PIMP_D (Server);
 
-    if (d->sock != -1) {
-
-      ::shutdown (d->sock, SHUT_RDWR);
+    if (d->listen_sock != -1) {
+      ::shutdown (d->listen_sock, SHUT_RDWR);
+      ::close(d->listen_sock);
     }
 
     if (isRunning()) {
@@ -196,6 +187,7 @@ namespace Modbus {
       // Wait for thread to join
       d->daemon.join();
     }
+
   }
 
   // ---------------------------------------------------------------------------
@@ -234,10 +226,10 @@ namespace Modbus {
 
   // ---------------------------------------------------------------------------
   Server::Private::Private (Server * q) :
-    Device::Private (q), sock (-1), req (0) {}
+    Device::Private (q), listen_sock (-1), req (0) {
+      all_pollfds.reserve(MAX_CONNECTIONS +1);
+  }
 
-  // ---------------------------------------------------------------------------
-  Server::Private::~Private() = default;
 
   // ---------------------------------------------------------------------------
   // virtual
@@ -292,14 +284,23 @@ namespace Modbus {
     switch (backend->net()) {
 
       case Tcp:
-        sock = modbus_tcp_pi_listen (ctx(), 1);
-        isOk = (sock != -1);
+        listen_sock = modbus_tcp_pi_listen (ctx(), MAX_CONNECTIONS);
+        if ( listen_sock != -1 ) {
+          isOk = true;
+          all_pollfds.push_back(pollfd{.fd=listen_sock, .events=POLL_IN, .revents=0});
+        }
         break;
 
       case Rtu:
-      case Ascii:
-        isOk = Device::Private::open();
-
+      case Ascii: {
+        if ( Device::Private::open() ) {
+          isOk = true;
+          int listen_sock = modbus_get_socket(ctx());
+          all_pollfds.push_back(pollfd{.fd=listen_sock, .events=POLL_IN, .revents=0});
+        } else {
+            std::cout << "fd after open: " << listen_sock << "\n";
+        }
+      }
       default:
         break;
     }
@@ -315,18 +316,16 @@ namespace Modbus {
 
   // ---------------------------------------------------------------------------
   void Server::Private::close() {
-      std::lock_guard<std::mutex> lg (d_guard);
-
+    std::lock_guard<std::mutex> lg (d_guard);
     if (backend->net() == Tcp) {
-
-      if (sock != -1) {
-
+      if (listen_sock != -1) {
 #ifdef _WIN32
-        ::closesocket (sock);
+        ::closesocket (listen_sock);
 #else
-        ::close (sock);
+        ::close (listen_sock);
 #endif
-        sock = -1;
+        all_pollfds.clear();
+        listen_sock = -1;
       }
     }
     Device::Private::close();
@@ -393,9 +392,7 @@ namespace Modbus {
         rc = 0;
       }
       else {
-
         if (messageCB) {
-
           rc = messageCB (req.get(), q);
         }
       }
@@ -403,25 +400,91 @@ namespace Modbus {
     return rc;
   }
 
+  int Server::Private::poll(int timeout)
+  {
+    int eventCount = ::poll(all_pollfds.data(), all_pollfds.size(), timeout);
+
+    if ( eventCount == 0) {
+        // there is nothing to process
+        return 0;
+    }
+
+    if ( eventCount < 0 ) {
+        // handle error
+        return -1;
+    }
+
+    // handle events
+    std::vector<pollfd> new_pfds{};
+
+    for ( pollfd& pfd : all_pollfds ) {
+
+      if ( pfd.revents & POLLIN ) {
+
+        if ( backend->net() == Net::Tcp && pfd.fd == listen_sock ) {
+          // if there is an event on the 'listening' socket
+          // handle incomming connection request aka `connect()`
+          // but only Server::Private::MAX_CONNECTIONS
+          if ( all_pollfds.size() < MAX_CONNECTIONS ) {
+            int new_socket = modbus_tcp_accept(ctx(), &listen_sock);
+            if ( new_socket !=  -1 ) {
+                new_pfds.push_back(pollfd{
+                  .fd=new_socket,
+                  .events=POLL_IN,
+                  .revents=0});
+            }
+          }
+        } else {
+          // handle incomming request
+          modbus_set_socket(ctx(), pfd.fd);
+          int rc = Server::Private::receive(this);
+          if ( rc == -1 ) {
+              // if receive fails after a successfull poll
+              // probably the connection is broken
+              ::close(pfd.fd);
+              pfd.fd = -1;
+              continue;
+          }
+
+          task(rc);
+        }
+      } else if ( pfd.revents & POLLHUP ) {
+          ::close(pfd.fd);
+          pfd.fd = -1;
+      }
+    }
+
+    // remove bad file descriptors from watch list
+    auto badFds = std::remove_if(all_pollfds.begin(), all_pollfds.end(), [](const pollfd& pfd) {
+        return (pfd.revents & (POLLERR|POLLHUP|POLLNVAL)) || (pfd.fd == -1);
+    });
+    all_pollfds.erase(badFds, all_pollfds.end());
+
+    if ( all_pollfds.empty() ) {
+        return -1;
+    }
+
+    // add new accepted file descriptors to watch list
+    if ( not new_pfds.empty() ) {
+      all_pollfds.insert(all_pollfds.end(), new_pfds.begin(), new_pfds.end());
+    }
+
+    return 0;
+  }
+
   // ---------------------------------------------------------------------------
   // static
   int Server::Private::receive (Private * d) {
-      std::lock_guard<std::mutex> lg (d->d_guard);
-    int rc;
-    if ( (d->backend->net() == Tcp) && !d->isConnected()) {
+    std::lock_guard<std::mutex> lg (d->d_guard);
 
-      // accept blocking call !
-      if (modbus_tcp_pi_accept (d->ctx(), &d->sock) < 0) {
+    int rc = 0;
 
-        return -1;
-      }
-    }
     d->req->clear();
     rc = modbus_receive (d->ctx(), d->req->adu());
-    if (rc > 0) {
-
-      d->req->setAduSize (rc);
+    if ( rc > 0 ) {
+        d->req->setAduSize(rc);
     }
+
     return rc;
   }
 
