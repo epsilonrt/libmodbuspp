@@ -555,8 +555,8 @@ namespace Modbus {
 
     protected:
       class Private;
-      Device (Private &dd);
-      std::unique_ptr<Private> d_ptr;
+      Device (std::unique_ptr<Device::Private> &&dd);
+      std::unique_ptr<Device::Private> d_ptr;
 
     private:
       PIMP_DECLARE_PRIVATE (Device)

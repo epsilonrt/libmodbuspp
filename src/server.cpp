@@ -42,11 +42,11 @@ namespace Modbus {
   // ---------------------------------------------------------------------------
 
   // ---------------------------------------------------------------------------
-  Server::Server (Server::Private &dd) : Device (dd) {}
+  Server::Server (std::unique_ptr<Server::Private> &&dd) : Device (std::move(dd)) {}
 
   // ---------------------------------------------------------------------------
   Server::Server () :
-    Device (*new Private (this)) {}
+    Device (std::unique_ptr<Private>(new Private (this))) {}
 
   // ---------------------------------------------------------------------------
   Server::Server (Net net, const std::string & connection,

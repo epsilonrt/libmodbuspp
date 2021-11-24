@@ -512,19 +512,22 @@ namespace Modbus {
 
   // ---------------------------------------------------------------------------
   Message::Private::Private (Message * q, Net n) :
-    q_ptr (q), net (n), aduSize (0),  isResponse (false), backend (0),
+    q_ptr (q), net (n), aduSize (0),  isResponse (false), backend (nullptr),
     transactionId (1) {
-    NetLayer * b;
+      std::unique_ptr<NetLayer> b = nullptr;
 
     switch (net) {
 
       case Tcp:
-        b = new TcpLayer ("*", "1502");
+        b = std::unique_ptr<TcpLayer> (new TcpLayer{"*", "1502"} );
         break;
 
       case Rtu:
+        b = std::unique_ptr<RtuLayer> (new RtuLayer{"*", "1502"} );
+        break;
+
       case Ascii:
-        b = new RtuLayer ("COM1", "9600E1");
+        b = std::unique_ptr<AsciiLayer> (new AsciiLayer{"*", "1502"} );
         break;
 
       default:
@@ -535,7 +538,6 @@ namespace Modbus {
 
     pduBegin = modbus_get_header_length (b->context());
     maxAduLength =  b->maxAduLength();
-    delete b;
     adu.resize (maxAduLength, 0);
     if (net == Tcp) {
       adu[6] = MODBUS_TCP_SLAVE;
@@ -556,9 +558,6 @@ namespace Modbus {
 
     adu[pduBegin] = static_cast<uint8_t> (func);
   }
-
-  // ---------------------------------------------------------------------------
-  Message::Private::~Private() = default;
 }
 
 /* ========================================================================== */

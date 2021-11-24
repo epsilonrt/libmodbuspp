@@ -29,7 +29,7 @@ namespace Modbus {
       Private (Request * q, Net n);
       Private (Request * q, Net n, const std::vector<uint8_t> & m);
       Private (Request * q, Net n, Function f);
-      virtual ~Private();
+      virtual ~Private() = default;
       PIMP_DECLARE_PUBLIC (Request)
   };
 }

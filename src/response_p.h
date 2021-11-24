@@ -26,7 +26,8 @@ namespace Modbus {
       Private (Response * q, NetLayer * b);
       Private (Response * q, NetLayer * b, const std::vector<uint8_t> & m);
       Private (Response * q, NetLayer * b, Function f);
-      virtual ~Private();
+      virtual ~Private() = default;
+
       PIMP_DECLARE_PUBLIC (Response)
   };
 }

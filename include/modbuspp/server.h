@@ -170,7 +170,7 @@ namespace Modbus {
       /**
        * @overload
        */
-      virtual void close();
+      virtual void close() override;
 
       /**
        * @brief Performs all server operations
@@ -307,7 +307,7 @@ namespace Modbus {
 
     protected:
       class Private;
-      Server (Private &dd);
+      Server (std::unique_ptr<Private> &&dd);
 
     private:
       PIMP_DECLARE_PRIVATE (Server)

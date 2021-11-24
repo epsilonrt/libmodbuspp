@@ -28,7 +28,6 @@ namespace Modbus {
     public:
       Private (Slave * q);
       Private (Slave * q, int s, Device * d);
-      virtual ~Private();
 
       inline modbus_t * ctx() {
         return dev->backend().context();

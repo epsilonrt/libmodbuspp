@@ -39,7 +39,7 @@ namespace Modbus {
   // ---------------------------------------------------------------------------
 
   // ---------------------------------------------------------------------------
-  Device::Device (Device::Private &dd) : d_ptr (&dd) {}
+  Device::Device (std::unique_ptr<Device::Private> &&dd) : d_ptr (std::move(dd)) {}
 
   // ---------------------------------------------------------------------------
   Device::Device () :  d_ptr (new Private (this)) {}
@@ -198,7 +198,7 @@ namespace Modbus {
     if (net() == Rtu) {
       PIMP_D (Device);
 
-      return * reinterpret_cast<RtuLayer *> (d->backend);
+      return * reinterpret_cast<RtuLayer *> (d->backend.get());
     }
     throw std::domain_error ("Unable to return RTU layer !");
   }
@@ -209,7 +209,7 @@ namespace Modbus {
     if (net() == Ascii) {
       PIMP_D (Device);
 
-      return * reinterpret_cast<AsciiLayer *> (d->backend);
+      return * reinterpret_cast<AsciiLayer *> (d->backend.get());
     }
     throw std::domain_error ("Unable to return ASCII layer !");
   }
@@ -220,7 +220,7 @@ namespace Modbus {
     if (net() == Tcp) {
       PIMP_D (Device);
 
-      return * reinterpret_cast<TcpLayer *> (d->backend);
+      return * reinterpret_cast<TcpLayer *> (d->backend.get());
     }
     throw std::domain_error ("Unable to return TCP layer !");
   }
@@ -419,7 +419,7 @@ namespace Modbus {
       }
       while (d->recoveryLink && rc == -1 && !msg->isResponse());
 
-      if (rc > 0 && rc != msg->size()) {
+      if (rc > 0 && static_cast<size_t>(rc) != msg->aduSize()) {
 
         errno = EMBBADDATA;
         return -1;
@@ -451,14 +451,8 @@ namespace Modbus {
 
   // ---------------------------------------------------------------------------
   Device::Private::Private (Device * q) :
-    q_ptr (q), isOpen (false), backend (0), recoveryLink (false),
+    q_ptr (q), isOpen (false), backend (nullptr), recoveryLink (false),
     debug (false) {}
-
-  // ---------------------------------------------------------------------------
-  Device::Private::~Private() {
-
-    delete backend;
-  }
 
   // ---------------------------------------------------------------------------
   void Device::Private::setConfigFromFile (const std::string & jsonfile,
@@ -513,15 +507,15 @@ namespace Modbus {
     switch (net) {
 
       case Tcp:
-        backend = new TcpLayer (connection, settings);
+        backend = std::unique_ptr<TcpLayer>{new TcpLayer (connection, settings)};
         break;
 
       case Rtu:
-        backend = new RtuLayer (connection, settings);
+        backend = std::unique_ptr<RtuLayer>{new RtuLayer (connection, settings)};
         break;
 
       case Ascii:
-	backend = new AsciiLayer (connection, settings);
+        backend = std::unique_ptr<AsciiLayer>{new AsciiLayer (connection, settings)};
 	break;
 
       default:
@@ -555,7 +549,7 @@ namespace Modbus {
   // ---------------------------------------------------------------------------
   int Device::Private::defaultSlave (int addr) const {
 
-    if (addr < 0 && backend != 0) {
+    if (addr < 0 && backend != nullptr) {
       Net n = backend->net();	
       return (n == Rtu || n == Ascii) ? Broadcast : TcpSlave;
     }
