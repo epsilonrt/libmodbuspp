@@ -195,7 +195,7 @@ namespace Modbus {
 
     protected:
       class Private;
-      RtuLayer (Private &dd);
+      RtuLayer (std::unique_ptr<RtuLayer::Private> &&dd);
 
     private:
       PIMP_DECLARE_PRIVATE (RtuLayer)

@@ -196,7 +196,7 @@ namespace Modbus {
 
     protected:
       class Private;
-      AsciiLayer (Private &dd);
+      AsciiLayer (std::unique_ptr<Private> &&dd);
 
     private:
       PIMP_DECLARE_PRIVATE (AsciiLayer)

@@ -78,7 +78,7 @@ namespace Modbus {
 
     protected:
       class Private;
-      TcpLayer (Private &dd);
+      TcpLayer (std::unique_ptr<TcpLayer::Private> &&dd);
 
     private:
       PIMP_DECLARE_PRIVATE (TcpLayer)
