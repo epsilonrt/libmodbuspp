@@ -20,7 +20,7 @@ cmake_minimum_required(VERSION 2.8.11)
 include(SubDirList)
 SUBDIRLIST(TESTS ${CMAKE_CURRENT_SOURCE_DIR})
 
-find_package(modbuspp CONFIG)
+find_package(MODBUSPP CONFIG)
 
 add_custom_target(build_and_test ${CMAKE_CTEST_COMMAND} -V)
 link_directories(${MODBUSPP_LIBRARY_DIRS})
