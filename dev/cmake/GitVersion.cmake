@@ -44,7 +44,10 @@ function(GetGitVersion _prefix)
     set(str v1.0-0)
     set(ret 0)
   endif()
-  
+
+  set(str v1.1)
+  set(ret 0)
+
   message("GetGitVersion:str=${str}")
   message("GetGitVersion:ret=${ret}")
   
