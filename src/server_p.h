@@ -39,7 +39,7 @@ namespace Modbus {
 
       BufferedSlave * addSlave (int slaveAddr, Device * master);
 
-      static void * loop (std::future<void> run, Private * d);
+      static void loop (std::future<void> run, Private * d);
       static int receive (Private * d);
 
       int sock;

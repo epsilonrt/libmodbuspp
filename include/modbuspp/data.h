@@ -22,6 +22,7 @@
 #include <type_traits>
 #include <limits>
 #include <string>
+#include <stdexcept>
 
 #include <modbuspp/global.h>
 #include <modbuspp/swap.h>
