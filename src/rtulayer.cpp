@@ -262,11 +262,13 @@ namespace Modbus {
   // ---------------------------------------------------------------------------
   // static
   int RtuLayer::stop (const std::string & settings) {
-
-    if (parity (settings) == 'N') {
-
-      return 2;
-    }
+	  size_t s = settings.length();
+	  if (s >= 2)
+	  {
+		  char c = settings[s - 1];
+		  if (c == '1')  { return 1; }
+		  else if (c == '2') { return 2; }
+	  }
     return 1;
   }
 

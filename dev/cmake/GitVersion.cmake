@@ -44,14 +44,17 @@ function(GetGitVersion _prefix)
     set(str v1.0-0)
     set(ret 0)
   endif()
-  
-  #message("GetGitVersion:str=${str}")
-  #message("GetGitVersion:ret=${ret}")
+
+  set(str v1.1)
+  set(ret 0)
+
+  message("GetGitVersion:str=${str}")
+  message("GetGitVersion:ret=${ret}")
   
   if (ret EQUAL 0 AND str)
     
     string(REGEX MATCH "^[vV][0-9]\\.[0-9].*" str ${str})
-    #message("GetGitVersion:version=${version}")
+    message("GetGitVersion:version=${str}")
     
     if (str)
     

@@ -44,8 +44,8 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
     "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
 endif()
 
-set (MODBUSPP_WITH_STATIC 0 CACHE BOOL "Enable building static libraries.")
-set (MODBUSPP_UNIT_TESTS 1 CACHE BOOL "Enable building unit tests.")
+set (MODBUSPP_WITH_STATIC 1 CACHE BOOL "Enable building static libraries.")
+set (MODBUSPP_UNIT_TESTS 0 CACHE BOOL "Enable building unit tests.")
 
 # Offer the user the choice of overriding the installation directories
 set(INSTALL_LIB_DIR lib CACHE PATH "Installation directory for libraries")
@@ -53,7 +53,9 @@ set(INSTALL_BIN_DIR bin CACHE PATH "Installation directory for executables")
 set(INSTALL_INCLUDE_DIR include CACHE PATH
   "Installation directory for header files")
 set(INSTALL_CODELITE_DIR /usr/share/codelite CACHE PATH "Installation directory for codelite templates")
-option(MODBUSPP_USE_EXTERNAL_JSON "Use an external JSON library" OFF)
+option(MODBUSPP_USE_EXTERNAL_JSON "Use an external JSON library" ON)
+
+
 
 set(DEF_INSTALL_CMAKE_DIR lib)
 set(DEF_INSTALL_DOC_DIR share/doc)
@@ -91,11 +93,11 @@ find_package(Gzip)
 pkg_check_modules (UNITTESTPP UnitTest++>=2.0.0)
 
 if(MODBUSPP_USE_EXTERNAL_JSON)
-  find_package(nlohmann_json 3.2.0 REQUIRED)
+  find_package(nlohmann_json CONFIG)
 else()
-  set(JSON_BuildTests OFF CACHE INTERNAL "")
-  set(JSON_Install OFF CACHE INTERNAL "")
-  add_subdirectory(3rdparty/json)
+  #set(JSON_BuildTests OFF CACHE INTERNAL "")
+  #set(JSON_Install OFF CACHE INTERNAL "")
+  #add_subdirectory(3rdparty/json)
 endif()
 
 set (MODBUSPP_CFLAGS_OTHER ${CMAKE_THREAD_LIBS_INIT} ${LIBMODBUS_CFLAGS})
@@ -108,10 +110,7 @@ include (GitVersion)
 GetGitVersion(MODBUSPP_VERSION)
 set(MODBUSPP_VERSION
   ${MODBUSPP_VERSION_MAJOR}.${MODBUSPP_VERSION_MINOR}.${MODBUSPP_VERSION_PATCH})
-configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/config.h.in
-                ${CMAKE_CURRENT_BINARY_DIR}/config.h @ONLY)
-configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/version.h.in
-                ${CMAKE_CURRENT_BINARY_DIR}/version.h @ONLY)
+
 
 include(CheckTypeSize)
 check_type_size(bool SIZEOF_BOOL BUILTIN_TYPES_ONLY LANGUAGE CXX)
@@ -126,6 +125,13 @@ check_symbol_exists(TIOCM_RTS sys/ioctl.h MODBUSPP_HAVE_TIOCM_RTS)
 
 list(APPEND CMAKE_REQUIRED_LIBRARIES ${LIBMODBUS_NAME})
 check_symbol_exists(modbus_rtu_set_recv_filter ${LIBMODBUS_NAME}/modbus-rtu.h MODBUSPP_HAVE_RTU_MULTI_SLAVES)
+
+
+message (STATUS "MODBUSPP_HAVE_RTU_MULTI_SLAVES: ${MODBUSPP_HAVE_RTU_MULTI_SLAVES}.")
+configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/config.h.in
+                ${CMAKE_CURRENT_BINARY_DIR}/config.h @ONLY)
+configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/version.h.in
+                ${CMAKE_CURRENT_BINARY_DIR}/version.h @ONLY)
 
 # Make relative paths absolute (needed later on)
 foreach(p LIB BIN INCLUDE CMAKE DATA DOC CODELITE)
@@ -273,7 +279,7 @@ set(CPACK_PACKAGE_CONTACT "Pascal JEAN <pascal.jean@piduino.org>")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "${PROJECT_NAME} - ${PROJECT_DESCRIPTION}")
 set(CPACK_RESOURCE_FILE_LICENSE "${PROJECT_SOURCE_DIR}/COPYING.LESSER")
 
-set(CPACK_GENERATOR "DEB")
+#set(CPACK_GENERATOR "DEB")
 
 if (CPACK_GENERATOR STREQUAL "DEB")
 
