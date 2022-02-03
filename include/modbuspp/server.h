@@ -18,6 +18,7 @@
 
 #include <modbuspp/master.h>
 #include <modbuspp/bufferedslave.h>
+#include <poll.h>
 
 namespace Modbus {
 
@@ -166,6 +167,9 @@ namespace Modbus {
        * affected resources.
        */
       virtual ~Server();
+
+
+      virtual std::vector<pollfd> fds();
 
       /**
        * @overload

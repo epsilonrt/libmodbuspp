@@ -218,6 +218,12 @@ namespace Modbus {
     d->messageCB = cb;
   }
 
+  std::vector<pollfd> Server::fds() {
+      PIMP_D(Server);
+
+      return d->all_pollfds;
+  }
+
   // ---------------------------------------------------------------------------
   //
   //                         Server::Private Class
