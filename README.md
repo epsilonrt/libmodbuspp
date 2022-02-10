@@ -299,7 +299,7 @@ _"Filter on the Modbus unit identifier (slave) in RTU mode to avoid useless CRC 
 To benefit from the routing capacity of the Router and Server classes in RTU, 
 you must therefore use the fork of libmodbus named **libmodbusepsi**.  
 In this fork released from the [piduino](http://apt.piduino.org) 
-repository, filtering can be disabled (with _modbus_rtu_set_recv_filter()_).    
+repository, filtering can be disabled (with _modbus_serial_set_recv_filter()_).    
 Thus, it is the Server class which performs this filtering (after checking the 
 CRC therefore). Effectively, this has the effect of loading the microprocessor, 
 but, at present, the computing power of our machines is such that it does not 

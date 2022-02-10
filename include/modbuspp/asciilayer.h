@@ -21,7 +21,7 @@
 namespace Modbus {
 
   /**
-   * @class RtuLayer
+   * @class AsciiLayer
    * @brief RTU serial link layer
    *
    * This class can not and should not be instantiated by the user.
@@ -38,13 +38,13 @@ namespace Modbus {
    * @author Pascal JEAN, aka epsilonrt
    * @copyright GNU Lesser General Public License
    */
-  class RtuLayer : public NetLayer {
+  class AsciiLayer : public NetLayer {
     public:
 
       /**
        * @brief Constructor
        */
-      RtuLayer (const std::string & port, const std::string & settings);
+      AsciiLayer (const std::string & port, const std::string & settings);
 
       /**
        * @brief Name of the serial port
@@ -192,14 +192,14 @@ namespace Modbus {
       /**
        * @brief Performing Modbus CRC16 generation of the buffer @b buf
        */
-      static uint16_t crc16 (const uint8_t * buf, uint16_t count);
+      static uint8_t lrc8 (const uint8_t * buffer, uint16_t buffer_length);
 
     protected:
       class Private;
-      RtuLayer (std::unique_ptr<RtuLayer::Private> &&dd);
+      AsciiLayer (std::unique_ptr<Private> &&dd);
 
     private:
-      PIMP_DECLARE_PRIVATE (RtuLayer)
+      PIMP_DECLARE_PRIVATE (AsciiLayer)
   };
 }
 

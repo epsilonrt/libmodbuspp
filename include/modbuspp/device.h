@@ -24,6 +24,7 @@ namespace Modbus {
 
   class NetLayer;
   class RtuLayer;
+  class AsciiLayer;
   class TcpLayer;
   class Message;
 
@@ -478,6 +479,14 @@ namespace Modbus {
       RtuLayer & rtu();
 
       /**
+       * @brief underlying RTU layer (backend)
+       *
+       * This function shall return the RTU layer if it is the layer used by
+       * the device. If it does not, a @b std::domain_error exception is thrown.
+       */
+      AsciiLayer & ascii();
+
+      /**
        * @brief underlying TCP layer (backend)
        *
        * This function shall return the TCP layer if it is the layer used by
@@ -546,8 +555,8 @@ namespace Modbus {
 
     protected:
       class Private;
-      Device (Private &dd);
-      std::unique_ptr<Private> d_ptr;
+      Device (std::unique_ptr<Device::Private> &&dd);
+      std::unique_ptr<Device::Private> d_ptr;
 
     private:
       PIMP_DECLARE_PRIVATE (Device)

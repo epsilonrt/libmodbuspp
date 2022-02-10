@@ -25,6 +25,7 @@ namespace Modbus {
 
     public:
       Private (const std::string & port, const std::string & settings);
+
       int oneByteTime;
   };
 }

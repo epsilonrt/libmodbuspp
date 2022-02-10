@@ -16,21 +16,17 @@
  */
 #pragma once
 
-#include <modbuspp/request.h>
-#include "message_p.h"
+#include <modbuspp/asciilayer.h>
+#include "netlayer_p.h"
 
 namespace Modbus {
 
-  class Request::Private : public Message::Private {
+  class AsciiLayer::Private  : public NetLayer::Private {
+
     public:
-      Private (Request * q, NetLayer * b);
-      Private (Request * q, NetLayer * b, const std::vector<uint8_t> & m);
-      Private (Request * q, NetLayer * b, Function f);
-      Private (Request * q, Net n);
-      Private (Request * q, Net n, const std::vector<uint8_t> & m);
-      Private (Request * q, Net n, Function f);
-      virtual ~Private() = default;
-      PIMP_DECLARE_PUBLIC (Request)
+      Private (const std::string & port, const std::string & settings);
+
+      int oneByteTime;
   };
 }
 

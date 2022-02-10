@@ -276,7 +276,7 @@ namespace Modbus {
 
     protected:
       class Private;
-      Router (Private &dd);
+      Router (std::unique_ptr<Private> &&dd);
 
     private:
       PIMP_DECLARE_PRIVATE (Router)
