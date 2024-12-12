@@ -234,40 +234,48 @@ namespace Modbus {
   // ---------------------------------------------------------------------------
   // static
   int RtuLayer::baud (const std::string & settings) {
-    int b;
     try {
-      b = std::stoi (settings);
+      return std::stoi (settings);
     }
     catch (...) {
-      b = 19200;
+      throw std::invalid_argument ("RtuLayer settings\"" + settings + "\" has an invalid baud rate setting.");
     }
-    return b;
   }
 
   // ---------------------------------------------------------------------------
   // static
   char RtuLayer::parity (const std::string & settings) {
-    char p = 'N';
     size_t s = settings.length();
 
     if (s >= 2) {
       char c = settings[s - 2];
-      if ( (c == 'E') || (c == 'O')) {
-        return c;
+      switch (c) {
+        case 'N':
+        case 'E':
+        case 'O':
+          return c;
       }
     }
-    return p;
+
+    throw std::invalid_argument ("RtuLayer settings\"" + settings + "\" has an invalid parity setting.");
   }
 
   // ---------------------------------------------------------------------------
   // static
   int RtuLayer::stop (const std::string & settings) {
+    size_t s = settings.length();
 
-    if (parity (settings) == 'N') {
-
-      return 2;
+    if (s >= 3) {
+      char c = settings[s - 1];
+      switch (c) {
+        case '1':
+          return 1;
+        case '2':
+          return 2;
+      }
     }
-    return 1;
+
+    throw std::invalid_argument ("RtuLayer settings\"" + settings + "\" has an invalid stop bit setting.");
   }
 
   // ---------------------------------------------------------------------------
