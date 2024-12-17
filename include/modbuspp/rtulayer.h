@@ -169,23 +169,22 @@ namespace Modbus {
 
       /**
        * @brief Extracts the baudrate from a settings string.
-       * @return the baudrate found. if no value is found, returns the default
-       * value, ie 19200.
+       * @return the baudrate found. If no valid value is found, an exception is thrown.
        */
       static int baud (const std::string & settings);
 
       /**
        * @brief Extracts the parity from a settings string.
-       * @return the parity found. if no value is found, returns the default
-       * value, ie E for Even parity.
+       * @return the parity found. If no valid value is found, an exception is thrown.
        */
       static char parity (const std::string & settings);
 
       /**
        * @brief Return the stop bits from a settings string.
        *
-       * @return the number returned is determined based on the parity found.
-       * If the parity is None, this function returns 2, otherwise returns 1.
+       * @return the number of stop bits.
+       * It is parsed from the last character of the settings string.
+       * If the last character is neither '1' or '2' an exception is thrown.
        */
       static int stop (const std::string & settings);
       
