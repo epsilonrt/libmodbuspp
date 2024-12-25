@@ -12,5 +12,5 @@ URL: https://github.com/epsilonrt/libmodbuspp
 Version: @MODBUSPP_VERSION@
 Requires: 
 Libs: -L${libdir} -lmodbuspp ${ldflags_other}
-Cflags: -I${includedir} ${cflags_other}
+Cflags: -I${includedir} -I${includedir}/@LIBMODBUS_NAME@ ${cflags_other}
 

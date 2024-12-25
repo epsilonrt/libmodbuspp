@@ -220,9 +220,6 @@ namespace Modbus {
   Request::Private::Private (Request * q, Net n, Function f) :
     Message::Private (q, n, f) {}
     
-  // ---------------------------------------------------------------------------
-  Request::Private::~Private() = default;
-
 }
 
 /* ========================================================================== */

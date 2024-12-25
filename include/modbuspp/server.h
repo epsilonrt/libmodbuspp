@@ -18,6 +18,7 @@
 
 #include <modbuspp/master.h>
 #include <modbuspp/bufferedslave.h>
+#include <poll.h>
 
 namespace Modbus {
 
@@ -167,10 +168,13 @@ namespace Modbus {
        */
       virtual ~Server();
 
+
+      virtual std::vector<pollfd> fds();
+
       /**
        * @overload
        */
-      virtual void close();
+      virtual void close() override;
 
       /**
        * @brief Performs all server operations
@@ -307,7 +311,7 @@ namespace Modbus {
 
     protected:
       class Private;
-      Server (Private &dd);
+      Server (std::unique_ptr<Private> &&dd);
 
     private:
       PIMP_DECLARE_PRIVATE (Server)

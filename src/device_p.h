@@ -28,7 +28,6 @@ namespace Modbus {
 
     public:
       Private (Device * q);
-      virtual ~Private();
       virtual void setBackend (Net net, const std::string & connection,
                                const std::string & settings);
       virtual void setConfig (const nlohmann::json & config);
@@ -39,18 +38,26 @@ namespace Modbus {
       virtual bool open();
       virtual void close();
       inline modbus_t * ctx() {
-        return backend->context();
+        if ( backend != nullptr ) {
+          return backend->context();
+        } else {
+          return nullptr;
+        }
       }
       inline modbus_t * ctx() const {
-        return backend->context();
+        if ( backend != nullptr ) {
+          return backend->context();
+        } else {
+          return nullptr;
+        }
       }
       int defaultSlave (int addr) const;
       bool isConnected () const;
       void printError (const char * what = nullptr) const;
 
-      Device * const q_ptr;
+      Device * const q_ptr = nullptr;
       bool isOpen;
-      NetLayer * backend;
+      std::unique_ptr<NetLayer> backend = nullptr;
       bool recoveryLink;
       bool debug;
 

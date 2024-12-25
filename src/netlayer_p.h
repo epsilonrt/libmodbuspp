@@ -23,16 +23,14 @@ namespace Modbus {
   class NetLayer::Private {
     public:
       Private (Net n, const std::string & c, const std::string & s, uint16_t m) :
-        ctx (0), net (n), connection (c), settings (s), maxAduLength (m)  {}
-      virtual ~Private() {
-        modbus_free (ctx);
-      }
+        net (n), connection (c), settings (s), maxAduLength (m)  {}
 
-      modbus_t * ctx;
       Net net;
       std::string connection;
       std::string settings;
       uint16_t maxAduLength;
+      std::unique_ptr<modbus_t, void(*)(modbus_t*)> ctx =
+        {nullptr, [](modbus_t* p){ modbus_free(p); }};
   };
 }
 

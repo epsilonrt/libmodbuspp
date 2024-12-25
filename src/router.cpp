@@ -28,10 +28,10 @@ namespace Modbus {
   // ---------------------------------------------------------------------------
 
   // ---------------------------------------------------------------------------
-  Router::Router (Router::Private &dd) : Server (dd) {}
+  Router::Router (std::unique_ptr<Router::Private> &&dd) : Server (std::move(dd)) {}
 
   // ---------------------------------------------------------------------------
-  Router::Router () : Server (*new Private (this)) {}
+  Router::Router () : Server (std::unique_ptr<Private>(new Private (this))) {}
 
   // ---------------------------------------------------------------------------
   Router::Router (Net net, const std::string & connection,
@@ -151,9 +151,6 @@ namespace Modbus {
 
   // ---------------------------------------------------------------------------
   Router::Private::Private (Router * q) : Server::Private (q) {}
-
-  // ---------------------------------------------------------------------------
-  Router::Private::~Private() = default;
 
   // ---------------------------------------------------------------------------
   // virtual
