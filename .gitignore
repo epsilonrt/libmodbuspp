@@ -11,5 +11,5 @@ obj/
 .*
 version.h
 config.h
-*build-*/
+*build*/
 work/
