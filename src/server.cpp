@@ -423,7 +423,7 @@ namespace Modbus {
 
   // ---------------------------------------------------------------------------
   // static
-  void * Server::Private::loop (std::future<void> run, Private * d) {
+  void Server::Private::loop (std::future<void> run, Private * d) {
     int rc;
 
     while (run.wait_for (std::chrono::milliseconds (100)) == std::future_status::timeout) {
