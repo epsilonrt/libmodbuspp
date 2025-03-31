@@ -6,7 +6,7 @@
 find_program(GZIP_EXE gzip)
 
 include(FindPackageHandleStandardArgs)
-FIND_PACKAGE_HANDLE_STANDARD_ARGS( gzip DEFAULT_MSG GZIP_EXE )
+FIND_PACKAGE_HANDLE_STANDARD_ARGS( Gzip DEFAULT_MSG GZIP_EXE )
 mark_as_advanced(GZIP_EXE)
 
 macro(gzip_compress target_name input_files result_archive)

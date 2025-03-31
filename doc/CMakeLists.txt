@@ -16,7 +16,7 @@
 
 # doc CMakeLists.txt
 
-cmake_minimum_required(VERSION 2.8.11)
+cmake_minimum_required(VERSION 3.0)
 
 set (MODBUSPP_WITH_DOXYGEN_DOC 0 CACHE BOOL "Enable build of the documentation")
 

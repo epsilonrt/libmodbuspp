@@ -15,7 +15,7 @@
 # along with the libmodbuspp Project.  If not, see <http://www.gnu.org/licenses/>.
 
 # modbuspp tests CMakeLists.txt
-cmake_minimum_required(VERSION 2.8.11)
+cmake_minimum_required(VERSION 3.0)
 
 include(SubDirList)
 SUBDIRLIST(TESTS ${CMAKE_CURRENT_SOURCE_DIR})
