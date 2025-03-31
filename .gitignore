@@ -13,3 +13,4 @@ version.h
 config.h
 *build*/
 work/
+lib/libmodbus
