@@ -291,7 +291,7 @@ namespace Modbus {
       /**
        * @brief Read a single coil (bit)
        *
-       * This function shall read a signle bit (coil) to the address @b addr of
+       * This function shall read a single bit (coil) to the address @b addr of
        * the device. The result of reading is stored in @b dest
        * as boolean.
        *
@@ -328,7 +328,7 @@ namespace Modbus {
       /**
        * @brief Read a single register
        *
-       * This function shall read a signle holding register to
+       * This function shall read a single holding register to
        * the address @b addr of the device.
        *
        * The result of reading is stored in @b dest as word values (16 bits).
