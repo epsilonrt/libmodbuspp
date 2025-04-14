@@ -209,8 +209,6 @@ namespace Modbus {
   Response::Private::Private (Response * q, NetLayer * b, Function f) :
     Message::Private (q, b, f) {}
     
-  // ---------------------------------------------------------------------------
-  Response::Private::~Private() = default;
 
 }
 

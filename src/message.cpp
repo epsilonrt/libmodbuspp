@@ -19,6 +19,7 @@
 #include <cstring>
 #include <modbuspp/device.h>
 #include <modbuspp/rtulayer.h>
+#include <modbuspp/asciilayer.h>
 #include <modbuspp/tcplayer.h>
 #include "message_p.h"
 #include "config.h"
@@ -260,6 +261,13 @@ namespace Modbus {
           }
           break;
 
+          case Ascii: {
+            uint8_t lrc = AsciiLayer::lrc8 (adu(), aduSize());
+
+            setByte(size(), lrc);
+          }
+          break;
+
           default:
             throw std::invalid_argument (
               "Unable to set PDU for this net !");
@@ -336,6 +344,32 @@ namespace Modbus {
       throw std::invalid_argument ("Unable to return CRC if ADU size less than 4 !");
     }
     return word (size() - 2);
+  }
+
+  // ---------------------------------------------------------------------------
+  uint8_t Message::lrc () const {
+    std::cout << "message::lrc\n";
+    if (net() != Ascii) {
+
+      throw std::domain_error ("Unable to return LRC if backend is not ASCII !");
+    }
+    if (aduSize() >= 4) {
+
+      throw std::invalid_argument ("Unable to return LRC if ADU size less than 8 !");
+    }
+    uint16_t lrc = word (size() - 2);
+    uint8_t lrc_hi = lrc >> 8 & 0xFF;
+    uint8_t lrc_lo = lrc & 0xFF;
+    lrc_hi -= '0';
+    lrc_lo -= '0';
+
+    std::cout << "lrc_hi: " << lrc_hi << "\n";
+    std::cout << "lrc_lo: " << lrc_lo << "\n";
+	
+    uint8_t lrc_8_bit = lrc_hi << 4;
+    lrc_8_bit |= lrc_lo;
+
+    return lrc_8_bit;
   }
 
   // ---------------------------------------------------------------------------
@@ -478,18 +512,22 @@ namespace Modbus {
 
   // ---------------------------------------------------------------------------
   Message::Private::Private (Message * q, Net n) :
-    q_ptr (q), net (n), aduSize (0),  isResponse (false), backend (0),
+    q_ptr (q), net (n), aduSize (0),  isResponse (false), backend (nullptr),
     transactionId (1) {
-    NetLayer * b;
+      std::unique_ptr<NetLayer> b = nullptr;
 
     switch (net) {
 
       case Tcp:
-        b = new TcpLayer ("*", "1502");
+        b = std::unique_ptr<TcpLayer> (new TcpLayer{"*", "1502"} );
         break;
 
       case Rtu:
-        b = new RtuLayer ("COM1", "9600E1");
+        b = std::unique_ptr<RtuLayer> (new RtuLayer{"*", "1502"} );
+        break;
+
+      case Ascii:
+        b = std::unique_ptr<AsciiLayer> (new AsciiLayer{"*", "1502"} );
         break;
 
       default:
@@ -500,7 +538,6 @@ namespace Modbus {
 
     pduBegin = modbus_get_header_length (b->context());
     maxAduLength =  b->maxAduLength();
-    delete b;
     adu.resize (maxAduLength, 0);
     if (net == Tcp) {
       adu[6] = MODBUS_TCP_SLAVE;
@@ -521,9 +558,6 @@ namespace Modbus {
 
     adu[pduBegin] = static_cast<uint8_t> (func);
   }
-
-  // ---------------------------------------------------------------------------
-  Message::Private::~Private() = default;
 }
 
 /* ========================================================================== */

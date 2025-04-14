@@ -26,12 +26,12 @@ namespace Modbus {
 
     public:
       Private (Master * q);
-      virtual ~Private();
-      virtual void setBackend (Net net, const std::string & connection,
-                               const std::string & settings);
-      virtual void setConfig (const nlohmann::json & config);
 
-      virtual Slave * addSlave (int slaveAddr);
+      void setBackend (Net net, const std::string & connection,
+                               const std::string & settings) override;
+      void setConfig (const nlohmann::json & config) override;
+
+      Slave * addSlave (int slaveAddr);
 
       std::map <int, std::shared_ptr<Slave>> slave;
       PIMP_DECLARE_PUBLIC (Master)
@@ -39,3 +39,4 @@ namespace Modbus {
 }
 
 /* ========================================================================== */
+

@@ -37,11 +37,11 @@ namespace Modbus {
   // ---------------------------------------------------------------------------
 
   // ---------------------------------------------------------------------------
-  TcpLayer::TcpLayer (TcpLayer::Private &dd) : NetLayer (dd) {}
+  TcpLayer::TcpLayer (std::unique_ptr<TcpLayer::Private> &&dd) : NetLayer (std::move(dd)) {}
 
   // ---------------------------------------------------------------------------
   TcpLayer::TcpLayer (const std::string & host, const std::string & service) :
-    NetLayer (*new Private (host, service)) {}
+    NetLayer (std::unique_ptr<Private>(new Private (host, service))) {}
 
   // ---------------------------------------------------------------------------
   const std::string & TcpLayer::node() const {
@@ -59,7 +59,7 @@ namespace Modbus {
   int TcpLayer::sendRawMessage (const Message * msg) {
     PIMP_D (TcpLayer);
 
-    return send (modbus_get_socket (d->ctx), msg->adu(), msg->aduSize(),
+    return send (modbus_get_socket (d->ctx.get()), msg->adu(), msg->aduSize(),
                  MSG_NOSIGNAL);
   }
 
@@ -107,7 +107,7 @@ namespace Modbus {
       node = host.c_str();
     }
 
-    ctx = modbus_new_tcp_pi (node, service.c_str());
+    ctx.reset( modbus_new_tcp_pi (node, service.c_str()) );
     if (! ctx) {
 
       throw std::invalid_argument (

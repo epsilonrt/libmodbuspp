@@ -259,7 +259,7 @@ namespace Modbus {
 
     protected:
       class Private;
-      Master (Private &dd);
+      Master (std::unique_ptr<Private> &&dd);
 
     private:
       PIMP_DECLARE_PRIVATE (Master)

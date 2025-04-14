@@ -54,7 +54,7 @@ namespace Modbus {
        * The destructor closes the connection if it is open and releases all
        * affected resources.
        */
-      virtual ~Slave();
+      virtual ~Slave() = default;
 
       /**
        * @brief Get slave number

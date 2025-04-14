@@ -28,10 +28,10 @@ namespace Modbus {
   // ---------------------------------------------------------------------------
 
   // ---------------------------------------------------------------------------
-  Master::Master (Master::Private &dd) : Device (dd) {}
+  Master::Master (std::unique_ptr<Master::Private> &&dd) : Device (std::move(dd)) {}
 
   // ---------------------------------------------------------------------------
-  Master::Master () :  Device (*new Private (this)) {}
+  Master::Master () :  Device (std::unique_ptr<Private>(new Private (this))) {}
 
   // ---------------------------------------------------------------------------
   Master::Master (Net net, const std::string & connection,
@@ -186,9 +186,6 @@ namespace Modbus {
   Master::Private::Private (Master * q) : Device::Private (q) {}
 
   // ---------------------------------------------------------------------------
-  Master::Private::~Private() = default;
-
-  // ---------------------------------------------------------------------------
   // virtual
   void Master::Private::setBackend (Net net, const std::string & connection,
                                     const std::string & settings) {
@@ -201,6 +198,7 @@ namespace Modbus {
         break;
 
       case Rtu:
+      case Ascii:
         (void) addSlave (Broadcast);
         break;
     }

@@ -26,7 +26,7 @@ namespace Modbus {
   // ---------------------------------------------------------------------------
 
   // ---------------------------------------------------------------------------
-  NetLayer::NetLayer (NetLayer::Private &dd) : d_ptr (&dd) {}
+  NetLayer::NetLayer (std::unique_ptr<NetLayer::Private> &&dd) : d_ptr (std::move(dd)) {}
 
   // ---------------------------------------------------------------------------
   NetLayer::NetLayer () :
@@ -53,14 +53,14 @@ namespace Modbus {
   modbus_t * NetLayer::context() {
     PIMP_D (NetLayer);
 
-    return d->ctx;
+    return d->ctx.get();
   }
 
   // ---------------------------------------------------------------------------
   const modbus_t * NetLayer::context() const {
     PIMP_D (const NetLayer);
 
-    return d->ctx;
+    return d->ctx.get();
   }
 
   // ---------------------------------------------------------------------------
