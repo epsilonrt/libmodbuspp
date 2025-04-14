@@ -16,6 +16,7 @@
  */
 #pragma once
 
+#include <stdexcept>
 #include <cstdio>     // printf
 #include <cstring>    // memcpy ...
 #include <array>
