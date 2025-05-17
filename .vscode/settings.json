@@ -1,0 +1,8 @@
+{
+  "cmake.debugConfig": {
+    "args": [
+      "${workspaceFolder}/examples/router/router-json/router-tcp-rs232-virtual.json"
+    ]
+  },
+  "cmake.buildDirectory": "${workspaceFolder}/cmake-build-${buildType}"
+}

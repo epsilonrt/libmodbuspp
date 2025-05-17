@@ -1,0 +1,12 @@
+{
+  "cmake.debugConfig": {
+    "args": [
+      "-m",
+      "rtu",
+      "-c",
+      "/dev/tnt0",
+      "-s",
+      "38400E1"
+    ]
+  }
+}

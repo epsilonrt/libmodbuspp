@@ -290,6 +290,8 @@ How beautiful is that ? :-)
 The source code of this program is searchable in the examples folder
 [router-json](https://github.com/epsilonrt/libmodbuspp/blob/master/examples/router/router-json/main.cpp).
 
+The syntax of JSON files is described in the page [JSON](https://github.com/epsilonrt/libmodbuspp/blob/master/doc/modbuspp_json.md) of the documentation.
+
 ### Note on routing libmodbus in RTU
 
 libmodbus does not support routing in RTU, in fact, only messages intended for a 
@@ -315,29 +317,14 @@ The fastest and safest way to install libmodbuspp on Debian, Armbian, Raspbian .
 is to use the APT repository from [piduino.org](http://apt.piduino.org), 
 so you should do the following :
 
-    wget -O- http://www.piduino.org/piduino-key.asc | sudo apt-key add -
-    sudo add-apt-repository 'deb http://apt.piduino.org stretch piduino'
+    wget -O- http://www.piduino.org/piduino-key.asc | sudo gpg --dearmor --yes --output /usr/share/keyrings/piduino-archive-keyring.gpg
+    echo "deb [signed-by=/usr/share/keyrings/piduino-archive-keyring.gpg] http://apt.piduino.org $(lsb_release -c -s) piduino" | sudo tee /etc/apt/sources.list.d/piduino.list
     sudo apt update
     sudo apt install libmodbuspp-dev libmodbuspp-doc 
 
-This repository provides Piduino packages for `i386`, `amd64`, `armhf` and 
-`arm64` architectures.  
-In the above commands, the repository is a Debian Stretch distribution, but you 
-can also choose Buster, Ubuntu Xenial or Bionic by replacing `stretch` with 
-`bsuter`, `xenial` or `bionic`. It may be necessary to install the 
-`software-properties-common` package for `add-apt-repository`.
+This repository provides Piduino packages for `amd64`, `armhf` and `arm64` architectures.  
 
-For Raspbian you have to do a little different :
-
-    wget -O- http://www.piduino.org/piduino-key.asc | sudo apt-key add -
-    echo 'deb http://raspbian.piduino.org stretch piduino' | sudo tee /etc/apt/sources.list.d/piduino.list
-    sudo apt update
-    sudo apt install libmodbuspp-dev libmodbuspp-doc
-
-The Raspbian repository provides Piduino packages for `armhf` architecture for Stretch only.
-
-If you want to build from sources, you can follow the 
-[Wiki](https://github.com/epsilonrt/libmodbuspp/wiki/Build-from-source).
+If you want to build from sources, you can follow the [Wiki](https://github.com/epsilonrt/libmodbuspp/wiki/Build-from-source).
 
 ### How To build an example ?
 

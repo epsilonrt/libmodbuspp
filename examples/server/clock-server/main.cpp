@@ -1,15 +1,15 @@
 /**
- * @brief libmodbuspp clock-server example
- *
- * Shows how to use libmodbuspp to build a MODBUS time server.
- *
- * @code
- * clock-server [-m tcp|rtu] [-c host_ip or serial_port] [-s ip_port or serial_settings]
- * @endcode
- *
- * Once the server has started you can test it with mbpoll :
- *
- * @code
+   @brief libmodbuspp clock-server example
+
+   Shows how to use libmodbuspp to build a MODBUS time server.
+
+   @code
+   clock-server [-m tcp|rtu] [-c host_ip or serial_port] [-s ip_port or serial_settings]
+   @endcode
+
+   Once the server has started you can test it with mbpoll :
+
+   @code
     $ mbpoll -mtcp -p1502 -a10 -t3 -c8 localhost
     mbpoll 1.4-12 - FieldTalk(tm) Modbus(R) Master Simulator
     Copyright © 2015-2019 Pascal JEAN, https://github.com/epsilonrt/mbpoll
@@ -32,26 +32,87 @@
     [6]:  2019
     [7]:  4
     [8]:  332
- * @endcode
- *
- * These data correspond to 15:40:37 on Thursday 28/11/2019, 332nd day of the
- * year. To read the time difference from GMT (in seconds) :
- *
- * @code
+   @endcode
+
+   These data correspond to 15:40:37 on Thursday 28/11/2019, 332nd day of the
+   year. To read the time difference from GMT (in seconds) :
+
+   @code
     $ mbpoll -mtcp -p1502 -a10 -t4:int -B -1 localhost
       ....
       -- Polling slave 10...
       [1]:  3600
- * @endcode
- *
- * To set the offset to GMT-2 hours :
- *
- * @code
+   @endcode
+
+   To set the offset to GMT-2 hours :
+
+   @code
     $ mbpoll -mtcp -p1502 -a10 -t4:int -B localhost -- -7200
       ....
       Written 1 references.
- * @endcode
- */
+   @endcode
+
+   @warning if you use a virtual serial port, make sure to set the RTU mode in mbpoll !
+   
+   so if you run the server on the virtual port /dev/tnt0, you type this command:
+
+   @code
+   $ ./clock-server -m rtu -c /dev/tnt0 -s 38400E1
+      Modbus Time Server
+      Press CTRL+C to stop...
+
+      Slave id: 10
+
+      Mapping of registers:
+      --- Input Registers
+      @ Reg.  Size    Description
+      1       16-bit  Seconds (0-60), unsigned
+      2       16-bit  Minutes (0-59), unsigned
+      3       16-bit  Hours (0-23), unsigned
+      4       16-bit  Day of the month (1-31), unsigned
+      5       16-bit  Month (1-12), unsigned
+      6       16-bit  Year e.g. 2019, unsigned
+      7       16-bit  Day of the week (0-6, Sunday = 0), unsigned
+      8       16-bit  Day in the year (1-366, 1 Jan = 1), unsigned
+      --- Holding Registers
+      @ Reg.  Size    Description
+      1       32-bit  number of seconds to add to UTC to get local time, signed
+      --- Coils
+      @ Reg.  Size    Description
+      1       1-bit   Daylight saving time
+
+      Opening /dev/tnt0 at 38400 bauds (E, 8, 1)
+      Listening server on /dev/tnt0:38400E1...
+   @endcode
+
+    then the mbpoll command to read the input registers is :
+
+    @code
+    $ mbpoll -m rtu -b38400 -a20 -t3 -c8 -1 /dev/tnt1
+      mbpoll 1.5-2 - ModBus(R) Master Simulator
+      Copyright (c) 2015-2023 Pascal JEAN, https://github.com/epsilonrt/mbpoll
+      This program comes with ABSOLUTELY NO WARRANTY.
+      This is free software, and you are welcome to redistribute it
+      under certain conditions; type 'mbpoll -w' for details.
+
+      Protocol configuration: ModBus RTU
+      Slave configuration...: address = [10]
+                              start reference = 1, count = 8
+      Communication.........: /dev/tnt1,      38400-8E1
+                              t/o 1.00 s, poll rate 1000 ms
+      Data type.............: 16-bit register, input register table
+
+      -- Polling slave 10...
+      [1]:    50
+      [2]:    52
+      [3]:    17
+      [4]:    16
+      [5]:    5
+      [6]:    2025
+      [7]:    5
+      [8]:    136
+    @endcode
+*/
 #include <ctime>
 #include <iostream>
 #include <modbuspp.h>
@@ -82,7 +143,7 @@ int main (int argc, char **argv) {
   string mode;
 
   time_t now, before;
-  tm * t;
+  tm *t;
 
   // ModBus Data
   bool daylight;// daylight saving time, true = summer time
@@ -136,7 +197,7 @@ int main (int argc, char **argv) {
     srv.setDebug();
     srv.setRecoveryLink();
 
-    BufferedSlave & slv = srv.addSlave (SlaveAddress); // Adding a new slave to the server
+    BufferedSlave &slv = srv.addSlave (SlaveAddress);  // Adding a new slave to the server
     cout << "Slave id: " << slv.number() << endl << endl;
     if (srv.debug()) {
       cout << "Mapping of registers:" << endl
@@ -172,13 +233,13 @@ int main (int argc, char **argv) {
     slv.setBlock (InputRegister, 8);
 
     /* --- Holding Registers
-     @ Reg.  Size    Description
-     1       32-bit  number of seconds to add to UTC to get local time, signed */
+      @ Reg.  Size    Description
+      1       32-bit  number of seconds to add to UTC to get local time, signed */
     slv.setBlock (HoldingRegister, 2);
 
     /* --- Coils
-     @ Reg.  Size    Description
-     1       1-bit   Daylight saving time, true = summer time */
+      @ Reg.  Size    Description
+      1       1-bit   Daylight saving time, true = summer time */
     slv.setBlock (Coil, 1);
 
     now = before = time (nullptr);
@@ -231,7 +292,7 @@ int main (int argc, char **argv) {
       while (srv.isOpen());
     }
   }
-  catch (std::exception & e) {
+  catch (std::exception &e) {
 
     cerr << "Error: " << e.what() << endl;
   }
