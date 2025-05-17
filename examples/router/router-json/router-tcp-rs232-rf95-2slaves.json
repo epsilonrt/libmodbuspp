@@ -1,0 +1,77 @@
+﻿{
+  "modbuspp-router": {
+    "mode": "tcp",
+    "connection": "*",
+    "settings": "1502",
+    "recovery-link": true,
+    "debug": true,
+    "response-timeout": 500,
+    "byte-timeout": 500,
+    "masters": [
+      {
+        "name": "rs232",
+        "mode": "rtu",
+        "connection": "/dev/ttyUSB0",
+        "settings": "38400E1",
+        "debug": true,
+        "response-timeout": 500,
+        "byte-timeout": 500,
+        "slaves": [
+          {
+            "id": 40,
+            "blocks": [
+              {
+                "table": "discrete-input",
+                "quantity": 6
+              },
+              {
+                "table": "input-register",
+                "quantity": 2
+              },
+              {
+                "table": "holding-register",
+                "quantity": 8
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "name": "rf95-rtu-bridge",
+        "mode": "rtu",
+        "connection": "/dev/tnt0",
+        "settings": "38400E1",
+        "debug": true,
+        "response-timeout": 3000,
+        "byte-timeout": 500,
+        "slaves": [
+          {
+            "id": 10,
+            "name": "lamp-on-arduino",
+            "blocks": [
+              {
+                "table": "coil",
+                "quantity": 1
+              }
+            ]
+          },
+          {
+            "id": 16,
+            "name": "hooc-on-lora-station",
+            "blocks": [
+              {
+                "table": "discrete-input",
+                "quantity": 1,
+                "starting-address": 4
+              },
+              {
+                "table": "coil",
+                "quantity": 3
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}
