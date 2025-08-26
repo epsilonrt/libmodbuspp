@@ -49,7 +49,7 @@ int main (int argc, char **argv) {
       cout << "R3=" << registers[3].value() << endl;
     }
     else {
-      cerr << "Unable to read input registers ! "  << mb.lastError() << endl;
+      cerr << "Unable to read holding registers ! "  << mb.lastError() << endl;
       exit (EXIT_FAILURE);
     }
     mb.close();
