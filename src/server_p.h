@@ -30,6 +30,7 @@ namespace Modbus {
       static const int MAX_CONNECTIONS = 16;
     public:
       Private (Server * q);
+      virtual ~Private() = default;
       virtual void setBackend (Net net, const std::string & connection,
                                const std::string & settings);
       virtual void setConfig (const nlohmann::json & config);
@@ -41,7 +42,7 @@ namespace Modbus {
 
       BufferedSlave * addSlave (int slaveAddr, Device * master);
 
-      static void * loop (std::future<void> run, Private * d);
+      static void loop (std::future<void> run, Private * d);
       static int receive (Private * d);
 
       int listen_sock = -1;

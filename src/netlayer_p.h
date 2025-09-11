@@ -24,6 +24,7 @@ namespace Modbus {
     public:
       Private (Net n, const std::string & c, const std::string & s, uint16_t m) :
         net (n), connection (c), settings (s), maxAduLength (m)  {}
+      virtual ~Private() = default;
 
       Net net;
       std::string connection;
