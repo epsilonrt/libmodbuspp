@@ -28,6 +28,7 @@ namespace Modbus {
 
     public:
       Private (Device * q);
+      virtual ~Private() = default;
       virtual void setBackend (Net net, const std::string & connection,
                                const std::string & settings);
       virtual void setConfig (const nlohmann::json & config);

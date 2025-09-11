@@ -26,6 +26,7 @@ namespace Modbus {
 
     public:
       Private (Master * q);
+      virtual ~Private() = default;
 
       void setBackend (Net net, const std::string & connection,
                                const std::string & settings) override;
@@ -39,4 +40,3 @@ namespace Modbus {
 }
 
 /* ========================================================================== */
-

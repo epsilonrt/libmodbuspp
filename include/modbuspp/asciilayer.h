@@ -47,6 +47,11 @@ namespace Modbus {
       AsciiLayer (const std::string & port, const std::string & settings);
 
       /**
+      * @brief Destructor
+      */
+      virtual ~AsciiLayer() = default;
+
+      /**
        * @brief Name of the serial port
        *
        * This property specifies the name of the serial port handled by the
