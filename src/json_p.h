@@ -36,6 +36,7 @@ namespace Modbus {
 
   NLOHMANN_JSON_SERIALIZE_ENUM (Net, {
     {Rtu, "rtu"},
+    {Ascii, "ascii"},
     {Tcp, "tcp"},
     {NoNet, nullptr},
   })
