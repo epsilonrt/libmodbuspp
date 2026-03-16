@@ -25,7 +25,7 @@ namespace Modbus {
 
     public:
       Private (Router * q);
-      virtual ~Private();
+      virtual ~Private() = default;
       virtual void setConfig (const nlohmann::json & config);
 
       virtual bool open();

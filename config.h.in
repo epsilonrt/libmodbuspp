@@ -19,6 +19,6 @@
 #include "version.h"
 #cmakedefine01 MODBUSPP_HAVE_TIOCRS485
 #cmakedefine01 MODBUSPP_HAVE_TIOCM_RTS
-#cmakedefine01 MODBUSPP_HAVE_RTU_MULTI_SLAVES
+#cmakedefine01 MODBUSPP_HAVE_SERIAL_MULTI_SLAVES
 
 /* ========================================================================== */

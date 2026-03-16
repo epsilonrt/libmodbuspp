@@ -94,17 +94,17 @@ namespace Modbus {
   // ---------------------------------------------------------------------------
 
   // ---------------------------------------------------------------------------
-  RtuLayer::RtuLayer (RtuLayer::Private &dd) : NetLayer (dd) {}
+  RtuLayer::RtuLayer (std::unique_ptr<RtuLayer::Private> &&dd) : NetLayer (std::move(dd)) {}
 
   // ---------------------------------------------------------------------------
   RtuLayer::RtuLayer (const std::string & port, const std::string & settings) :
-    NetLayer (*new Private (port, settings)) {}
+    NetLayer (std::unique_ptr<Private>(new Private(port, settings))) {}
 
   // ---------------------------------------------------------------------------
   SerialMode RtuLayer::serialMode() {
     PIMP_D (RtuLayer);
 
-    int m = modbus_rtu_get_serial_mode (d->ctx);
+    int m = modbus_serial_get_serial_mode (d->ctx.get());
     if (m != -1) {
       return static_cast<SerialMode> (m);
     }
@@ -115,14 +115,14 @@ namespace Modbus {
   bool RtuLayer::setSerialMode (SerialMode mode) {
     PIMP_D (RtuLayer);
 
-    return (modbus_rtu_set_serial_mode (d->ctx, static_cast<int> (mode)) != -1);
+    return (modbus_serial_set_serial_mode (d->ctx.get(), static_cast<int> (mode)) != -1);
   }
 
   // ---------------------------------------------------------------------------
   SerialRts RtuLayer::rts() {
     PIMP_D (RtuLayer);
 
-    int r = modbus_rtu_get_rts (d->ctx);
+    int r = modbus_serial_get_rts (d->ctx.get());
     if (r != -1) {
 
       return static_cast<SerialRts> (r);
@@ -134,21 +134,21 @@ namespace Modbus {
   bool RtuLayer::setRts (SerialRts r) {
     PIMP_D (RtuLayer);
 
-    return (modbus_rtu_set_rts (d->ctx, static_cast<int> (r)) != -1);
+    return (modbus_serial_set_rts (d->ctx.get(), static_cast<int> (r)) != -1);
   }
 
   // ---------------------------------------------------------------------------
   int RtuLayer::rtsDelay() {
     PIMP_D (RtuLayer);
 
-    return modbus_rtu_get_rts_delay (d->ctx);
+    return modbus_serial_get_rts_delay (d->ctx.get());
   }
 
   // ---------------------------------------------------------------------------
   bool RtuLayer::setRtsDelay (int delay) {
     PIMP_D (RtuLayer);
 
-    return (modbus_rtu_set_rts_delay (d->ctx, delay) != -1);
+    return (modbus_serial_set_rts_delay (d->ctx.get(), delay) != -1);
   }
 
   // ---------------------------------------------------------------------------
@@ -193,7 +193,7 @@ namespace Modbus {
       setRts (r);
       usleep (rtsDelay());
 
-      size = write (modbus_get_socket (d->ctx), msg->adu(), msg->aduSize());
+      size = write (modbus_get_socket (d->ctx.get()), msg->adu(), msg->aduSize());
 
       usleep (d->oneByteTime * msg->aduSize() + rtsDelay());
       setRts ( (r == RtsDown) ? RtsUp : RtsDown); // restore initial state
@@ -202,7 +202,7 @@ namespace Modbus {
     }
     else {
 #endif
-      return write (modbus_get_socket (d->ctx), msg->adu(), msg->aduSize());
+      return write (modbus_get_socket (d->ctx.get()), msg->adu(), msg->aduSize());
 #if MODBUSPP_HAVE_TIOCM_RTS
     }
 #endif
@@ -234,40 +234,48 @@ namespace Modbus {
   // ---------------------------------------------------------------------------
   // static
   int RtuLayer::baud (const std::string & settings) {
-    int b;
     try {
-      b = std::stoi (settings);
+      return std::stoi (settings);
     }
     catch (...) {
-      b = 19200;
+      throw std::invalid_argument ("RtuLayer settings\"" + settings + "\" has an invalid baud rate setting.");
     }
-    return b;
   }
 
   // ---------------------------------------------------------------------------
   // static
   char RtuLayer::parity (const std::string & settings) {
-    char p = 'N';
     size_t s = settings.length();
 
     if (s >= 2) {
       char c = settings[s - 2];
-      if ( (c == 'E') || (c == 'O')) {
-        return c;
+      switch (c) {
+        case 'N':
+        case 'E':
+        case 'O':
+          return c;
       }
     }
-    return p;
+
+    throw std::invalid_argument ("RtuLayer settings\"" + settings + "\" has an invalid parity setting.");
   }
 
   // ---------------------------------------------------------------------------
   // static
   int RtuLayer::stop (const std::string & settings) {
+    size_t s = settings.length();
 
-    if (parity (settings) == 'N') {
-
-      return 2;
+    if (s >= 3) {
+      char c = settings[s - 1];
+      switch (c) {
+        case '1':
+          return 1;
+        case '2':
+          return 2;
+      }
     }
-    return 1;
+
+    throw std::invalid_argument ("RtuLayer settings\"" + settings + "\" has an invalid stop bit setting.");
   }
 
   // ---------------------------------------------------------------------------
@@ -299,16 +307,15 @@ namespace Modbus {
     NetLayer::Private (Rtu, port, settings, MODBUS_RTU_MAX_ADU_LENGTH) {
 
     // RTU MUST BE 8-bits
-    ctx = modbus_new_rtu (port.c_str(), RtuLayer::baud (settings),
+    ctx.reset( modbus_new_rtu (port.c_str(), RtuLayer::baud (settings),
                           RtuLayer::parity (settings), 8,
-                          RtuLayer::stop (settings));
+                          RtuLayer::stop (settings)) );
     if (! ctx) {
-
       throw std::invalid_argument (
         "Unable to create RTU Modbus Backend("
         + port + "," + settings + ")\n" + lastError());
     }
-    oneByteTime = modbus_rtu_get_rts_delay (ctx);
+    oneByteTime = modbus_serial_get_rts_delay (ctx.get());
   }
 }
 

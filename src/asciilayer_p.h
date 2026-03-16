@@ -1,10 +1,10 @@
-/* Copyright © 2018-2026 Pascal JEAN, All rights reserved.
+/* Copyright © 2018-2019 Pascal JEAN, All rights reserved.
  * This file is part of the libmodbuspp Library.
  *
  * The libmodbuspp Library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
+ * version 3 of the License, or (at your option) any later version.
  *
  * The libmodbuspp Library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -16,19 +16,18 @@
  */
 #pragma once
 
-#include <modbuspp/response.h>
-#include "message_p.h"
+#include <modbuspp/asciilayer.h>
+#include "netlayer_p.h"
 
 namespace Modbus {
 
-  class Response::Private : public Message::Private {
+  class AsciiLayer::Private  : public NetLayer::Private {
+
     public:
-      Private (Response * q, NetLayer * b);
-      Private (Response * q, NetLayer * b, const std::vector<uint8_t> & m);
-      Private (Response * q, NetLayer * b, Function f);
+      Private (const std::string & port, const std::string & settings);
       virtual ~Private() = default;
 
-      PIMP_DECLARE_PUBLIC (Response)
+      int oneByteTime;
   };
 }
 

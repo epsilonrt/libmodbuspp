@@ -118,8 +118,8 @@ namespace Modbus {
 
     protected:
       class Private;
-      NetLayer (Private &dd);
-      std::unique_ptr<Private> d_ptr;
+      NetLayer (std::unique_ptr<NetLayer::Private> &&dd);
+      std::unique_ptr<NetLayer::Private> d_ptr;
 
     private:
       PIMP_DECLARE_PRIVATE (NetLayer)

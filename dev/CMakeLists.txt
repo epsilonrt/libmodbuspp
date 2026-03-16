@@ -17,6 +17,9 @@
 
 cmake_minimum_required(VERSION 3.0)
 
+option(INSTALL_TEMPLATES "Install codelite project templates to /usr/share/codelite" OFF)
+
+if(INSTALL_TEMPLATES)
 # set packaging dir
 if(NOT CPACK_PACKAGE_DIRECTORY)
   set(CPACK_PACKAGE_DIRECTORY ${CMAKE_BINARY_DIR}/packages)
@@ -37,3 +40,4 @@ install (DIRECTORY codelite/unit-test-modbuspp
   DIRECTORY_PERMISSIONS OWNER_EXECUTE OWNER_WRITE OWNER_READ GROUP_EXECUTE GROUP_READ WORLD_EXECUTE WORLD_READ
   COMPONENT dev
   )
+endif(INSTALL_TEMPLATES)

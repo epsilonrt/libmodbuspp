@@ -28,15 +28,15 @@ namespace Modbus {
       Private (Message * q, Net n);
       Private (Message * q, Net n, const std::vector<uint8_t> & m);
       Private (Message * q, Net n, Function f);
-      virtual ~Private();
+      virtual ~Private() = default;
 
-      Message * const q_ptr;
+      Message * const q_ptr = nullptr;
       Net net;
       int pduBegin;
       size_t aduSize;
       uint16_t maxAduLength;
       bool isResponse;
-      NetLayer * backend;
+      NetLayer * backend = nullptr;
       uint16_t transactionId;
       std::vector<uint8_t> adu;
   };

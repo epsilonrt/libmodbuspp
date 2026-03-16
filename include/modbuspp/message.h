@@ -20,6 +20,7 @@
 #include <stdexcept>
 #include <vector>
 #include <iostream>
+#include <functional>
 #include <modbuspp/global.h>
 #include <modbuspp/data.h>
 
@@ -46,7 +47,7 @@ namespace Modbus {
        * @return 1 if the message has been completely processed, 0 if the
        * message has not been processed, -1 if error.
        */
-      typedef int (*Callback) (Message * msg, Device * sender);
+      using Callback = std::function<int(Message*, Device*)>;
 
       /**
        * @brief Constructors
@@ -218,6 +219,14 @@ namespace Modbus {
        * an std::invalid_argument exception  if aduSize()<4.
        */
       uint16_t crc () const;
+
+      /**
+       * @brief Return the LRC read in the message
+       *
+       * throw an std::domain_error exception if net()!=Rtu,
+       * an std::invalid_argument exception  if aduSize()<8.
+       */
+      uint8_t lrc () const;
 
       /**
        * @brief Returns TCP/IP transaction identifier

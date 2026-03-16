@@ -17,6 +17,7 @@
 #pragma once
 
 #include <modbuspp/rtulayer.h>
+#include <modbuspp/asciilayer.h>
 #include <modbuspp/tcplayer.h>
 #include <modbuspp/master.h>
 #include <modbuspp/server.h>

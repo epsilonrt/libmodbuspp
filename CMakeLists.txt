@@ -72,16 +72,11 @@ set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
 set(THREADS_PREFER_PTHREAD_FLAG TRUE)
 find_package(Threads REQUIRED)
 
-set(LIBMODBUS_MIN_VERSION "3.1.6")
+set(LIBMODBUS_MIN_VERSION "3.1.10")
 find_package(PkgConfig REQUIRED)
 
-pkg_check_modules (LIBMODBUS libmodbusepsi>=${LIBMODBUS_MIN_VERSION})
-if (LIBMODBUS_FOUND)
-  set(LIBMODBUS_NAME modbusepsi)
-else()
-  pkg_check_modules (LIBMODBUS REQUIRED libmodbus>=${LIBMODBUS_MIN_VERSION})
-  set(LIBMODBUS_NAME modbus)
-endif()
+pkg_check_modules (LIBMODBUS REQUIRED libmodbusepsi>=${LIBMODBUS_MIN_VERSION})
+set(LIBMODBUS_NAME modbusepsi)
 
 set(LIBMODBUS_PACKAGE lib${LIBMODBUS_NAME}5)
 set(LIBMODBUSDEV_PACKAGE lib${LIBMODBUS_NAME}-dev)
@@ -98,7 +93,7 @@ else()
   add_subdirectory(3rdparty/json)
 endif()
 
-set (MODBUSPP_CFLAGS_OTHER ${CMAKE_THREAD_LIBS_INIT} ${LIBMODBUS_CFLAGS})
+set (MODBUSPP_CFLAGS_OTHER ${CMAKE_THREAD_LIBS_INIT})
 set (MODBUSPP_LDFLAGS_OTHER ${LIBMODBUS_LDFLAGS} -lpthread)
 
 include (GetDate)
@@ -108,8 +103,6 @@ include (GitVersion)
 GetGitVersion(MODBUSPP_VERSION)
 set(MODBUSPP_VERSION
   ${MODBUSPP_VERSION_MAJOR}.${MODBUSPP_VERSION_MINOR}.${MODBUSPP_VERSION_PATCH})
-configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/config.h.in
-                ${CMAKE_CURRENT_BINARY_DIR}/config.h @ONLY)
 configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/version.h.in
                 ${CMAKE_CURRENT_BINARY_DIR}/version.h @ONLY)
 
@@ -125,7 +118,10 @@ check_symbol_exists(TIOCSRS485 sys/ioctl.h MODBUSPP_HAVE_TIOCRS485)
 check_symbol_exists(TIOCM_RTS sys/ioctl.h MODBUSPP_HAVE_TIOCM_RTS)
 
 list(APPEND CMAKE_REQUIRED_LIBRARIES ${LIBMODBUS_NAME})
-check_symbol_exists(modbus_rtu_set_recv_filter ${LIBMODBUS_NAME}/modbus-rtu.h MODBUSPP_HAVE_RTU_MULTI_SLAVES)
+check_symbol_exists(modbus_serial_set_recv_filter ${LIBMODBUS_NAME}/modbus-serial.h MODBUSPP_HAVE_SERIAL_MULTI_SLAVES)
+
+configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/config.h.in
+                ${CMAKE_CURRENT_BINARY_DIR}/config.h @ONLY)
 
 # Make relative paths absolute (needed later on)
 foreach(p LIB BIN INCLUDE CMAKE DATA DOC CODELITE)
@@ -307,7 +303,7 @@ if (CPACK_GENERATOR STREQUAL "DEB")
   set(CPACK_DEBIAN_DEV_PACKAGE_NAME "libmodbuspp-dev")
   set(CPACK_COMPONENT_DEV_DESCRIPTION "${CPACK_DEBIAN_LIB_PACKAGE_NAME} - ${PROJECT_DESCRIPTION} (development files)\n${PROJECT_DESCRIPTION_TEXT}\n  This package provides the development files.")
   set(CPACK_DEBIAN_DEV_FILE_NAME "lib${PROJECT_NAME}-dev_${CPACK_PACKAGE_VERSION}_${CPACK_DEBIAN_PACKAGE_ARCHITECTURE}.deb")
-  set(CPACK_DEBIAN_DEV_PACKAGE_DEPENDS "${CPACK_DEBIAN_LIB_PACKAGE_NAME} (= ${CPACK_PACKAGE_VERSION}),pkg-config,git-core,${LIBMODBUSDEV_PACKAGE} (>= ${LIBMODBUS_VERSION})")
+  set(CPACK_DEBIAN_DEV_PACKAGE_DEPENDS "${CPACK_DEBIAN_LIB_PACKAGE_NAME} (= ${CPACK_PACKAGE_VERSION}),pkg-fconfig,git-core,${LIBMODBUSDEV_PACKAGE} (>= ${LIBMODBUS_VERSION})")
   set(CPACK_DEBIAN_DEV_PACKAGE_SECTION "libdevel")
   #set(CPACK_PACKAGE_DESCRIPTION_FILE "${MODBUSPP_SRC_DIR}/doc/README-deb.md")
 

@@ -1,10 +1,10 @@
-/* Copyright © 2018-2026 Pascal JEAN, All rights reserved.
+/* Copyright © 2018-2019 Pascal JEAN, All rights reserved.
  * This file is part of the libmodbuspp Library.
  *
  * The libmodbuspp Library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
+ * version 3 of the License, or (at your option) any later version.
  *
  * The libmodbuspp Library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -21,7 +21,7 @@
 namespace Modbus {
 
   /**
-   * @class RtuLayer
+   * @class AsciiLayer
    * @brief RTU serial link layer
    *
    * This class can not and should not be instantiated by the user.
@@ -38,13 +38,18 @@ namespace Modbus {
    * @author Pascal JEAN, aka epsilonrt
    * @copyright GNU Lesser General Public License
    */
-  class RtuLayer : public NetLayer {
+  class AsciiLayer : public NetLayer {
     public:
 
       /**
        * @brief Constructor
        */
-      RtuLayer (const std::string & port, const std::string & settings);
+      AsciiLayer (const std::string & port, const std::string & settings);
+
+      /**
+      * @brief Destructor
+      */
+      virtual ~AsciiLayer() = default;
 
       /**
        * @brief Name of the serial port
@@ -169,36 +174,37 @@ namespace Modbus {
 
       /**
        * @brief Extracts the baudrate from a settings string.
-       * @return the baudrate found. If no valid value is found, an exception is thrown.
+       * @return the baudrate found. if no value is found, returns the default
+       * value, ie 19200.
        */
       static int baud (const std::string & settings);
 
       /**
        * @brief Extracts the parity from a settings string.
-       * @return the parity found. If no valid value is found, an exception is thrown.
+       * @return the parity found. if no value is found, returns the default
+       * value, ie E for Even parity.
        */
       static char parity (const std::string & settings);
 
       /**
        * @brief Return the stop bits from a settings string.
        *
-       * @return the number of stop bits.
-       * It is parsed from the last character of the settings string.
-       * If the last character is neither '1' or '2' an exception is thrown.
+       * @return the number returned is determined based on the parity found.
+       * If the parity is None, this function returns 2, otherwise returns 1.
        */
       static int stop (const std::string & settings);
       
       /**
        * @brief Performing Modbus CRC16 generation of the buffer @b buf
        */
-      static uint16_t crc16 (const uint8_t * buf, uint16_t count);
+      static uint8_t lrc8 (const uint8_t * buffer, uint16_t buffer_length);
 
     protected:
       class Private;
-      RtuLayer (std::unique_ptr<RtuLayer::Private> &&dd);
+      AsciiLayer (std::unique_ptr<Private> &&dd);
 
     private:
-      PIMP_DECLARE_PRIVATE (RtuLayer)
+      PIMP_DECLARE_PRIVATE (AsciiLayer)
   };
 }
 
